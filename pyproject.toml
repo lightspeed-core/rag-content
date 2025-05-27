@@ -1,0 +1,64 @@
+[tool.ruff]
+
+# description of all rules are available on https://docs.astral.sh/ruff/rules/
+lint.select = ["D", "E", "F", "W", "C", "S", "I", "TCH", "SLOT", "RUF", "C90", "N", "YTT", "ASYNC", "TRIO"]
+
+# we need to check 'mood' of all docstrings, this needs to be enabled explicitly
+lint.extend-select = ["D401"]
+
+lint.ignore = []
+
+target-version = "py311"
+lint.pydocstyle.convention = "google"
+line-length = 100
+
+[tool.mypy]
+disable_error_code = ["union-attr", "return-value", "arg-type", "import-untyped"]
+ignore_missing_imports = true
+
+[tool.pdm]
+distribution = true
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "black==24.10.0",
+    "mypy==1.12.0",
+    "ruff==0.6.9",
+    "types-requests==2.32.0.20240622",
+    "pre-commit==4.0.1",
+    "coverage>=7.6.12",
+    "huggingface-hub>=0.23.4"
+]
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[project.optional-dependencies]
+cpu = [
+    "torch @ https://download.pytorch.org/whl/cpu/torch-2.3.1%2Bcpu-cp311-cp311-linux_x86_64.whl",
+]
+gpu = [
+    "torch==2.3.1",
+]
+
+[tool.pdm.scripts]
+test = {shell = "coverage run --source=src/lightspeed_rag_content -m unittest discover tests --verbose && coverage report -m --fail-under 90"}
+
+[project]
+name = "lightspeed-rag-content"
+version = "0.1.0"
+description = "RAG content for OpenShift LightSpeed."
+authors = []
+dependencies = [
+    "PyYAML==6.0.1",
+    "huggingface_hub==0.23.4",
+    "llama-index==0.10.62",
+    "llama-index-vector-stores-faiss==0.1.2",
+    "llama-index-embeddings-huggingface==0.2.2",
+    "llama-index-readers-file==0.1.30",
+    "faiss-cpu==1.8.0.post1",
+    "llama-index-vector-stores-postgres>=0.1.14",
+]
+requires-python = "==3.11.*"
+dynamic = ["license", "readme"]
