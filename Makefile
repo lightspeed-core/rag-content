@@ -52,21 +52,6 @@ verify: check-types ## Verify the code using various linters
 	pdm run black --check scripts src
 	pdm run ruff check scripts src --per-file-ignores=scripts/*:S101
 
-update-docs: ## Update the plaintext OCP docs in ocp-product-docs-plaintext/
-	@set -e && for OCP_VERSION in $$(ls -1 ocp-product-docs-plaintext); do \
-		examples/get_ocp_plaintext_docs.sh $$OCP_VERSION; \
-	done
-	examples/get_runbooks.sh
-
-build-image-ocp-example: build-base-image ## Build a rag-content container image
-	podman build -t ocp-rag-content -f examples/Containerfile.ocp_lightspeed --build-arg FLAVOR=$(TORCH_GROUP) --build-arg NUM_WORKERS=$(NUM_WORKERS) .
-
-build-image-ocp-example-test: build-image-ocp-example ## Build test image for the OCP example
-	podman build -t test-rag-content -f examples/Containerfile.minimal_test .
-
-run-ocp-example-test: build-image-ocp-example-test ## Execute test image for the OCP example
-	podman run test-rag-content
-
 build-base-image: ## Build base container image
 	podman build -t $(TORCH_GROUP)-road-core-base -f Containerfile.base --build-arg FLAVOR=$(TORCH_GROUP)
 
@@ -82,22 +67,6 @@ start-postgres-debug: ## Start postgresql from the pgvector container image with
 	 -p $(POSTGRES_PORT):5432 \
 	 -v ./postgresql/data:/var/lib/postgresql/data:Z pgvector/pgvector:pg16 \
 	 postgres -c log_statement=all -c log_destination=stderr
-
-generate-embeddings-postgres: ## Generate embeddings for postgres vector store
-	POSTGRES_USER=$(POSTGRES_USER) \
-	POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) \
-	POSTGRES_HOST=$(POSTGRES_HOST) \
-	POSTGRES_PORT=$(POSTGRES_PORT) \
-	POSTGRES_DATABASE=$(POSTGRES_DATABASE) \
-	pdm run python examples/generate_embeddings_openshift.py \
-	 -o ./output \
-	 -f ocp-product-docs-plaintext/4.15/ \
-	 -r runbooks/ \
-	 -md embeddings_model/ \
-	 -mn sentence-transformers/all-mpnet-base-v2 \
-	 -v 4.15 \
-	 -i  ocp-product-docs-4_15 \
-	 --vector-store-type postgres
 
 help: ## Show this help screen
 	@echo 'Usage: make <OPTIONS> ... <TARGETS>'

@@ -1,45 +1,15 @@
-# Road RAG content
+# RAG Content
 
-Road Rag Content provides a shared codebase for generating Retrieval-Augmented
-Generation (RAG) vector databases. It serves as the core framework for projects
-like OpenShift Lightspeed and OpenStack Lightspeed to generate their own RAG
-vector databases.
+RAG Content provides a shared codebase for generating vector databases.
+It serves as the core framework for Lightspeed-related projects (e.g., OpenShift
+Lightspeed, OpenStack Lightspeed, etc.) to generate their own vector databases
+that can be used for RAG.
 
-This project includes the ``lightspeed_rag_content`` library, along with some
-additional utilities to consistency and efficiency across multiple
-implementations.
+## Installing the Python Library
 
-## Installing the Python library
-
-The ``lightspeed_rag_content`` library is not available via pip but is included
-in the base container image or can be installed via ``pdm``.
-
-### Via container image
-
-The base container image can be manually generated or pulled from a
-container registry.
-
-1. Install the requirements: ``make`` and ``podman``.
-
-2. Generate the base container image
-
-```bash
-$ make build-base-image FLAVOR=cpu
-```
-
-3. The ``lightspeed_rag_content`` and its dependencies will be installed in the
-image:
-
-```bash
-$ podman run localhost/cpu-road-core-base:latest python -c "import lightspeed_rag_content; print(lightspeed_rag_content.__name__)"
-lightspeed_rag_content
-```
-
-Alternatively, to pull the latest version of the base container image, run:
-
-```bash
-$ podman pull ghcr.io/road-core/rag-content-cpu:latest
-```
+The ``lightspeed_rag_content`` library is not available via pip, but it's included:
+   - in the base [container image](#via-container-image) or
+   - it can be installed [via PDM](#via-pdm).
 
 ### Via PDM
 
@@ -47,179 +17,173 @@ To install the library via PDM, do:
 
 1. Run the command ``pdm install``
 
-```bash
-$ pdm install
-```
+    ```bash
+    pdm install
+    ```
 
-2. Test if the library can be imported
+2. Test if the library can be imported (expect `lightspeed-rag-content` in the output):
 
-```bash
-$ pdm run python -c "import lightspeed_rag_content; print(lightspeed_rag_content.__name__)"
-lightspeed_rag_content
-```
+    ```bash
+    pdm run python -c "import lightspeed_rag_content; print(lightspeed_rag_content.__name__)"
+    ```
 
-## Using the Python library
+### Via Container Image
 
-Let’s say you’re working on another Lightspeed project and you need to generate
-a RAG vector database from a set of documents. Instead of starting from scratch,
-you just inherit ``lightspeed_rag_content`` library and use its abstractions:
+The base container image can be manually generated or pulled from a container
+registry at `ghcr.io/lightspeed-core/rag-content-cpu:latest`. To build the image locally,
+follow these steps:
 
-Here’s an example:
+1. Install the requirements: `make` and `podman`.
+2. Generate the base container image (set `FLAVOR=gpu` if you plan to use a GPU):
 
-```python
-from lightspeed_rag_content.metadata_processor import MetadataProcessor
-from lightspeed_rag_content.document_processor import DocumentProcessor
+    ```bash
+    make build-base-image FLAVOR=cpu
+    ```
+
+3. The `lightspeed_rag_content` and its dependencies will be installed in the
+image (expect `lightspeed-rag-content` in the output):
+    ```bash
+    podman run localhost/cpu-lightspeed-core-base:latest python -c "import lightspeed_rag_content; print(lightspeed_rag_content.__name__)"
+    ```
 
 
-class CustomMetadataProcessor(MetadataProcessor):
+## Generating the Vector Database
 
-    def __init__(self, url):
-        ...
-
-    def url_function(self, file_path):
-        # Return a URL for the file, so it can be referenced when used
-        # in an answer
-        ...
-
-# Instantiate custom Metadata Processor
-metadata_processor = CustomMetadataProcessor("www.my-project.com")
-
-# Instantiate Document Processor
-document_processor = DocumentProcessor(
-    chunk_size, chunk_overlap, model_name, model_dir, num_workers,
-    vector_store_type
-)
-
-# Load and embed the the documents, this method can be called multiple times
-# for different sets of documents
-document_processor.process(docs_path, metadata=metadata_processor)
-
-# Save the new vector database to the output directory
-document_processor.save(index, output_path)
-```
-
-# Generating the RAG for OpenShift
-
-This guide outlines the steps for generating an example OpenShift Lightspeed
-database for RAG.
-
-The database can be generated manually, or in a container.
-
-## Generate database in a container
-
-Container base generation entails simply calling the appropriate make target:
-
-```
-make build-image-ocp-example
-```
-
-## Manual database generation
-
-Install the dependencies and activate the virtualenv:
-
-```
-pdm install
-source .venv/bin/activate
-```
-
-### Download the OCP documentation
-
-The command below downloads the OCP documentation version 4.15 and
-converts it to plain text:
-
-```
-./examples/get_ocp_plaintext_docs.sh 4.15
-```
-
-Note, this step requires the command "asciidoctor" to be installed. See
-https://docs.asciidoctor.org/asciidoctor/latest/install for installation
-instructions.
-
-### Download the runbooks
-
-Download the runbooks by running the following script:
-
-```
-./examples/get_runbooks.sh
-```
-
-### Download the embedding model
-
-The embedding model used by OpenShift Lightspeed is the
-**sentence-transformers/all-mpnet-base-v2**, in order to download it run
-the following command:
-
-```
-./scripts/download_embeddings_model.py -l ./embeddings_model/ -r sentence-transformers/all-mpnet-base-v2
-```
-
-### Generating the RAG vector database
-
-You can generate the RAG vector database either using
+You can generate the vector database either using
 
 1. [Faiss Vector Store](#faiss-vector-store), or
 2. [Postgres (PGVector) Vector Store](#postgres-pgvector-vector-store)
 
-#### Faiss Vector Store
+Both approaches require you to download the embedding model and to prepare documentation
+in text format that is going to be chunked and map to embeddings generated using
+the model:
 
-In order to generate the RAG vector database using
-Faiss Vector Store with
-the
-**sentend-transformers/all-mpnet-base-v2** embedding model and OpenShift
-documentation version 4.15 run the following commands:
+1. Download the embedding model
+([sentence-transformers/all-mpnet-base-v2](https://huggingface.co/sentence-transformers/all-mpnet-base-v2))
+from HuggingFace as follows:
 
-```
-mkdir -p vector_db/ocp_product_docs/4.15
-
-./examples/generate_embeddings_openshift.py -o ./vector_db/ocp_product_docs/4.15 -f ocp-product-docs-plaintext/4.15/ -r runbooks/ -md embeddings_model/ -mn sentence-transformers/all-mpnet-base-v2 -v 4.15 -i ocp-product-docs-4_15
-```
-
-Once the command is done, you can find the vector database at
-**vector_db/**, the embedding model at **embeddings_model/** and the
-Index ID set to **ocp-product-docs-4_15**.
-
-These dictories and index ID can now be used to configure OpenShift
-Lightspeed.
-
-#### Postgres (PGVector) Vector Store
-
-In order to generate the RAG vector database using
-Postgres (PGVector) Vector Store run the following commands:
-
-1. Start Postgres with the pgvector extension by running
+    ```bash
+   mkdir ./embeddings_model
+   pdm run python ./scripts/download_embeddings_model.py -l ./embeddings_model/ -r sentence-transformers/all-mpnet-base-v2
     ```
-    make start-postgres-debug
-    ```
-   The `data` folder of Postgres is created at
-   `./postgresql/data`. This command also creates `./output` for the
-   output directory, in which the metadata is saved.
-2. Run
-    ```
-    make generate-embeddings-postgres
-    ```
-   which generates embeddings on Postgres, which can be used for RAG, and `metadata.json`
-   in `./output`. Generated embeddings are stored in the `data_ocp_product_docs_4_15` table
-   on the Postgres DB.
 
-   ```commandline
-   $ podman exec -it pgvector bash
-   root@42b7f8fcfe9b:/# psql -U postgres
-   psql (16.4 (Debian 16.4-1.pgdg120+2))
-   Type "help" for help.
+2. Prepare dummy documentation:
 
-   postgres=# \dt
-                      List of relations
-    Schema |            Name            | Type  |  Owner
-   --------+----------------------------+-------+----------
-    public | data_ocp_product_docs_4_15 | table | postgres
-   (1 row)
-
-   postgres=#
+   ```bash
+   mkdir -p ./custom_docs/0.1
+   echo "Vector Database is an efficient way how to provide information to LLM" > ./custom_docs/0.1/info.txt
    ```
 
-## `requirements*` files generation for conflux
+3. Prepare a custom script (`./custom_processor.py`) for populating the vector
+database. We provide an example of how such a script might look like using the
+`lightspeed_rag_content` library. Note that in your case the script will be
+different:
 
-In order to generate all requirements files:
+    ```python
+    from lightspeed_rag_content.metadata_processor import MetadataProcessor
+    from lightspeed_rag_content.document_processor import DocumentProcessor
+    from lightspeed_rag_content import utils
+
+    class CustomMetadataProcessor(MetadataProcessor):
+
+        def __init__(self, url):
+            self.url = url
+
+        def url_function(self, file_path: str) -> str:
+            # Return a URL for the file, so it can be referenced when used
+            # in an answer
+            return self.url
+
+    if __name__ == "__main__":
+        parser = utils.get_common_arg_parser()
+        args = parser.parse_args()
+
+        # Instantiate custom Metadata Processor
+        metadata_processor = CustomMetadataProcessor("https://www.redhat.com")
+
+        # Instantiate Document Processor
+        document_processor = DocumentProcessor(
+            chunk_size=args.chunk,
+            chunk_overlap=args.overlap,
+            model_name=args.model_name,
+            embeddings_model_dir=args.model_dir,
+            num_workers=args.workers,
+            vector_store_type=args.vector_store_type,
+        )
+
+        # Load and embed the documents, this method can be called multiple times
+        # for different sets of documents
+        document_processor.process(args.folder, metadata=metadata_processor)
+
+        # Save the new vector database to the output directory
+        document_processor.save(args.index, args.output)
+    ```
+
+### Faiss Vector Store
+
+Generate the documentation using the script from the previous section
+([Generating the Vector Database](#generating-the-vector-database)):
+
+```bash
+pdm run ./custom_processor.py -o ./vector_db/custom_docs/0.1 -f ./custom_docs/0.1/ -md embeddings_model/ -mn sentence-transformers/all-mpnet-base-v2 -i custom_docs-0_1
+```
+
+Once the command is done, you can find the vector database at `./vector_db`, the
+embedding model at `./embeddings_model`, and the Index ID set to `custom-docs-0_1`.
+
+
+### Postgres (PGVector) Vector Store
+
+To generate a vector database stored in Postgres (PGVector), run the following
+commands:
+
+1. Start Postgres with the pgvector extension by running:
+
+    ```bash
+    make start-postgres-debug
+    ```
+
+    The `data` folder of Postgres is created at `./postgresql/data`. This command
+    also creates `./output` for the output directory, in which the metadata is saved.
+
+2. Run:
+
+    ```bash
+    POSTGRES_USER=postgres \
+    POSTGRES_PASSWORD=somesecret \
+    POSTGRES_HOST=localhost \
+    POSTGRES_PORT=15432 \
+    POSTGRES_DATABASE=postgres \
+    pdm run python ./custom_processor.py \
+     -o ./output \
+     -f custom_docs/0.1/ \
+     -md embeddings_model/ \
+     -mn sentence-transformers/all-mpnet-base-v2 \
+     -i custom_docs-0_1 \
+     --vector-store-type postgres
+    ```
+
+    Which generates embeddings on PostgreSQL, which can be used for RAG, and
+    `metadata.json` in `./output`. Generated embeddings are stored in the
+    `data_table_name` table.
+
+    ```bash
+    $ podman exec -it pgvector bash
+    $ psql -U postgres
+    psql (16.4 (Debian 16.4-1.pgdg120+2))
+    Type "help" for help.
+
+    postgres=# \dt
+                     List of relations
+     Schema |          Name          | Type  |  Owner
+    --------+------------------------+-------+----------
+     public | data_table_name        | table | postgres
+    (1 row)
+    ```
+
+## `requirements*` Files Generation for Konflux
+
+To generate all `requirements*` files:
 
 ```
 requirements-build.in
