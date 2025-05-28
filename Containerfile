@@ -9,7 +9,7 @@ RUN dnf install -y python3.11 python3.11-pip libcudnn8 libnccl git
 RUN ln -sf /usr/bin/python3.11 /usr/bin/python
 ENV LD_LIBRARY_PATH=/usr/local/cuda-12.6/compat:$LD_LIBRARY_PATH
 
-FROM ${FLAVOR}-base as road-core-rag-builder
+FROM ${FLAVOR}-base as lightspeed-core-rag-builder
 ARG FLAVOR
 
 USER 0
