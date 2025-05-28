@@ -1,9 +1,9 @@
 name: Push to GHCR
 on:
   push:
-    branches: [main]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
   workflow_dispatch:
 
 env:
@@ -22,7 +22,7 @@ jobs:
         architecture: [ cpu, gpu ]
     steps:
 
-      # Checkout push-to-registry action github repository
+      # Checkout push-to-registry action GitHub repository
       - name: Checkout Push to Registry action
         uses: actions/checkout@v4
 
@@ -43,7 +43,7 @@ jobs:
           oci: true
           build-args: FLAVOR=${{ matrix.architecture }}
           containerfiles: |
-            ./Containerfile.base
+            ./Containerfile
 
       # Push the image to GHCR (Image Registry)
       - name: Push To GHCR

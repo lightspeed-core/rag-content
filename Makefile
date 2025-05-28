@@ -53,7 +53,7 @@ verify: check-types ## Verify the code using various linters
 	pdm run ruff check scripts src --per-file-ignores=scripts/*:S101
 
 build-base-image: ## Build base container image
-	podman build -t $(TORCH_GROUP)-road-core-base -f Containerfile.base --build-arg FLAVOR=$(TORCH_GROUP)
+	podman build -t $(TORCH_GROUP)-lightspeed-core-base -f Containerfile --build-arg FLAVOR=$(TORCH_GROUP)
 
 start-postgres: ## Start postgresql from the pgvector container image
 	mkdir -pv ./postgresql/data ./output
