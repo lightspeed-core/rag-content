@@ -172,4 +172,3 @@ if __name__ == "__main__":
     # optional cleanup step
     # (for now it might be better to see 'steps' files to check if everything's ok
     # shutil.rmtree(work_directory)
-
