@@ -82,7 +82,7 @@ class TestMetadataProcessor(unittest.TestCase):
 
         result = self.md_processor.populate(self.file_path)
 
-        expected_result = {"docs_url": self.url, "title": self.title}
+        expected_result = {"docs_url": self.url, "title": self.title, "url_reachable": True}
         self.assertEqual(expected_result, result)
 
     @mock.patch.object(metadata_processor.MetadataProcessor, "ping_url")
@@ -98,6 +98,6 @@ class TestMetadataProcessor(unittest.TestCase):
                              level="WARNING") as log:
             result = self.md_processor.populate(self.file_path)
 
-        expected_result = {"docs_url": self.url, "title": self.title}
+        expected_result = {"docs_url": self.url, "title": self.title, "url_reachable": False}
         self.assertEqual(expected_result, result)
         self.assertIn("URL not reachable", log.output[0])

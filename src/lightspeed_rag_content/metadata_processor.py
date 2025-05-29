@@ -41,14 +41,16 @@ class MetadataProcessor:
             pass
         return title
 
-    def ping_url(self, url: str) -> bool:
-        """Check if the URL parameter is live."""
-        try:
-            response = requests.get(url, timeout=30)
-            return response.status_code == 200
-        except requests.exceptions.RequestException as e:
-            LOG.warning(e)
-            return False
+    def ping_url(self, url: str, retries = 3) -> bool:
+        for trynum in range(1, retries + 1):
+            """Check if the URL parameter is live."""
+            try:
+                response = requests.get(url, timeout=30)
+                if trynum < retries and response.status_code != 200: continue
+                return response.status_code == 200
+            except requests.exceptions.RequestException:
+                if trynum < retries: continue
+                return False
 
     def populate(self, file_path: str) -> Dict:
         """Populate title and metadata with docs URL.
@@ -68,12 +70,14 @@ class MetadataProcessor:
             "url": docs_url,
         }
 
+        url_reachable = True
         if not self.ping_url(docs_url):
             LOG.warning(
                 'URL not reachable: %(url)s (Title: "%(title)s", '
                 "File path: %(file_path)s)",
                 document,
             )
+            url_reachable = False
 
         LOG.debug(
             'Metadata populated for: "%(title)s" (URL: %(url)s, File '
@@ -81,7 +85,7 @@ class MetadataProcessor:
             document,
         )
 
-        return {"docs_url": docs_url, "title": title}
+        return {"docs_url": docs_url, "title": title, "url_reachable": url_reachable}
 
     @abc.abstractmethod
     def url_function(self, file_path: str) -> str:

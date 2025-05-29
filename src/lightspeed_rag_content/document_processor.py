@@ -169,6 +169,7 @@ class DocumentProcessor:
         metadata: MetadataProcessor,
         required_exts: List[str] | None = None,
         file_extractor: Dict | None = None,
+        unreachable_action: str = "warn",
     ) -> None:
         """Read documents from path and split them into nodes for vector database."""
         reader = SimpleDirectoryReader(
@@ -181,6 +182,18 @@ class DocumentProcessor:
 
         # Create chunks/nodes
         docs = reader.load_data(num_workers=self.num_workers)
+
+        # Check for unreachable URLs if we are not ignoring them
+        if unreachable_action != "warn":
+            reachable_docs = [doc for doc in docs if doc.metadata["url_reachable"] == True]
+            if len(docs) != len(reachable_docs):
+                # Optionally fail on unreachable URLs
+                if unreachable_action == "fail":
+                    raise RuntimeError("Some documents have unreachable URLs. ")
+                # Optionally drop unreachable URLs
+                if unreachable_action == "drop":
+                    docs = reachable_docs
+
         nodes = self._settings.settings.text_splitter.get_nodes_from_documents(docs)
         self._good_nodes.extend(self._filter_out_invalid_nodes(nodes))
 
