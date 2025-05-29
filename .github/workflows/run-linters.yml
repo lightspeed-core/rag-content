@@ -1,0 +1,23 @@
+name: Linters
+on:
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  run-linters:
+    name: Execute Linters
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PDM
+        uses: pdm-project/setup-pdm@v4
+
+      - name: Install dependencies
+        run: pdm install
+
+      - name: Run linters
+        run: make verify
