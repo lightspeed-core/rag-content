@@ -44,18 +44,20 @@ Please read: https://docs.asciidoctor.org/asciidoctor/latest/extensions/
 You can also investigate the default text converter 'asciidoc_text_converter.rb'
 stored in the asciidoc package.
 """
-
 import logging
 import shutil
 import subprocess
 from importlib import resources
 from pathlib import Path
+from typing import Optional
 
 import yaml
 
 LOG: logging.Logger = logging.getLogger(__name__)
 
-RUBY_ASCIIDOC_DIR: Path = Path(resources.files(__package__)).joinpath("ruby_asciidoc")
+RUBY_ASCIIDOC_DIR: Path = Path(str(resources.files(__package__))).joinpath(
+    "ruby_asciidoc"
+)
 
 
 class AsciidoctorConverter:
@@ -69,8 +71,8 @@ class AsciidoctorConverter:
     def __init__(
         self,
         target_format: str = "text",
-        attributes_file: Path | None = None,
-        converter_file: Path | None = None,
+        attributes_file: Optional[Path] = None,
+        converter_file: Optional[Path] = None,
     ):
         """Initialize AsciidoctorConverter.
 
@@ -99,7 +101,7 @@ class AsciidoctorConverter:
         self.asciidoctor_cmd = self._get_asciidoctor_path()
 
     @staticmethod
-    def _get_converter_file(target_format: str) -> Path | None:
+    def _get_converter_file(target_format: str) -> Optional[Path]:
         """Return converter file if target_format requires one."""
         asciidoctor_supported_formats = ["html5", "xhtml5", "manpage"]
         if target_format in asciidoctor_supported_formats:
@@ -127,9 +129,9 @@ class AsciidoctorConverter:
         return asciidoctor_path
 
     @staticmethod
-    def _get_attribute_list(attributes_file: Path | None) -> list:
+    def _get_attribute_list(attributes_file: Path | None) -> list[str]:
         """Convert file containing attributes to list of '-a <key>=<value>'."""
-        attribute_list: list = []
+        attribute_list: list[str] = []
 
         if attributes_file is None:
             return attribute_list
