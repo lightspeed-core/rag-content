@@ -41,7 +41,7 @@ update-deps: ## Check pyproject.toml for changes, update the lock file if needed
 	pdm install --dev --group $(TORCH_GROUP) --lockfile pdm.lock.$(TORCH_GROUP)
 
 check-types: ## Checks type hints in sources
-	pdm run mypy --explicit-package-bases --disallow-untyped-calls --disallow-untyped-defs --disallow-incomplete-defs scripts
+	pdm run mypy --namespace-packages --explicit-package-bases --strict --disallow-untyped-calls --disallow-untyped-defs --disallow-incomplete-defs src scripts
 
 format: ## Format the code into unified format
 	pdm run black scripts src

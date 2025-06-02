@@ -20,16 +20,20 @@ import os
 import time
 from collections import namedtuple
 from pathlib import Path
-from typing import Dict, List
+from typing import TYPE_CHECKING, Optional, Union
 
 import faiss
 from llama_index.core import Settings, SimpleDirectoryReader, VectorStoreIndex
 from llama_index.core.llms.utils import resolve_llm
+from llama_index.core.readers.base import BaseReader
 from llama_index.core.schema import TextNode
 from llama_index.core.storage.storage_context import StorageContext
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.vector_stores.faiss import FaissVectorStore
 from llama_index.vector_stores.postgres import PGVectorStore
+
+if TYPE_CHECKING:
+    from llama_index.core.vector_stores.types import BasePydanticVectorStore
 
 from lightspeed_rag_content.metadata_processor import MetadataProcessor
 
@@ -49,7 +53,7 @@ class DocumentProcessor:
         chunk_overlap: int,
         model_name: str,
         embeddings_model_dir: Path,
-        num_workers: int = 0,
+        num_workers: Optional[int] = 0,
         vector_store_type: str = "faiss",
         table_name: str = "table_name",
     ):
@@ -62,17 +66,14 @@ class DocumentProcessor:
         self.vector_store_type = vector_store_type
         self.table_name = table_name
 
-        if self.num_workers <= 0:
-            self.num_workers = None
-
         # List of good nodes
-        self._good_nodes = []
+        self._good_nodes: list[TextNode] = []
         # Total number of embedded files
         self._num_embedded_files = 0
         # Start of time, used to calculate the execution time
         self._start_time = time.time()
 
-        os.environ["HF_HOME"] = self.embeddings_model_dir
+        os.environ["HF_HOME"] = str(self.embeddings_model_dir)
         os.environ["TRANSFORMERS_OFFLINE"] = "1"
 
         self._settings = self._get_settings()
@@ -85,13 +86,15 @@ class DocumentProcessor:
         Settings.chunk_size = self.chunk_size
         Settings.chunk_overlap = self.chunk_overlap
         Settings.embed_model = HuggingFaceEmbedding(
-            model_name=self.embeddings_model_dir
+            model_name=str(self.embeddings_model_dir)
         )
         Settings.llm = resolve_llm(None)
 
         embedding_dimension = len(
             Settings.embed_model.get_text_embedding("random text")
         )
+
+        vector_store: None | BasePydanticVectorStore = None
         if self.vector_store_type == "faiss":
             faiss_index = faiss.IndexFlatIP(embedding_dimension)
             vector_store = FaissVectorStore(faiss_index=faiss_index)
@@ -125,7 +128,7 @@ class DocumentProcessor:
                 return True
         return False
 
-    def _filter_out_invalid_nodes(self, nodes: List) -> List:
+    def _filter_out_invalid_nodes(self, nodes: list[TextNode]) -> list[TextNode]:
         """Filter out invalid nodes."""
         good_nodes = []
         for node in nodes:
@@ -145,9 +148,9 @@ class DocumentProcessor:
         idx.set_index_id(index)
         idx.storage_context.persist(persist_dir=persist_folder)
 
-    def _save_metadata(self, index, persist_folder) -> None:
+    def _save_metadata(self, index: str, persist_folder: str) -> None:
         """Create and save the metadata."""
-        metadata: dict = {}
+        metadata: dict[str, Union[str, int, float]] = {}
         metadata["execution-time"] = time.time() - self._start_time
         metadata["llm"] = "None"
         metadata["embedding-model"] = self.model_name
@@ -167,12 +170,12 @@ class DocumentProcessor:
         self,
         docs_dir: Path,
         metadata: MetadataProcessor,
-        required_exts: List[str] | None = None,
-        file_extractor: Dict | None = None,
+        required_exts: Optional[list[str]] = None,
+        file_extractor: Optional[dict[str, BaseReader]] = None,
     ) -> None:
-        """Read documents from path and split them into nodes for vector database."""
+        """Read documents from a path and split them into nodes for a vector database."""
         reader = SimpleDirectoryReader(
-            docs_dir,
+            str(docs_dir),
             recursive=True,
             file_metadata=metadata.populate,
             required_exts=required_exts,
@@ -184,7 +187,7 @@ class DocumentProcessor:
         nodes = self._settings.settings.text_splitter.get_nodes_from_documents(docs)
         self._good_nodes.extend(self._filter_out_invalid_nodes(nodes))
 
-        # Count embedded files and unreachables nodes
+        # Count embedded files and unreachable nodes
         self._num_embedded_files += len(docs)
 
     def save(self, index: str, output_dir: str) -> None:

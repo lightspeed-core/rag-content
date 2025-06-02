@@ -16,7 +16,6 @@
 
 import abc
 import logging
-from typing import Dict
 
 import requests
 
@@ -28,7 +27,7 @@ class MetadataProcessor:
 
     Projects should make their own metadata processors.
     Specifically, the `url_function` which is meant to derive URL
-    from name of a document, is not implemented.
+    from the name of a document, is not implemented.
     """
 
     def get_file_title(self, file_path: str) -> str:
@@ -50,7 +49,7 @@ class MetadataProcessor:
             LOG.warning(e)
             return False
 
-    def populate(self, file_path: str) -> Dict:
+    def populate(self, file_path: str) -> dict[str, str]:
         """Populate title and metadata with docs URL.
 
         Populate the docs_url and title metadata elements with docs URL

@@ -47,7 +47,7 @@ def get_common_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-w",
         "--workers",
-        default=-1,
+        default=None,
         type=int,
         help=(
             "Number of workers to parallelize the data loading. Set to a "

@@ -1,0 +1,23 @@
+name: Type checks
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  mypy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Python version
+        run: python --version
+      - name: Mypy installation
+        run: pip install --user mypy pydantic types-PyYAML
+      - name: Type checks
+        run: mypy --explicit-package-bases --disallow-untyped-calls --disallow-untyped-defs --disallow-incomplete-defs --ignore-missing-imports --disable-error-code attr-defined src/ scripts/
