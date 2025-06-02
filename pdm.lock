@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = []
 lock_version = "4.5.0"
-content_hash = "sha256:d5c2ea1dea6f1712b0a50ec85ca008ae617576de0726cd024072836f82a9ae2f"
+content_hash = "sha256:888d5fcaf3e6ef4a485510952f6da3c1c89a5a6dd7c879d35b8c4cdd5ef50d4c"
 
 [[metadata.targets]]
 requires_python = "==3.11.*"
@@ -788,6 +788,18 @@ files = [
 ]
 
 [[package]]
+name = "mando"
+version = "0.7.1"
+summary = ""
+dependencies = [
+    "six",
+]
+files = [
+    {file = "mando-0.7.1-py2.py3-none-any.whl", hash = "sha256:26ef1d70928b6057ee3ca12583d73c63e05c49de8972d620c278a7b206581a8a"},
+    {file = "mando-0.7.1.tar.gz", hash = "sha256:18baa999b4b613faefb00eac4efadcf14f510b59b924b66e08289aa1de8c3500"},
+]
+
+[[package]]
 name = "markupsafe"
 version = "3.0.2"
 summary = ""
@@ -1343,6 +1355,19 @@ files = [
     {file = "PyYAML-6.0.1-cp311-cp311-win32.whl", hash = "sha256:1635fd110e8d85d55237ab316b5b011de701ea0f29d07611174a1b42f1444741"},
     {file = "PyYAML-6.0.1-cp311-cp311-win_amd64.whl", hash = "sha256:bf07ee2fef7014951eeb99f56f39c9bb4af143d8aa3c21b1677805985307da34"},
     {file = "PyYAML-6.0.1.tar.gz", hash = "sha256:bfdf460b1736c775f2ba9f6a92bca30bc2095067b8a9d77876d1fad6cc3b4a43"},
+]
+
+[[package]]
+name = "radon"
+version = "6.0.1"
+summary = ""
+dependencies = [
+    "colorama",
+    "mando",
+]
+files = [
+    {file = "radon-6.0.1-py2.py3-none-any.whl", hash = "sha256:632cc032364a6f8bb1010a2f6a12d0f14bc7e5ede76585ef29dc0cecf4cd8859"},
+    {file = "radon-6.0.1.tar.gz", hash = "sha256:d1ac0053943a893878940fedc8b19ace70386fc9c9bf0a09229a44125ebf45b5"},
 ]
 
 [[package]]

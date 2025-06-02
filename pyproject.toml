@@ -19,16 +19,8 @@ ignore_missing_imports = true
 [tool.pdm]
 distribution = true
 
-[tool.pdm.dev-dependencies]
-dev = [
-    "black==24.10.0",
-    "mypy==1.12.0",
-    "ruff==0.6.9",
-    "types-requests==2.32.0.20240622",
-    "pre-commit==4.0.1",
-    "coverage>=7.6.12",
-    "huggingface-hub>=0.23.4"
-]
+[tool.pdm.scripts]
+test = {shell = "coverage run --source=src/lightspeed_rag_content -m unittest discover tests --verbose && coverage report -m --fail-under 90"}
 
 [build-system]
 requires = ["pdm-backend"]
@@ -41,9 +33,6 @@ cpu = [
 gpu = [
     "torch==2.3.1",
 ]
-
-[tool.pdm.scripts]
-test = {shell = "coverage run --source=src/lightspeed_rag_content -m unittest discover tests --verbose && coverage report -m --fail-under 90"}
 
 [project]
 name = "lightspeed-rag-content"
@@ -62,3 +51,15 @@ dependencies = [
 ]
 requires-python = "==3.11.*"
 dynamic = ["license", "readme"]
+
+[dependency-groups]
+dev = [
+    "black==24.10.0",
+    "mypy==1.12.0",
+    "ruff==0.6.9",
+    "types-requests==2.32.0.20240622",
+    "pre-commit==4.0.1",
+    "coverage>=7.6.12",
+    "huggingface-hub>=0.23.4",
+    "radon>=6.0.1",
+]
