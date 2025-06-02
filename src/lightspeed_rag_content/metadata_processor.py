@@ -41,7 +41,7 @@ class MetadataProcessor:
             pass
         return title
 
-    def ping_url(self, url: str, retries = 3) -> bool:
+    def ping_url(self, url: str, retries: int = 3) -> bool:
         for trynum in range(1, retries + 1):
             """Check if the URL parameter is live."""
             try:
