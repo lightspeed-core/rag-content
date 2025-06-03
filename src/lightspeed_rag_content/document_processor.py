@@ -174,7 +174,13 @@ class DocumentProcessor:
         file_extractor: Optional[dict[str, BaseReader]] = None,
         unreachable_action: Optional[str] = "warn",
     ) -> None:
-        """Read documents from a path and split them into nodes for a vector database."""
+        """Read documents from a path and split them into nodes for a vector database.
+
+        unreachable_action:
+        "warn": Just log a warning message for links that are unreacheable
+        "fail": Fail in case of an unreachable link. Raises RuntimeError
+        "drop": Drop the document, do not include it into the vector database
+        """
         reader = SimpleDirectoryReader(
             str(docs_dir),
             recursive=True,
