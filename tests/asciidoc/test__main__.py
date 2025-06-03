@@ -33,8 +33,12 @@ class Test__main__(unittest.TestCase):
         self.asciidoctor_cmd = "/usr/bin/asciidoctor"
         self.input_file = Path("input.adoc")
         self.output_file = Path("output.adoc")
-        self.text_converter_file = RUBY_ASCIIDOC_DIR.joinpath("asciidoc_text_converter.rb")
-        self.structure_dumper_file = RUBY_ASCIIDOC_DIR.joinpath("asciidoc_structure_dumper.rb")
+        self.text_converter_file = RUBY_ASCIIDOC_DIR.joinpath(
+            "asciidoc_text_converter.rb"
+        )
+        self.structure_dumper_file = RUBY_ASCIIDOC_DIR.joinpath(
+            "asciidoc_structure_dumper.rb"
+        )
 
     def get_mock_parsed_args(self) -> Mock:
         mock_args = Mock()
@@ -74,7 +78,9 @@ class Test__main__(unittest.TestCase):
     @patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.shutil.which")
     def test_main_convert_incorrect_cmd_error(self, mock_which, mock_run):
         mock_which.return_value = self.asciidoctor_cmd
-        mock_run.side_effect = subprocess.CalledProcessError(cmd=self.asciidoctor_cmd, returncode=1)
+        mock_run.side_effect = subprocess.CalledProcessError(
+            cmd=self.asciidoctor_cmd, returncode=1
+        )
         mock_args = self.get_mock_parsed_args()
 
         with self.assertRaises(SystemExit) as e:
@@ -109,7 +115,9 @@ class Test__main__(unittest.TestCase):
 
     @patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.subprocess.run")
     def test_main_incorrect_asciidoctor_cmd(self, mock_run):
-        mock_run.side_effect = subprocess.CalledProcessError(cmd=self.asciidoctor_cmd, returncode=1)
+        mock_run.side_effect = subprocess.CalledProcessError(
+            cmd=self.asciidoctor_cmd, returncode=1
+        )
         mock_args = Mock()
         mock_args.input_file = self.input_file
 
