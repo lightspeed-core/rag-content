@@ -45,10 +45,12 @@ class MetadataProcessor:
             """Check if the URL parameter is live."""
             try:
                 response = requests.get(url, timeout=30)
-                if trynum < retries and response.status_code != 200: continue
+                if trynum < retries and response.status_code != 200:
+                    continue
                 return response.status_code == 200
             except requests.exceptions.RequestException:
-                if trynum < retries: continue
+                if trynum < retries:
+                    continue
                 return False
 
     def populate(self, file_path: str) -> dict[str, str]:

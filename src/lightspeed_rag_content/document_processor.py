@@ -172,7 +172,7 @@ class DocumentProcessor:
         metadata: MetadataProcessor,
         required_exts: Optional[list[str]] = None,
         file_extractor: Optional[dict[str, BaseReader]] = None,
-        unreachable_action: Optional[str] = "warn"
+        unreachable_action: Optional[str] = "warn",
     ) -> None:
         """Read documents from a path and split them into nodes for a vector database."""
         reader = SimpleDirectoryReader(
@@ -188,7 +188,9 @@ class DocumentProcessor:
 
         # Check for unreachable URLs if we are not ignoring them
         if unreachable_action != "warn":
-            reachable_docs = [doc for doc in docs if doc.metadata["url_reachable"] == True]
+            reachable_docs = [
+                doc for doc in docs if doc.metadata["url_reachable"] == True
+            ]
             if len(docs) != len(reachable_docs):
                 # Optionally fail on unreachable URLs
                 if unreachable_action == "fail":

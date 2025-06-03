@@ -43,14 +43,19 @@ class TestDocumentProcessor(unittest.TestCase):
         # Mock the _get_settings() method
         self.settings_obj = mock.MagicMock()
         self.patcher = mock.patch.object(
-                document_processor.DocumentProcessor, "_get_settings")
+            document_processor.DocumentProcessor, "_get_settings"
+        )
         self._settings = self.patcher.start()
         self._settings.return_value = self.settings_obj
         self.addCleanup(self.patcher.stop)
 
         self.doc_processor = document_processor.DocumentProcessor(
-                self.chunk_size, self.chunk_overlap, self.model_name,
-                self.embeddings_model_dir, self.num_workers)
+            self.chunk_size,
+            self.chunk_overlap,
+            self.model_name,
+            self.embeddings_model_dir,
+            self.num_workers,
+        )
 
     def test__got_whitespace_false(self):
         text = "NoWhitespace"
@@ -73,7 +78,8 @@ class TestDocumentProcessor(unittest.TestCase):
         fake_node_1.text = "NoWhitespace"
 
         result = self.doc_processor._filter_out_invalid_nodes(
-            [fake_node_0, fake_node_1])
+            [fake_node_0, fake_node_1]
+        )
 
         # Only nodes with whitespaces should be returned
         self.assertEqual([fake_node_0], result)
@@ -86,7 +92,8 @@ class TestDocumentProcessor(unittest.TestCase):
 
         fake_index.set_index_id.assert_called_once_with("fake-index")
         fake_index.storage_context.persist.assert_called_once_with(
-            persist_dir="/fake/path")
+            persist_dir="/fake/path"
+        )
 
     @mock.patch.object(document_processor.json, "dumps")
     @mock.patch("builtins.open", new_callable=mock.mock_open)
@@ -103,7 +110,7 @@ class TestDocumentProcessor(unittest.TestCase):
             "embedding-dimension": mock.ANY,
             "chunk": self.chunk_size,
             "overlap": self.chunk_overlap,
-            "total-embedded-files": 0
+            "total-embedded-files": 0,
         }
         mock_dumps.assert_called_once_with(expected_dict)
 
@@ -115,7 +122,8 @@ class TestDocumentProcessor(unittest.TestCase):
         fake_good_nodes = [mock.Mock(), mock.Mock()]
 
         with mock.patch.object(
-            self.doc_processor, '_filter_out_invalid_nodes') as mock_filter:
+            self.doc_processor, "_filter_out_invalid_nodes"
+        ) as mock_filter:
             mock_filter.return_value = fake_good_nodes
             self.doc_processor.process("/fake/path/docs", fake_metadata)
 
@@ -129,15 +137,18 @@ class TestDocumentProcessor(unittest.TestCase):
         reader.load_data.return_value = [
             Document(text="doc0", metadata={"url_reachable": False}),
             Document(text="doc1", metadata={"url_reachable": True}),
-            Document(text="doc2", metadata={"url_reachable": False})
+            Document(text="doc2", metadata={"url_reachable": False}),
         ]
         fake_metadata = mock.MagicMock()
         fake_good_nodes = [mock.Mock(), mock.Mock()]
 
         with mock.patch.object(
-            self.doc_processor, '_filter_out_invalid_nodes') as mock_filter:
+            self.doc_processor, "_filter_out_invalid_nodes"
+        ) as mock_filter:
             mock_filter.return_value = fake_good_nodes
-            self.doc_processor.process("/fake/path/docs", fake_metadata, unreachable_action="drop")
+            self.doc_processor.process(
+                "/fake/path/docs", fake_metadata, unreachable_action="drop"
+            )
 
         self.assertEqual(1, self.doc_processor._num_embedded_files)
 
@@ -151,10 +162,13 @@ class TestDocumentProcessor(unittest.TestCase):
         fake_good_nodes = [mock.Mock(), mock.Mock()]
 
         with mock.patch.object(
-            self.doc_processor, '_filter_out_invalid_nodes') as mock_filter:
+            self.doc_processor, "_filter_out_invalid_nodes"
+        ) as mock_filter:
             mock_filter.return_value = fake_good_nodes
             with self.assertRaises(RuntimeError):
-                self.doc_processor.process("/fake/path/docs", fake_metadata, unreachable_action="fail")
+                self.doc_processor.process(
+                    "/fake/path/docs", fake_metadata, unreachable_action="fail"
+                )
 
     def test_save(self):
         with (
@@ -166,27 +180,45 @@ class TestDocumentProcessor(unittest.TestCase):
         mock_index.assert_called_once_with("fake-index", "/fake/output_dir")
         mock_md.assert_called_once_with("fake-index", "/fake/output_dir")
 
-    @mock.patch.dict(os.environ, {
-        "POSTGRES_USER": "postgres",
-        "POSTGRES_PASSWORD": "somesecret",
-        "POSTGRES_HOST": "localhost",
-        "POSTGRES_PORT": "15432",
-        "POSTGRES_DATABASE": "postgres",
-    })
-    @mock.patch("lightspeed_rag_content.document_processor.HuggingFaceEmbedding", new=MockEmbedding)
+    @mock.patch.dict(
+        os.environ,
+        {
+            "POSTGRES_USER": "postgres",
+            "POSTGRES_PASSWORD": "somesecret",
+            "POSTGRES_HOST": "localhost",
+            "POSTGRES_PORT": "15432",
+            "POSTGRES_DATABASE": "postgres",
+        },
+    )
+    @mock.patch(
+        "lightspeed_rag_content.document_processor.HuggingFaceEmbedding",
+        new=MockEmbedding,
+    )
     def test_pgvector(self):
         self.patcher.stop()  # Remove the mock on the _get_settings() method
         self.doc_processor = document_processor.DocumentProcessor(
-            self.chunk_size, self.chunk_overlap, self.model_name,
-            self.embeddings_model_dir, self.num_workers,
-            "postgres")
+            self.chunk_size,
+            self.chunk_overlap,
+            self.model_name,
+            self.embeddings_model_dir,
+            self.num_workers,
+            "postgres",
+        )
         self.assertIsNotNone(self.doc_processor)
 
-    @mock.patch("lightspeed_rag_content.document_processor.HuggingFaceEmbedding", new=MockEmbedding)
+    @mock.patch(
+        "lightspeed_rag_content.document_processor.HuggingFaceEmbedding",
+        new=MockEmbedding,
+    )
     def test_invalid_vector_store_type(self):
         self.patcher.stop()  # Remove the mock on the _get_settings() method
-        self.assertRaises(RuntimeError,
+        self.assertRaises(
+            RuntimeError,
             document_processor.DocumentProcessor,
-            self.chunk_size, self.chunk_overlap, self.model_name,
-            self.embeddings_model_dir, self.num_workers,
-            "nonexisting")
+            self.chunk_size,
+            self.chunk_overlap,
+            self.model_name,
+            self.embeddings_model_dir,
+            self.num_workers,
+            "nonexisting",
+        )

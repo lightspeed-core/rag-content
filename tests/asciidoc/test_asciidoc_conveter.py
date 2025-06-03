@@ -36,7 +36,9 @@ class TestAsciidoctorConverter(unittest.TestCase):
         [[]
         """
 
-        self.text_converter_path = RUBY_ASCIIDOC_DIR.joinpath("asciidoc_text_converter.rb")
+        self.text_converter_path = RUBY_ASCIIDOC_DIR.joinpath(
+            "asciidoc_text_converter.rb"
+        )
         self.input_file = Path("input.adoc")
         self.output_file = Path("output.txt")
         self.attributes_file = Path("attributes.yaml")
@@ -47,7 +49,9 @@ class TestAsciidoctorConverter(unittest.TestCase):
     def test_convert(self, mock_which, mock_run):
         mock_which.return_value = self.asciidoctor_cmd
         with patch("builtins.open", mock_open(read_data=self.valid_attributes_file)):
-            adoc_text_converter = AsciidoctorConverter(attributes_file=self.attributes_file)
+            adoc_text_converter = AsciidoctorConverter(
+                attributes_file=self.attributes_file
+            )
             adoc_text_converter.convert(self.input_file, self.output_file)
 
         mock_run.assert_called_with(
@@ -123,7 +127,9 @@ class TestAsciidoctorConverter(unittest.TestCase):
 
     def test__get_converter_file(self):
         converter_file = AsciidoctorConverter._get_converter_file("text")
-        self.assertEqual(converter_file, RUBY_ASCIIDOC_DIR.joinpath("asciidoc_text_converter.rb"))
+        self.assertEqual(
+            converter_file, RUBY_ASCIIDOC_DIR.joinpath("asciidoc_text_converter.rb")
+        )
 
     def test__get_converter_file_asciidoctor_built_in_format(self):
         converter_file = AsciidoctorConverter._get_converter_file("html5")
@@ -140,7 +146,9 @@ class TestAsciidoctorConverter(unittest.TestCase):
             AsciidoctorConverter()
 
     def test__get_attribute_list_valid_yaml(self):
-        with patch("builtins.open", mock_open(read_data=self.valid_attributes_file)) as m:
+        with patch(
+            "builtins.open", mock_open(read_data=self.valid_attributes_file)
+        ) as m:
             AsciidoctorConverter._get_attribute_list("valid.yaml")
             m.assert_called_once()
 

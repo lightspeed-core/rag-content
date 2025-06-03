@@ -57,8 +57,9 @@ class TestMetadataProcessor(unittest.TestCase):
 
         self.assertFalse(result)
 
-    @mock.patch("builtins.open", new_callable=mock.mock_open,
-                read_data="# Road-Core title")
+    @mock.patch(
+        "builtins.open", new_callable=mock.mock_open, read_data="# Road-Core title"
+    )
     def test_get_file_title(self, mock_file):
         result = self.md_processor.get_file_title(self.file_path)
 
@@ -82,22 +83,32 @@ class TestMetadataProcessor(unittest.TestCase):
 
         result = self.md_processor.populate(self.file_path)
 
-        expected_result = {"docs_url": self.url, "title": self.title, "url_reachable": True}
+        expected_result = {
+            "docs_url": self.url,
+            "title": self.title,
+            "url_reachable": True,
+        }
         self.assertEqual(expected_result, result)
 
     @mock.patch.object(metadata_processor.MetadataProcessor, "ping_url")
     @mock.patch.object(metadata_processor.MetadataProcessor, "get_file_title")
     @mock.patch.object(metadata_processor.MetadataProcessor, "url_function")
     def test_populate_url_unreachable(
-            self, mock_url_func, mock_get_title, mock_ping_url):
+        self, mock_url_func, mock_get_title, mock_ping_url
+    ):
         mock_url_func.return_value = self.url
         mock_get_title.return_value = self.title
         mock_ping_url.return_value = False
 
-        with self.assertLogs("lightspeed_rag_content.metadata_processor",
-                             level="WARNING") as log:
+        with self.assertLogs(
+            "lightspeed_rag_content.metadata_processor", level="WARNING"
+        ) as log:
             result = self.md_processor.populate(self.file_path)
 
-        expected_result = {"docs_url": self.url, "title": self.title, "url_reachable": False}
+        expected_result = {
+            "docs_url": self.url,
+            "title": self.title,
+            "url_reachable": False,
+        }
         self.assertEqual(expected_result, result)
         self.assertIn("URL not reachable", log.output[0])
