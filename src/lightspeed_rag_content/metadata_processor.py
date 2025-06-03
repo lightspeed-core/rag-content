@@ -18,6 +18,7 @@ import abc
 import logging
 
 import requests
+import typing
 
 LOG = logging.getLogger(__name__)
 
@@ -41,8 +42,8 @@ class MetadataProcessor:
         return title
 
     def ping_url(self, url: str, retries: int = 3) -> bool:
+        """Check if the URL parameter is live."""
         for trynum in range(1, retries + 1):
-            """Check if the URL parameter is live."""
             try:
                 response = requests.get(url, timeout=30)
                 if trynum < retries and response.status_code != 200:
@@ -52,8 +53,9 @@ class MetadataProcessor:
                 if trynum < retries:
                     continue
                 return False
+        return False
 
-    def populate(self, file_path: str) -> dict[str, str]:
+    def populate(self, file_path: str) -> dict[str, typing.Any]:
         """Populate title and metadata with docs URL.
 
         Populate the docs_url and title metadata elements with docs URL
