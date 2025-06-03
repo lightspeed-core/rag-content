@@ -55,9 +55,9 @@ import yaml
 
 LOG: logging.Logger = logging.getLogger(__name__)
 
-RUBY_ASCIIDOC_DIR: Path = Path(str(resources.files(__package__))).joinpath(
-    "ruby_asciidoc"
-)
+PACKAGE = __package__ or ""
+
+RUBY_ASCIIDOC_DIR: Path = Path(str(resources.files(PACKAGE))).joinpath("ruby_asciidoc")
 
 
 class AsciidoctorConverter:
