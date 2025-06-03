@@ -24,4 +24,4 @@ jobs:
       - name: Black version
         run: pdm run black --version
       - name: Black check
-        run: pdm run black --check scripts src
+        run: pdm run black . --check
