@@ -18,6 +18,7 @@ import abc
 import logging
 
 import requests
+import typing
 
 LOG = logging.getLogger(__name__)
 
@@ -40,16 +41,21 @@ class MetadataProcessor:
             pass
         return title
 
-    def ping_url(self, url: str) -> bool:
+    def ping_url(self, url: str, retries: int = 3) -> bool:
         """Check if the URL parameter is live."""
-        try:
-            response = requests.get(url, timeout=30)
-            return response.status_code == 200
-        except requests.exceptions.RequestException as e:
-            LOG.warning(e)
-            return False
+        for trynum in range(1, retries + 1):
+            try:
+                response = requests.get(url, timeout=30)
+                if trynum < retries and response.status_code != 200:
+                    continue
+                return response.status_code == 200
+            except requests.exceptions.RequestException:
+                if trynum < retries:
+                    continue
+                return False
+        return False
 
-    def populate(self, file_path: str) -> dict[str, str]:
+    def populate(self, file_path: str) -> dict[str, typing.Any]:
         """Populate title and metadata with docs URL.
 
         Populate the docs_url and title metadata elements with docs URL
@@ -67,12 +73,14 @@ class MetadataProcessor:
             "url": docs_url,
         }
 
+        url_reachable = True
         if not self.ping_url(docs_url):
             LOG.warning(
                 'URL not reachable: %(url)s (Title: "%(title)s", '
                 "File path: %(file_path)s)",
                 document,
             )
+            url_reachable = False
 
         LOG.debug(
             'Metadata populated for: "%(title)s" (URL: %(url)s, File '
@@ -80,7 +88,7 @@ class MetadataProcessor:
             document,
         )
 
-        return {"docs_url": docs_url, "title": title}
+        return {"docs_url": docs_url, "title": title, "url_reachable": url_reachable}
 
     @abc.abstractmethod
     def url_function(self, file_path: str) -> str:

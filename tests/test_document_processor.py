@@ -18,6 +18,7 @@ import unittest
 from unittest import mock
 
 from llama_index.core.schema import TextNode
+from llama_index.core import Document
 from lightspeed_rag_content import document_processor
 
 
@@ -30,7 +31,7 @@ class MockEmbedding:
         return "ABC"
 
 
-class TestMetadataProcessor(unittest.TestCase):
+class TestDocumentProcessor(unittest.TestCase):
 
     def setUp(self):
         self.chunk_size = 380
@@ -129,6 +130,45 @@ class TestMetadataProcessor(unittest.TestCase):
         reader.load_data.assert_called_once_with(num_workers=self.num_workers)
         self.assertEqual(fake_good_nodes, self.doc_processor._good_nodes)
         self.assertEqual(3, self.doc_processor._num_embedded_files)
+
+    @mock.patch.object(document_processor, "SimpleDirectoryReader")
+    def test_process_drop_unreachable(self, mock_dir_reader):
+        reader = mock_dir_reader.return_value
+        reader.load_data.return_value = [
+            Document(text="doc0", metadata={"url_reachable": False}),
+            Document(text="doc1", metadata={"url_reachable": True}),
+            Document(text="doc2", metadata={"url_reachable": False}),
+        ]
+        fake_metadata = mock.MagicMock()
+        fake_good_nodes = [mock.Mock(), mock.Mock()]
+
+        with mock.patch.object(
+            self.doc_processor, "_filter_out_invalid_nodes"
+        ) as mock_filter:
+            mock_filter.return_value = fake_good_nodes
+            self.doc_processor.process(
+                "/fake/path/docs", fake_metadata, unreachable_action="drop"
+            )
+
+        self.assertEqual(1, self.doc_processor._num_embedded_files)
+
+    @mock.patch.object(document_processor, "SimpleDirectoryReader")
+    def test_process_fail_unreachable(self, mock_dir_reader):
+        reader = mock_dir_reader.return_value
+        reader.load_data.return_value = [
+            Document(text="doc0", metadata={"url_reachable": False})
+        ]
+        fake_metadata = mock.MagicMock()
+        fake_good_nodes = [mock.Mock(), mock.Mock()]
+
+        with mock.patch.object(
+            self.doc_processor, "_filter_out_invalid_nodes"
+        ) as mock_filter:
+            mock_filter.return_value = fake_good_nodes
+            with self.assertRaises(RuntimeError):
+                self.doc_processor.process(
+                    "/fake/path/docs", fake_metadata, unreachable_action="fail"
+                )
 
     def test_save(self):
         with (
