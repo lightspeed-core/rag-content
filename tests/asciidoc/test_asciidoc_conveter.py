@@ -149,15 +149,17 @@ class TestAsciidoctorConverter(unittest.TestCase):
         with patch(
             "builtins.open", mock_open(read_data=self.valid_attributes_file)
         ) as m:
-            AsciidoctorConverter._get_attribute_list("valid.yaml")
+            AsciidoctorConverter._get_attribute_list(Path("valid.yaml"))
             m.assert_called_once()
 
     def test__get_attribute_list_invalid_yaml(self):
         with patch("builtins.open", mock_open(read_data=self.invalid_attributes_file)):
             with self.assertRaises(yaml.YAMLError):
-                AsciidoctorConverter._get_attribute_list("invalid.yaml")
+                AsciidoctorConverter._get_attribute_list(Path("invalid.yaml"))
 
     def test__get_attribute_list_empty_yaml(self):
         with patch("builtins.open", mock_open(read_data="")):
-            attributes = AsciidoctorConverter._get_attribute_list("non_existing.yaml")
+            attributes = AsciidoctorConverter._get_attribute_list(
+                Path("non_existing.yaml")
+            )
             self.assertEqual(attributes, [])
