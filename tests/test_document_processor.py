@@ -15,6 +15,7 @@
 
 import os
 import unittest
+from pathlib import Path
 from unittest import mock
 
 from llama_index.core.schema import TextNode
@@ -53,7 +54,7 @@ class TestDocumentProcessor(unittest.TestCase):
             self.chunk_size,
             self.chunk_overlap,
             self.model_name,
-            self.embeddings_model_dir,
+            Path(self.embeddings_model_dir),
             self.num_workers,
         )
 
@@ -125,7 +126,7 @@ class TestDocumentProcessor(unittest.TestCase):
             self.doc_processor, "_filter_out_invalid_nodes"
         ) as mock_filter:
             mock_filter.return_value = fake_good_nodes
-            self.doc_processor.process("/fake/path/docs", fake_metadata)
+            self.doc_processor.process(Path("/fake/path/docs"), fake_metadata)
 
         reader.load_data.assert_called_once_with(num_workers=self.num_workers)
         self.assertEqual(fake_good_nodes, self.doc_processor._good_nodes)
@@ -135,9 +136,18 @@ class TestDocumentProcessor(unittest.TestCase):
     def test_process_drop_unreachable(self, mock_dir_reader):
         reader = mock_dir_reader.return_value
         reader.load_data.return_value = [
-            Document(text="doc0", metadata={"url_reachable": False}),
-            Document(text="doc1", metadata={"url_reachable": True}),
-            Document(text="doc2", metadata={"url_reachable": False}),
+            Document(
+                text="doc0",
+                metadata={"url_reachable": False},  # pyright: ignore[reportCallIssue]
+            ),
+            Document(
+                text="doc1",
+                metadata={"url_reachable": True},  # pyright: ignore[reportCallIssue]
+            ),
+            Document(
+                text="doc2",
+                metadata={"url_reachable": False},  # pyright: ignore[reportCallIssue]
+            ),
         ]
         fake_metadata = mock.MagicMock()
         fake_good_nodes = [mock.Mock(), mock.Mock()]
@@ -147,7 +157,7 @@ class TestDocumentProcessor(unittest.TestCase):
         ) as mock_filter:
             mock_filter.return_value = fake_good_nodes
             self.doc_processor.process(
-                "/fake/path/docs", fake_metadata, unreachable_action="drop"
+                Path("/fake/path/docs"), fake_metadata, unreachable_action="drop"
             )
 
         self.assertEqual(1, self.doc_processor._num_embedded_files)
@@ -156,7 +166,10 @@ class TestDocumentProcessor(unittest.TestCase):
     def test_process_fail_unreachable(self, mock_dir_reader):
         reader = mock_dir_reader.return_value
         reader.load_data.return_value = [
-            Document(text="doc0", metadata={"url_reachable": False})
+            Document(
+                text="doc0",
+                metadata={"url_reachable": False},  # pyright: ignore[reportCallIssue]
+            )
         ]
         fake_metadata = mock.MagicMock()
         fake_good_nodes = [mock.Mock(), mock.Mock()]
@@ -167,7 +180,7 @@ class TestDocumentProcessor(unittest.TestCase):
             mock_filter.return_value = fake_good_nodes
             with self.assertRaises(RuntimeError):
                 self.doc_processor.process(
-                    "/fake/path/docs", fake_metadata, unreachable_action="fail"
+                    Path("/fake/path/docs"), fake_metadata, unreachable_action="fail"
                 )
 
     def test_save(self):
@@ -200,7 +213,7 @@ class TestDocumentProcessor(unittest.TestCase):
             self.chunk_size,
             self.chunk_overlap,
             self.model_name,
-            self.embeddings_model_dir,
+            Path(self.embeddings_model_dir),
             self.num_workers,
             "postgres",
         )
