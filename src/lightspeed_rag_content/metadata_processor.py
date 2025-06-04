@@ -16,9 +16,9 @@
 
 import abc
 import logging
+import typing
 
 import requests
-import typing
 
 LOG = logging.getLogger(__name__)
 
@@ -35,9 +35,9 @@ class MetadataProcessor:
         """Extract title from the plaintext doc file."""
         title = ""
         try:
-            with open(file_path, "r") as file:
+            with open(file_path, "r", encoding="utf-8") as file:
                 title = file.readline().rstrip("\n").lstrip("# ")
-        except Exception:  # noqa: S110
+        except Exception:  # noqa: S110 pylint: disable=broad-exception-caught
             pass
         return title
 

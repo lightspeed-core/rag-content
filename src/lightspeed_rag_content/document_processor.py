@@ -32,10 +32,10 @@ from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.vector_stores.faiss import FaissVectorStore
 from llama_index.vector_stores.postgres import PGVectorStore
 
+from lightspeed_rag_content.metadata_processor import MetadataProcessor
+
 if TYPE_CHECKING:
     from llama_index.core.vector_stores.types import BasePydanticVectorStore
-
-from lightspeed_rag_content.metadata_processor import MetadataProcessor
 
 LOG = logging.getLogger(__name__)
 
@@ -163,7 +163,9 @@ class DocumentProcessor:
         metadata["chunk"] = self.chunk_size
         metadata["overlap"] = self.chunk_overlap
         metadata["total-embedded-files"] = self._num_embedded_files
-        with open(os.path.join(persist_folder, "metadata.json"), "w") as file:
+        with open(
+            os.path.join(persist_folder, "metadata.json"), "w", encoding="utf-8"
+        ) as file:
             file.write(json.dumps(metadata))
 
     def process(
@@ -195,7 +197,7 @@ class DocumentProcessor:
         # Check for unreachable URLs if we are not ignoring them
         if unreachable_action != "warn":
             reachable_docs = [
-                doc for doc in docs if doc.metadata["url_reachable"] == True
+                doc for doc in docs if doc.metadata["url_reachable"] is True
             ]
             if len(docs) != len(reachable_docs):
                 # Optionally fail on unreachable URLs

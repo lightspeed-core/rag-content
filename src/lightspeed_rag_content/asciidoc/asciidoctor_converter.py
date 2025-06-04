@@ -136,12 +136,12 @@ class AsciidoctorConverter:
         if attributes_file is None:
             return attribute_list
 
-        with open(attributes_file, "r") as file:
+        with open(attributes_file, "r", encoding="utf-8") as file:
             if (attributes := yaml.safe_load(file)) is None:
                 return attribute_list
 
             for key, value in attributes.items():
-                attribute_list += ["-a", key + "=%s" % value]
+                attribute_list += ["-a", key + f"={value}"]
 
         return attribute_list
 
