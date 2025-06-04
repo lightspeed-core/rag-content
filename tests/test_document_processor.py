@@ -101,7 +101,9 @@ class TestDocumentProcessor(unittest.TestCase):
     def test__save_metadata(self, mock_file, mock_dumps):
         self.doc_processor._save_metadata("fake-index", "/fake/path")
 
-        mock_file.assert_called_once_with("/fake/path/metadata.json", "w")
+        mock_file.assert_called_once_with(
+            "/fake/path/metadata.json", "w", encoding="utf-8"
+        )
         expected_dict = {
             "execution-time": mock.ANY,
             "llm": "None",
