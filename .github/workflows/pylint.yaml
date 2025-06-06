@@ -25,4 +25,4 @@ jobs:
       - name: Install devel dependencies
         run: pdm install --group default,dev
       - name: Python linter
-        run: pdm run pylint src
+        run: make pylint
