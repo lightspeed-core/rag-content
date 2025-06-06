@@ -80,7 +80,7 @@ black:
 	pdm run black --check .
 
 ruff:
-	pdm run ruff check . --per-file-ignores=tests/*:S101 --per-file-ignores=scripts/*:S101
+	pdm run ruff check src --per-file-ignores=tests/*:S101 --per-file-ignores=scripts/*:S101
 
 .PHONY: verify
 verify: check-types check-format check-code-metrics check-coverage ## Verify the code using various linters
