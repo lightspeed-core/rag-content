@@ -12,7 +12,16 @@ jobs:
       pull-requests: read
     steps:
       - uses: actions/checkout@v4
-      - uses: chartboost/ruff-action@v1
+      - uses: actions/setup-python@v5
         with:
-          args: 'check . --per-file-ignores=tests/*:S101
-
+          python-version: '3.11'
+      - name: Python version
+        run: python --version
+      - name: PDM installation
+        run: pip install --user pdm
+      - name: Install dependencies
+        run: pdm install
+      - name: Install devel dependencies
+        run: pdm install --group default,dev
+      - name: Python linter
+        run: make ruff
