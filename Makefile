@@ -76,6 +76,9 @@ format: ## Format the code into unified format
 	pdm run ruff check scripts src --fix --per-file-ignores=scripts/*:S101
 	pdm run pre-commit run
 
+black:
+	pdm run black --check .
+
 .PHONY: verify
 verify: check-types check-format check-code-metrics check-coverage ## Verify the code using various linters
 
