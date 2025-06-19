@@ -181,6 +181,25 @@ commands:
     (1 row)
     ```
 
+## Update lockfiles
+
+Three lock file are used in this repository:
+
+```
+pdm.lock
+pdm.lock.cpu
+pdm.lock.gpu
+```
+
+Usually all three lock files needs to be regenerated when new updates (dependencies) are available. Use
+following commands in order to do it:
+
+```
+pdm update
+pdm update --lockfile pdm.lock.cpu
+pdm update --lockfile pdm.lock.gpu
+```
+
 ## `requirements*` Files Generation for Konflux
 
 To generate all `requirements*` files:
