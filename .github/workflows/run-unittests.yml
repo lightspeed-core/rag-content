@@ -1,23 +1,33 @@
-name: Unittests
+name: Unit tests
+
 on:
-  pull_request:
-    branches: ["main"]
-  workflow_dispatch:
+  - push
+  - pull_request
 
 jobs:
-  run-unittests:
-    name: Execute unittests
+  unit-tests:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: read
+      pull-requests: read
+    strategy:
+      matrix:
+        python-version: ["3.11"]
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup PDM
-        uses: pdm-project/setup-pdm@v4
-
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Python version
+        run: uv run python --version
+      - name: uv version
+        run: uv --version
       - name: Install dependencies
-        run: pdm install
-
-      - name: Run unittests
-        run: pdm run test
+        run: uv pip install --python ${{ matrix.python-version }} -e .
+      - name: Install pdm  # Required for dynamic version test
+        run: uv pip install pdm
+      - name: Run unit tests
+        run: |
+          uv run coverage run --source=src/lightspeed_rag_content -m unittest discover tests --verbose
+          uv run coverage report -m --fail-under 90

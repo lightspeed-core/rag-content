@@ -1,4 +1,4 @@
-ARG FLAVOR=cpu
+ARG FLAVOR=gpu
 
 FROM registry.access.redhat.com/ubi9/python-311 as cpu-base
 ARG FLAVOR

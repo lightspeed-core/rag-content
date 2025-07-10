@@ -19,7 +19,6 @@ COPY tests ./tests
 COPY scripts ./scripts
 
 # Pytorch backend - cpu. `uv` contains convenient way to specify the backend.
-#ENV UV_TORCH_BACKEND=cpu
 ENV UV_COMPILE_BYTECODE=0 \
     UV_PYTHON_DOWNLOADS=0
 
@@ -35,9 +34,9 @@ ENV PATH="/rag-content/.venv/bin:$PATH"
 
 # Download embeddings model
 ENV EMBEDDING_MODEL=sentence-transformers/all-mpnet-base-v2
-# RUN python ./scripts/download_embeddings_model.py \
-#        -l ./embeddings_model \
-#        -r ${EMBEDDING_MODEL}
+RUN python ./scripts/download_embeddings_model.py \
+       -l ./embeddings_model \
+       -r ${EMBEDDING_MODEL}
 
 # Reset the entrypoint.
 ENTRYPOINT []
