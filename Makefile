@@ -5,10 +5,10 @@ NUM_WORKERS ?= $$(( $(shell nproc --all) / 2))
 # Define behavior based on the flavor
 ifeq ($(FLAVOR),cpu)
 TORCH_GROUP := cpu
-else ifeq ($(FLAVOR),gpu)
-TORCH_GROUP := gpu
+else ifeq ($(FLAVOR),auto)
+TORCH_GROUP := auto
 else
-$(error Unsupported FLAVOR $(FLAVOR), must be 'cpu' or 'gpu')
+$(error Unsupported FLAVOR $(FLAVOR), must be 'cpu' or 'auto')
 endif
 
 # Define arguments for pgvector support
@@ -20,15 +20,18 @@ POSTGRES_DATABASE ?= postgres
 
 .PHONY: install-tools
 install-tools: ## Install required utilities/tools
-	@command -v pdm > /dev/null || { echo >&2 "pdm is not installed. Installing..."; pip3.11 install --upgrade pip pdm; }
+	@command -v uv > /dev/null || { echo >&2 "uv is not installed. Installing..."; pip3.11 install --upgrade pip uv; }
 
 .PHONY: pdm-lock-check
 pdm-lock-check: ## Check that the pdm.lock file is in a good shape
 	pdm lock --check --group $(TORCH_GROUP) --lockfile pdm.lock.$(TORCH_GROUP)
 
+#uv-lock-check: ## Check that the uv.lock file is in a good shape
+#	UV_TORCH_BACKEND=$(TORCH_GROUP) uv lock --check
+
 .PHONY: install-glob
-install-global: install-tools pdm-lock-check ## Install ligthspeed-rag-content to global Python directories
-	pdm install --global --project . --group $(TORCH_GROUP) --lockfile pdm.lock.$(TORCH_GROUP)
+install-global: install-tools ## Install ligthspeed-rag-content into file system.
+	 uv pip install --python 3.11 --system --torch-backend=$(TORCH_GROUP) .
 
 .PHONY: install-hooks
 install-hooks: install-deps-test ## Install commit hooks
@@ -61,7 +64,7 @@ check-format: ## Check that the code is properly formatted using Black and Ruff 
 .PHONY: check-coverage
 check-coverage: ## Check the coverage of unit tests.
 	@echo "Running $@ target ..."
-	pdm run test
+	pdm run coverage run --source=src/lightspeed_rag_content -m unittest discover tests --verbose && pdm run coverage report -m --fail-under 90
 
 .PHONY: check-code-metrics
 check-code-metrics: ## Check the code using Radon.

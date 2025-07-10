@@ -1,0 +1,72 @@
+name: Build image, main branch push quay.io
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: ["main"]
+
+env:
+  IMAGE_NAME: rag-content-cpu
+  IMAGE_NAMESPACE: ${{ github.repository_owner }}
+  IMAGE_REGISTRY: ghcr.io
+  LATEST_TAG: latest
+  CONTAINER_FILE: Containerfile
+
+jobs:
+  build-and-push-dev:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Required for image pushing to a registry
+      packages: write
+    steps:
+      - name: Install buildah
+        run: |
+          sudo apt update
+          # qemu is required for arm64 builds
+          sudo apt install -y buildah qemu-user-static
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@v1.3.1
+        with:
+          # this might remove tools that are actually needed,
+          # if set to "true" but frees about 6 GB
+          tool-cache: true
+
+      - name: Create dev image tag
+        run: |
+          echo "DEV_TAG=dev-$(date +%Y%m%d)-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "dev image tag: ${{ env.DEV_TAG }}"
+      - name: Build image with Buildah
+        id: build_image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: ${{ env.IMAGE_NAME }}
+          tags: |
+            ${{ env.DEV_TAG }}
+            ${{ env.LATEST_TAG }}
+          containerfiles: |
+            ${{ env.CONTAINER_FILE }}
+          archs: amd64, arm64
+          oci: true
+      - name: Check images
+        run: |
+          buildah images | grep '${{ env.IMAGE_NAME }}'
+          echo '${{ steps.build_image.outputs.image }}'
+          echo '${{ steps.build_image.outputs.tags }}'
+      - name: Check manifest
+        run: |
+          set -x
+          buildah manifest inspect ${{ steps.build_image.outputs.image }}:${{ env.LATEST_TAG }}
+      
+      - name: Push image to Quay.io
+        uses: redhat-actions/push-to-registry@v2
+        if: ${{ github.event_name != 'pull_request' }}
+        with:
+          image: ${{ steps.build_image.outputs.image }}
+          tags: ${{ steps.build_image.outputs.tags }}
+          registry: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAMESPACE }}
+          username: ${{ github.actor }}
+          password: ${{ github.token }}

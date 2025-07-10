@@ -1,36 +1,45 @@
-ARG FLAVOR=cpu
+# Image with CPU only backend. Smaller images.
+FROM registry.access.redhat.com/ubi9/ubi-minimal
 
-FROM registry.access.redhat.com/ubi9/python-311 as cpu-base
-ARG FLAVOR
-
-FROM nvcr.io/nvidia/cuda:12.6.2-devel-ubi9 as gpu-base
-ARG FLAVOR
-RUN dnf install -y python3.11 python3.11-pip libcudnn8 libnccl git
-RUN ln -sf /usr/bin/python3.11 /usr/bin/python
-ENV LD_LIBRARY_PATH=/usr/local/cuda-12.6/compat:$LD_LIBRARY_PATH
-
-FROM ${FLAVOR}-base as lightspeed-core-rag-builder
-ARG FLAVOR
-
-USER 0
-RUN dnf install -y rubygems && \
-    dnf clean all && \
+# Install Python
+RUN microdnf install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
+    python3.11 python3.11-devel python3.11-pip
+# Install asciidoctor
+RUN microdnf install -y rubygems && \
+    microdnf clean all && \
     gem install asciidoctor
+# Install uv package manager
+RUN pip3.11 install uv
 
 WORKDIR /rag-content
+
+COPY Makefile pyproject.toml uv.lock README.md ./
+COPY src ./src
+COPY tests ./tests
+COPY scripts ./scripts
+
+# Pytorch backend - cpu. `uv` contains convenient way to specify the backend.
+#ENV UV_TORCH_BACKEND=cpu
+ENV UV_COMPILE_BYTECODE=0 \
+    UV_PYTHON_DOWNLOADS=0
+
+# Install Python dependencies
+RUN uv sync --locked --no-install-project
+
+# Then, add the rest of the project source code and install it
+# Installing separately from its dependencies allows optimal layer caching
+RUN uv sync --locked
+
+# Add executables from .venv to system PATH
+ENV PATH="/rag-content/.venv/bin:$PATH"
+
+# Download embeddings model
 ENV EMBEDDING_MODEL=sentence-transformers/all-mpnet-base-v2
+# RUN python ./scripts/download_embeddings_model.py \
+#        -l ./embeddings_model \
+#        -r ${EMBEDDING_MODEL}
 
-COPY . /rag-content
-RUN make install-global
-
-# Test torch
-RUN if [[ $(echo $LD_LIBRARY_PATH) == *"/usr/local/cuda-12.6/compat"* ]]; then \
-        python -c "import torch; print(torch.version.cuda); print(torch.cuda.is_available());"; \
-    fi
-
-# # Download embeddings model
-RUN python ./scripts/download_embeddings_model.py \
-        -l ./embeddings_model \
-        -r ${EMBEDDING_MODEL}
+# Reset the entrypoint.
+ENTRYPOINT []
 
 LABEL description="Contains embedding model and dependencies needed to generate a vector database"

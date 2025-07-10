@@ -19,20 +19,9 @@ ignore_missing_imports = true
 [tool.pdm]
 distribution = true
 
-[tool.pdm.scripts]
-test = {shell = "coverage run --source=src/lightspeed_rag_content -m unittest discover tests --verbose && coverage report -m --fail-under 90"}
-
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
-
-[project.optional-dependencies]
-cpu = [
-    "torch @ https://download.pytorch.org/whl/cpu/torch-2.3.1%2Bcpu-cp311-cp311-linux_x86_64.whl",
-]
-gpu = [
-    "torch==2.3.1",
-]
 
 [project]
 name = "lightspeed-rag-content"
@@ -48,9 +37,20 @@ dependencies = [
     "llama-index-readers-file==0.1.30",
     "faiss-cpu==1.8.0.post1",
     "llama-index-vector-stores-postgres>=0.1.14",
+    "torch==2.3.1",
 ]
 requires-python = "==3.11.*"
 dynamic = ["license", "readme"]
+
+# PyTorch has multiple wheel variants for different backends - cpu, gpu, etc.
+# By default on pypi.org is the gpu variant. Forces uv to use the cpu variant.
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu" }]
+torchvision = [{ index = "pytorch-cpu" }]
 
 [dependency-groups]
 dev = [
