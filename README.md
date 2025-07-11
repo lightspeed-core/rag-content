@@ -223,6 +223,17 @@ providers:
          db_path: /home/<user>/rag-content/vector_db/custom_docs/0.1/faiss_store.db
 ```
 
+Once we have a database we can use script `query_rag.py` to check some results:
+
+```bash
+python scripts/query_rag.py \
+  -p vector_db/custom_docs/0.1 \
+  -x custom-docs-0_1 \
+  -m embeddings_model \
+  -k 5 \
+  -q "how can I configure a cinder backend"
+```
+
 ### Llama-Stack SQLite-vec
 
 The process is the same as in the
@@ -255,6 +266,17 @@ providers:
      provider_type: inline::sqlite-vec
      config:
        db_path: /home/<user>/rag-content/vector_db/custom_docs/0.1/sqlitevec_store.db
+```
+
+Once we have a database we can use script `query_rag.py` to check some results:
+
+```bash
+python scripts/query_rag.py \
+  -p vector_db/custom_docs/0.1 \
+  -x custom-docs-0_1 \
+  -m embeddings_model \
+  -k 5 \
+  -q "how can I configure a cinder backend"
 ```
 
 ## Update lockfiles
