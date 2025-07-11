@@ -223,6 +223,17 @@ The vector-io will be named `custom-docs-0_1`:
           db_path: /home/<user>/rag-content/vector_db/custom_docs/0.1/faiss_store.db
 ```
 
+Once we have a database we can use script `query_rag.py` to check some results:
+
+```
+python scripts/query_rag.py \
+  -p vector_db/custom_docs/0.1 \
+  -x custom-docs-0_1 \
+  -m embeddings_model \
+  -k 5 \
+  -q "how can I configure a cinder backend"
+```
+
 > [!NOTE]
 > When bringing the vector-io file with our knowledge to a new host/container,
 > configuring the vector-io provider, and running llama-stack, the service
@@ -267,6 +278,17 @@ The vector-io will be named `custom-docs-0_1`:
       provider_type: inline::sqlite-vec
       config:
         db_path: /home/<user>/rag-content/vector_db/custom_docs/0.1/sqlitevec_store.db
+```
+
+Once we have a database we can use script `query_rag.py` to check some results:
+
+```
+python scripts/query_rag.py \
+  -p vector_db/custom_docs/0.1 \
+  -x custom-docs-0_1 \
+  -m embeddings_model \
+  -k 5 \
+  -q "how can I configure a cinder backend"
 ```
 
 > [!NOTE]
