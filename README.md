@@ -114,6 +114,7 @@ different:
             embeddings_model_dir=args.model_dir,
             num_workers=args.workers,
             vector_store_type=args.vector_store_type,
+            manual_chunking=args.manual_chunking,
         )
 
         # Load and embed the documents, this method can be called multiple times
@@ -239,6 +240,11 @@ python scripts/query_rag.py \
 > configuring the vector-io provider, and running llama-stack, the service
 > automatically register the vector-dbs present in the file; we'll need to
 > manually register them.
+>
+> There are several ways to register the vector-dbs from a vector-io provider
+> in llama-stack, and in this repository we provide a simple script named
+> `register-llama-dbs.py` to this this auto-magically.  This script can be used
+> in the container build process or in a pod's init-container.
 
 
 > [!CAUTION]
@@ -297,6 +303,11 @@ python scripts/query_rag.py \
 > configuring the vector-io provider, and running llama-stack, the service
 > automatically register the vector-dbs present in the file; we'll need to
 > manually register them.
+>
+> There are several ways to register the vector-dbs from a vector-io provider
+> in llama-stack, and in this repository we provide a simple script named
+> `register-llama-dbs.py` to this this auto-magically.  This script can be used
+> in the container build process or in a pod's init-container.
 
 ## Update lockfiles
 
