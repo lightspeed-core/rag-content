@@ -26,3 +26,32 @@ class TestMetadataProcessor(unittest.TestCase):
         parser = utils.get_common_arg_parser()
 
         self.assertIsInstance(parser, argparse.ArgumentParser)
+
+    def test_arg_parser_vector_store_type(self):
+        parser = utils.get_common_arg_parser()
+
+        for vector_store_type in ("faiss", "postgres", "llamastack-faiss",
+                                  "llamastack-sqlitevec"):
+            args = parser.parse_args(["--vector-store-type",
+                                      vector_store_type])
+            self.assertEqual(args.vector_store_type, vector_store_type)
+
+    def test_arg_parser_vector_store_type_incorrect(self):
+        parser = utils.get_common_arg_parser()
+
+        for vector_store_type in ("faisss", "lamastack-faiss"):
+            self.assertRaises(SystemExit,
+                              parser.parse_args,
+                              ["--vector-store-type", vector_store_type])
+
+    def test_arg_parser_auto_chunking(self):
+        parser = utils.get_common_arg_parser()
+
+        args = parser.parse_args(["--auto-chunking"])
+        self.assertFalse(args.manual_chunking)
+
+    def test_arg_parser_auto_chunking_default(self):
+        parser = utils.get_common_arg_parser()
+
+        args = parser.parse_args([])
+        self.assertTrue(args.manual_chunking)
