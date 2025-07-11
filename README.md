@@ -239,6 +239,11 @@ python scripts/query_rag.py \
 > configuring the vector-io provider, and running llama-stack, the service
 > automatically register the vector-dbs present in the file; we'll need to
 > manually register them.
+>
+> There are several ways to register the vector-dbs from a vector-io provider
+> in llama-stack, and in this repository we provide a simple script named
+> `register-llama-dbs.py` to this this auto-magically.  This script can be used
+> in the container build process or in a pod's init-container.
 
 > [!CAUTION]
 > For some reason the faiss DB files in llama-stack are ridiculously large and
@@ -296,6 +301,11 @@ python scripts/query_rag.py \
 > configuring the vector-io provider, and running llama-stack, the service
 > automatically register the vector-dbs present in the file; we'll need to
 > manually register them.
+>
+> There are several ways to register the vector-dbs from a vector-io provider
+> in llama-stack, and in this repository we provide a simple script named
+> `register-llama-dbs.py` to this this auto-magically.  This script can be used
+> in the container build process or in a pod's init-container.
 
 ## Update lockfiles
 
