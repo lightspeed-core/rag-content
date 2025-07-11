@@ -3,7 +3,7 @@ FROM registry.access.redhat.com/ubi9/ubi-minimal
 
 # Install Python
 RUN microdnf install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
-    python3.12 python3.12-devel python3.12-pip && \
+    python3.12 python3.12-devel python3.12-pip git && \
     microdnf clean all
 # Install asciidoctor
 RUN microdnf install -y rubygems && \
