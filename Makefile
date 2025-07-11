@@ -26,8 +26,8 @@ install-tools: ## Install required utilities/tools
 pdm-lock-check: ## Check that the pdm.lock file is in a good shape
 	pdm lock --check --group $(TORCH_GROUP) --lockfile pdm.lock.$(TORCH_GROUP)
 
-#uv-lock-check: ## Check that the uv.lock file is in a good shape
-#	UV_TORCH_BACKEND=$(TORCH_GROUP) uv lock --check
+uv-lock-check: ## Check that the uv.lock file is in a good shape
+	UV_TORCH_BACKEND=$(TORCH_GROUP) uv lock --check
 
 .PHONY: install-glob
 install-global: install-tools ## Install ligthspeed-rag-content into file system.

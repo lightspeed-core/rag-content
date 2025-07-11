@@ -60,7 +60,7 @@ jobs:
         run: |
           set -x
           buildah manifest inspect ${{ steps.build_image.outputs.image }}:${{ env.LATEST_TAG }}
-      
+
       - name: Push image to Quay.io
         uses: redhat-actions/push-to-registry@v2
         if: ${{ github.event_name != 'pull_request' }}

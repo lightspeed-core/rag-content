@@ -3,13 +3,14 @@ FROM registry.access.redhat.com/ubi9/ubi-minimal
 
 # Install Python
 RUN microdnf install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
-    python3.11 python3.11-devel python3.11-pip
+    python3.11 python3.11-devel python3.11-pip && \
+    microdnf clean all
 # Install asciidoctor
 RUN microdnf install -y rubygems && \
     microdnf clean all && \
     gem install asciidoctor
 # Install uv package manager
-RUN pip3.11 install uv
+RUN pip3.11 install uv==0.7.20
 
 WORKDIR /rag-content
 
@@ -18,6 +19,7 @@ COPY src ./src
 COPY tests ./tests
 COPY scripts ./scripts
 
+# Configure UV environment variables for optimal performance
 # Pytorch backend - cpu. `uv` contains convenient way to specify the backend.
 ENV UV_COMPILE_BYTECODE=0 \
     UV_PYTHON_DOWNLOADS=0
