@@ -4,7 +4,7 @@
 
 This script performs several steps:
     1. removes torch+cpu dependency from project file
-    2. generates requirements.txt file from pyproject.toml + pdm.lock
+    2. generates requirements.txt file from pyproject.toml + uv.lock
     3. removes all torch dependencies (including CUDA/Nvidia packages)
     4. downloads torch+cpu wheel
     5. computes hashes for this wheel
@@ -28,7 +28,7 @@ from urllib.request import urlretrieve
 PROCESS_SPECIAL_PACKAGES = False
 
 # just these files are needed as project stub, no other configs and/or sources are needed
-PROJECT_FILES = ("pyproject.toml", "pdm.lock", "LICENSE", "README.md")
+PROJECT_FILES = ("pyproject.toml", "uv.lock", "LICENSE", "README.md")
 
 # registry with Torch wheels (CPU variant)
 TORCH_REGISTRY = "https://download.pytorch.org/whl/cpu"
@@ -59,7 +59,7 @@ def copy_project_stub(directory: str) -> None:
 
 def remove_torch_dependency(directory: str) -> None:
     """Remove torch (specifically torch+cpu) dependency from the project.toml file."""
-    shell("pdm remove torch", directory)
+    shell("uv remove torch", directory)
 
 
 def generate_requirements_file(work_directory: str) -> None:

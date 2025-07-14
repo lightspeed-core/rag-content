@@ -1,15 +1,4 @@
-# Default to CPU if not specified
-FLAVOR ?= cpu
 NUM_WORKERS ?= $$(( $(shell nproc --all) / 2))
-
-# Define behavior based on the flavor
-ifeq ($(FLAVOR),cpu)
-TORCH_GROUP := cpu
-else ifeq ($(FLAVOR),auto)
-TORCH_GROUP := auto
-else
-$(error Unsupported FLAVOR $(FLAVOR), must be 'cpu' or 'auto')
-endif
 
 # Define arguments for pgvector support
 POSTGRES_USER ?= postgres
@@ -22,78 +11,72 @@ POSTGRES_DATABASE ?= postgres
 install-tools: ## Install required utilities/tools
 	@command -v uv > /dev/null || { echo >&2 "uv is not installed. Installing..."; pip3.11 install --upgrade pip uv; }
 
-.PHONY: pdm-lock-check
-pdm-lock-check: ## Check that the pdm.lock file is in a good shape
-	pdm lock --check --group $(TORCH_GROUP) --lockfile pdm.lock.$(TORCH_GROUP)
-
+.PHONY: uv-lock-check
 uv-lock-check: ## Check that the uv.lock file is in a good shape
-	UV_TORCH_BACKEND=$(TORCH_GROUP) uv lock --check
+	uv lock --check
 
-.PHONY: install-glob
+.PHONY: install-global
 install-global: install-tools ## Install ligthspeed-rag-content into file system.
-	 uv pip install --python 3.11 --system --torch-backend=$(TORCH_GROUP) .
+	uv pip install --python 3.11 --system .
 
 .PHONY: install-hooks
 install-hooks: install-deps-test ## Install commit hooks
-	pdm run pre-commit install
+	uv pip install pre-commit
 
 .PHONY: install-deps
-install-deps: install-tools pdm-lock-check ## Install all required dependencies, according to pdm.lock
-	pdm sync --group $(TORCH_GROUP) --lockfile pdm.lock.$(TORCH_GROUP)
+install-deps: install-tools uv-lock-check ## Install all required dependencies, according to uv.lock
+	uv sync
 
 .PHONY: install-deps-test
-install-deps-test: install-tools pdm-lock-check ## Install all required dev dependencies, according to pdm.lock
-	pdm sync --dev --group $(TORCH_GROUP) --lockfile pdm.lock.$(TORCH_GROUP)
+install-deps-test: install-tools uv-lock-check ## Install all required dev dependencies, according to uv.lock
+	uv sync --dev
 
 .PHONY: update-deps
 update-deps: ## Check pyproject.toml for changes, update the lock file if needed, then sync.
-	pdm install --group $(TORCH_GROUP) --lockfile pdm.lock.$(TORCH_GROUP)
-	pdm install --dev --group $(TORCH_GROUP) --lockfile pdm.lock.$(TORCH_GROUP)
+	uv lock --upgrade
+	uv sync
+	uv sync --dev
 
 .PHONY: check-types
 check-types: ## Check types in the code.
 	@echo "Running $@ target ..."
-	pdm run mypy --namespace-packages --explicit-package-bases --strict --disallow-untyped-calls --disallow-untyped-defs --disallow-incomplete-defs src scripts
+	uv run mypy --namespace-packages --explicit-package-bases --strict --disallow-untyped-calls --disallow-untyped-defs --disallow-incomplete-defs src scripts
 
 .PHONY: check-format
 check-format: ## Check that the code is properly formatted using Black and Ruff formatter.
 	@echo "Running $@ target ..."
-	pdm run black --check scripts src
-	pdm run ruff check scripts src --per-file-ignores=scripts/*:S101
+	uv run black --check scripts src
+	uv run ruff check scripts src --per-file-ignores=scripts/*:S101
 
 .PHONY: check-coverage
 check-coverage: ## Check the coverage of unit tests.
 	@echo "Running $@ target ..."
-	pdm run coverage run --source=src/lightspeed_rag_content -m unittest discover tests --verbose && pdm run coverage report -m --fail-under 90
+	uv run coverage run --source=src/lightspeed_rag_content -m unittest discover tests --verbose && uv run coverage report -m --fail-under 90
 
 .PHONY: check-code-metrics
 check-code-metrics: ## Check the code using Radon.
 	@echo "Running $@ target ..."
-	@OUTPUT=$$(pdm run radon cc -a A src/ | tee /dev/tty | tail -1) && \
+	@OUTPUT=$$(uv run radon cc -a A src/ | tee /dev/tty | tail -1) && \
 	GRADE=$$(echo $$OUTPUT | grep -oP " [A-F] " | tr -d '[:space:]') && \
 	if [ "$$GRADE" = "A" ]; then exit 0; else exit 1; fi
 
 .PHONY: format
 format: ## Format the code into unified format
-	pdm run black scripts src
-	pdm run ruff check scripts src --fix --per-file-ignores=scripts/*:S101
-	pdm run pre-commit run
+	uv run black scripts src
+	uv run ruff check scripts src --fix --per-file-ignores=scripts/*:S101
+	uv run pre-commit run
 
 black:
-	pdm run black --check .
+	uv tool run black --check .
 
 pylint:
-	pdm run pylint src
+	uv run pylint src
 
 ruff:
-	pdm run ruff check src --per-file-ignores=tests/*:S101 --per-file-ignores=scripts/*:S101
+	uv run ruff check src --per-file-ignores=tests/*:S101 --per-file-ignores=scripts/*:S101
 
 .PHONY: verify
 verify: check-types check-format check-code-metrics check-coverage ## Verify the code using various linters
-
-.PHONY: build-base-image
-build-base-image: ## Build base container image
-	podman build -t $(TORCH_GROUP)-lightspeed-core-base -f Containerfile --build-arg FLAVOR=$(TORCH_GROUP)
 
 .PHONY: start-postgres
 start-postgres: ## Start postgresql from the pgvector container image

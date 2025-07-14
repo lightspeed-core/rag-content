@@ -9,22 +9,22 @@ that can be used for RAG.
 
 The ``lightspeed_rag_content`` library is not available via pip, but it's included:
    - in the base [container image](#via-container-image) or
-   - it can be installed [via PDM](#via-pdm).
+   - it can be installed [via UV](#via-uv).
 
-### Via PDM
+### Via uv
 
-To install the library via PDM, do:
+To install the library via uv, do:
 
-1. Run the command ``pdm install``
+1. Run the command ``uv sync``
 
     ```bash
-    pdm install
+    uv sync
     ```
 
 2. Test if the library can be imported (expect `lightspeed-rag-content` in the output):
 
     ```bash
-    pdm run python -c "import lightspeed_rag_content; print(lightspeed_rag_content.__name__)"
+    uv run python -c "import lightspeed_rag_content; print(lightspeed_rag_content.__name__)"
     ```
 
 ### Via Container Image
@@ -34,16 +34,16 @@ registry at `ghcr.io/lightspeed-core/rag-content-cpu:latest`. To build the image
 follow these steps:
 
 1. Install the requirements: `make` and `podman`.
-2. Generate the base container image (set `FLAVOR=gpu` if you plan to use a GPU):
+2. Generate the container image:
 
     ```bash
-    make build-base-image FLAVOR=cpu
+    podman run -t localhost/lightspeed-rag-content-cpu:latest
     ```
 
 3. The `lightspeed_rag_content` and its dependencies will be installed in the
 image (expect `lightspeed-rag-content` in the output):
     ```bash
-    podman run localhost/cpu-lightspeed-core-base:latest python -c "import lightspeed_rag_content; print(lightspeed_rag_content.__name__)"
+    podman run localhost/lightspeed-rag-content-cpu:latest python -c "import lightspeed_rag_content; print(lightspeed_rag_content.__name__)"
     ```
 
 
@@ -125,7 +125,7 @@ Generate the documentation using the script from the previous section
 ([Generating the Vector Database](#generating-the-vector-database)):
 
 ```bash
-pdm run ./custom_processor.py -o ./vector_db/custom_docs/0.1 -f ./custom_docs/0.1/ -md embeddings_model/ -mn sentence-transformers/all-mpnet-base-v2 -i custom_docs-0_1
+uv run ./custom_processor.py -o ./vector_db/custom_docs/0.1 -f ./custom_docs/0.1/ -md embeddings_model/ -mn sentence-transformers/all-mpnet-base-v2 -i custom_docs-0_1
 ```
 
 Once the command is done, you can find the vector database at `./vector_db`, the
@@ -154,7 +154,7 @@ commands:
     POSTGRES_HOST=localhost \
     POSTGRES_PORT=15432 \
     POSTGRES_DATABASE=postgres \
-    pdm run python ./custom_processor.py \
+    uv run python ./custom_processor.py \
      -o ./output \
      -f custom_docs/0.1/ \
      -md embeddings_model/ \
@@ -183,21 +183,18 @@ commands:
 
 ## Update lockfiles
 
-Three lock file are used in this repository:
+The lock file is used in this repository:
 
 ```
-pdm.lock
-pdm.lock.cpu
-pdm.lock.gpu
+uv.lock
 ```
 
-Usually all three lock files needs to be regenerated when new updates (dependencies) are available. Use
+The lock file needs to be regenerated when new updates (dependencies) are available. Use
 following commands in order to do it:
 
 ```
-pdm update
-pdm update --lockfile pdm.lock.cpu
-pdm update --lockfile pdm.lock.gpu
+uv lock --upgrade
+uv sync
 ```
 
 ## `requirements*` Files Generation for Konflux
