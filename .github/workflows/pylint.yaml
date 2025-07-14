@@ -13,16 +13,11 @@ jobs:
     name: "Pylinter"
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
         with:
           python-version: '3.11'
-      - name: Python version
-        run: python --version
-      - name: PDM installation
-        run: pip install --user pdm
       - name: Install dependencies
-        run: pdm install
-      - name: Install devel dependencies
-        run: pdm install --group default,dev
+        run: uv sync
       - name: Python linter
-        run: make pylint
+        run: uv run pylint src

@@ -1,8 +1,8 @@
 name: Check dependencies
 
 on:
-  #- push
-  #- pull_request
+  - push
+  - pull_request
 
 jobs:
   check_dependencies:
@@ -12,16 +12,11 @@ jobs:
       pull-requests: read
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
         with:
           python-version: '3.11'
-      - name: Check Python version
-        run: python --version
-      - name: PDM installation
-        run: pip install --user pdm
-      - name: PDM version
-        run: pdm --version
-      - name: Generate requirements.txt file
-        run: pdm export --prod --format requirements --output requirements.txt --no-extras
-      - name: List requirements.txt file
-        run: cat requirements.txt
+      - name: Install dependencies
+        run: uv sync
+      - name: List dependencies
+        run: uv pip list

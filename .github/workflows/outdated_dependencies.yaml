@@ -12,12 +12,11 @@ jobs:
       pull-requests: read
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
         with:
           python-version: '3.11'
-      - name: Check Python version
-        run: python --version
-      - name: PDM installation
-        run: pip install --user pdm
+      - name: Install dependencies
+        run: uv sync
       - name: List outdated dependencies
-        run: pdm outdated
+        run: uv pip list --outdated
