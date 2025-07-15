@@ -214,8 +214,9 @@ tool_groups:
             mock.Mock(
                 spec=TextNode,
                 ref_doc_id=i,
+                id_=i * 3,
                 text=str(i),
-                extra_info={"title": f"title{i}"},
+                metadata={"title": f"title{i}", "docs_url": f"https://redhat.com/{i}"},
             )
             for i in range(1, 3)
         ]
@@ -230,12 +231,30 @@ tool_groups:
             {
                 "content": "1",
                 "mime_type": "text/plain",
-                "metadata": {"document_id": 1, "title": "title1"},
+                "metadata": {
+                    "document_id": 1,
+                    "title": "title1",
+                    "docs_url": "https://redhat.com/1",
+                },
+                "chunk_metadata": {
+                    "document_id": 1,
+                    "chunk_id": 3,
+                    "source": "https://redhat.com/1",
+                },
             },
             {
                 "content": "2",
                 "mime_type": "text/plain",
-                "metadata": {"document_id": 2, "title": "title2"},
+                "metadata": {
+                    "document_id": 2,
+                    "title": "title2",
+                    "docs_url": "https://redhat.com/2",
+                },
+                "chunk_metadata": {
+                    "document_id": 2,
+                    "chunk_id": 6,
+                    "source": "https://redhat.com/2",
+                },
             },
         ]
 
@@ -290,6 +309,7 @@ tool_groups:
 
         write_cfg = self.patch_object(doc, "write_yaml_config")
         client = self.patch_object(doc, "_start_llama_stack")
+        client.inspect.version.return_value = "0.2.14"
         realpath = self.patch(
             "os.path.realpath", return_value="/cwd/out_dir/vector_store.db"
         )
@@ -308,6 +328,45 @@ tool_groups:
             embedding_dimension=768,
         )
 
+        return client.return_value
+
+    def _test_save_0_2_12(self):
+        """Set up and verify save functionality for testing.
+
+        Sets up common test fixtures and verifies core save operations
+        including YAML config generation and vector DB registration.
+
+        Returns:
+            Mock client object for additional assertions by calling tests.
+        """
+        doc = document_processor._LlamaStackDB(self.config)
+        doc.documents = [
+            {"metadata": 1, "chunk_metadata": 1},
+            {"metadata": 2, "chunk_metadata": 2},
+        ]
+
+        write_cfg = self.patch_object(doc, "write_yaml_config")
+        client = self.patch_object(doc, "_start_llama_stack")
+        client.inspect.version.return_value = "0.2.12"
+        realpath = self.patch(
+            "os.path.realpath", return_value="/cwd/out_dir/vector_store.db"
+        )
+
+        doc.save(mock.sentinel.index, "out_dir")
+
+        realpath.assert_called_once_with("out_dir/faiss_store.db")
+        write_cfg.assert_called_once_with(
+            mock.sentinel.index,
+            "out_dir/llama-stack.yaml",
+            "/cwd/out_dir/vector_store.db",
+        )
+        client.return_value.vector_dbs.register.assert_called_once_with(
+            vector_db_id=mock.sentinel.index,
+            embedding_model=self.model_name,
+            embedding_dimension=768,
+        )
+
+        self.assertDictEqual([{"metadata": 1}, {"metadata": 2}], doc.documents)
         return client.return_value
 
     def test_save_manual_chunking(self):

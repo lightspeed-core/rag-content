@@ -323,13 +323,19 @@ tool_groups:
         """Add documents to the list of documents to save."""
         if self.config.manual_chunking:
             for node in self._split_and_filter(docs):
-                # Add document_id to node's metadata because llama-stack needs it
-                node.extra_info["document_id"] = node.ref_doc_id
+                # Add document_id to chunks's metadata because llama-stack needs it
+                node.metadata["document_id"] = node.ref_doc_id
+                chunk_metadata = {
+                    "document_id": node.ref_doc_id,
+                    "chunk_id": node.id_,
+                    "source": node.metadata.get("docs_url", node.metadata["title"]),
+                }
                 self.documents.append(
                     {
                         "content": node.text,
                         "mime_type": "text/plain",
-                        "metadata": node.extra_info,
+                        "metadata": node.metadata,
+                        "chunk_metadata": chunk_metadata,
                     }
                 )
 
@@ -369,6 +375,11 @@ tool_groups:
 
         try:
             if self.config.manual_chunking:
+                # TODO: Remove this when min llama-stack version >= 0.2.13
+                #       (requires python >= 3.12)
+                if client.inspect.version() == "0.2.12":
+                    for doc in self.documents:
+                        del doc["chunk_metadata"]
                 client.vector_io.insert(vector_db_id=index, chunks=self.documents)
             else:
                 client.tool_runtime.rag_tool.insert(
