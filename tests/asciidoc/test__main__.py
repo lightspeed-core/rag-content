@@ -26,8 +26,11 @@ from lightspeed_rag_content.asciidoc.__main__ import (
 from lightspeed_rag_content.asciidoc.asciidoctor_converter import RUBY_ASCIIDOC_DIR
 
 
-class Test__main__(unittest.TestCase):
+class Test__main__(unittest.TestCase):  # noqa: N801
+    """Test the main module functionality for AsciiDoc processing."""
+
     def setUp(self):
+        """Set up test fixtures before each test method."""
         super().setUp()
 
         self.asciidoctor_cmd = "/usr/bin/asciidoctor"
@@ -41,6 +44,7 @@ class Test__main__(unittest.TestCase):
         )
 
     def get_mock_parsed_args(self) -> Mock:
+        """Create and return a mock parsed arguments object."""
         mock_args = Mock()
         mock_args.input_file = self.input_file
         mock_args.output_file = self.output_file
@@ -53,6 +57,7 @@ class Test__main__(unittest.TestCase):
     @patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.subprocess.run")
     @patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.shutil.which")
     def test_main_convert(self, mock_which, mock_run):
+        """Test successful conversion of AsciiDoc files."""
         mock_which.return_value = self.asciidoctor_cmd
         mock_args = self.get_mock_parsed_args()
         main_convert(mock_args)
@@ -77,6 +82,7 @@ class Test__main__(unittest.TestCase):
     @patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.subprocess.run")
     @patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.shutil.which")
     def test_main_convert_incorrect_cmd_error(self, mock_which, mock_run):
+        """Test handling of conversion errors when command fails."""
         mock_which.return_value = self.asciidoctor_cmd
         mock_run.side_effect = subprocess.CalledProcessError(
             cmd=self.asciidoctor_cmd, returncode=1
@@ -89,6 +95,7 @@ class Test__main__(unittest.TestCase):
 
     @patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.shutil.which")
     def test_main_convert_missing_asciidoctor_cmd(self, mock_which):
+        """Test error handling when asciidoctor command is not found."""
         mock_which.return_value = ""
         mock_args = self.get_mock_parsed_args()
 
@@ -99,6 +106,7 @@ class Test__main__(unittest.TestCase):
     @patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.subprocess.run")
     @patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.shutil.which")
     def test_main_get_structure(self, mock_which, mock_run):
+        """Test successful extraction of AsciiDoc document structure."""
         mock_which.return_value = "/usr/bin/ruby"
         mock_args = Mock()
         mock_args.input_file = self.input_file
@@ -115,6 +123,7 @@ class Test__main__(unittest.TestCase):
 
     @patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.subprocess.run")
     def test_main_incorrect_asciidoctor_cmd(self, mock_run):
+        """Test error handling when structure extraction command fails."""
         mock_run.side_effect = subprocess.CalledProcessError(
             cmd=self.asciidoctor_cmd, returncode=1
         )
@@ -127,6 +136,7 @@ class Test__main__(unittest.TestCase):
 
     @patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.shutil.which")
     def test_main_missing_asciidoctor_cmd(self, mock_which):
+        """Test error handling when Ruby command is not found for structure extraction."""
         mock_which.return_value = ""
         mock_args = Mock()
         mock_args.input_file = self.input_file
@@ -140,6 +150,7 @@ class Test__main__(unittest.TestCase):
                 self.assertTrue(len(error_msgs) > 0)
 
     def test_get_argument_parser(self):
+        """Test creation and configuration of the argument parser."""
         args = get_argument_parser()
 
         self.assertIsInstance(args, argparse.ArgumentParser)

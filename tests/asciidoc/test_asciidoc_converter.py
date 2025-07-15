@@ -25,7 +25,10 @@ from lightspeed_rag_content.asciidoc.asciidoctor_converter import (
 
 
 class TestAsciidoctorConverter(unittest.TestCase):
+    """Test AsciidoctorConverter class functionality."""
+
     def setUp(self):
+        """Set up test fixtures and mock data for AsciidoctorConverter tests."""
         super().setUp()
 
         self.valid_attributes_file = """---
@@ -47,6 +50,7 @@ class TestAsciidoctorConverter(unittest.TestCase):
     @patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.subprocess.run")
     @patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.shutil.which")
     def test_convert(self, mock_which, mock_run):
+        """Test convert method with valid attributes file and default converter."""
         mock_which.return_value = self.asciidoctor_cmd
         with patch("builtins.open", mock_open(read_data=self.valid_attributes_file)):
             adoc_text_converter = AsciidoctorConverter(
@@ -76,6 +80,7 @@ class TestAsciidoctorConverter(unittest.TestCase):
     @patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.subprocess.run")
     @patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.shutil.which")
     def test_convert_custom_converter(self, mock_which, mock_run):
+        """Test convert method with custom converter file specified."""
         mock_which.return_value = self.asciidoctor_cmd
         custom_converter = Path("custom_converter")
         adoc_text_converter = AsciidoctorConverter(converter_file=custom_converter)
@@ -101,6 +106,7 @@ class TestAsciidoctorConverter(unittest.TestCase):
     @patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.subprocess.run")
     @patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.shutil.which")
     def test_convert_overwrite_output_file(self, mock_which, mock_run):
+        """Test convert method logs warning when overwriting existing output file."""
         mock_which.return_value = self.asciidoctor_cmd
         adoc_text_converter = AsciidoctorConverter()
 
@@ -115,6 +121,7 @@ class TestAsciidoctorConverter(unittest.TestCase):
     @patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.subprocess.run")
     @patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.shutil.which")
     def test_convert_new_output_file(self, mock_which, mock_run):
+        """Test convert method creates parent directory for new output file."""
         mock_which.return_value = self.asciidoctor_cmd
         adoc_text_converter = AsciidoctorConverter()
 
@@ -126,26 +133,31 @@ class TestAsciidoctorConverter(unittest.TestCase):
         output_file.parent.mkdir.assert_called_once()
 
     def test__get_converter_file(self):
+        """Test _get_converter_file returns correct path for text format."""
         converter_file = AsciidoctorConverter._get_converter_file("text")
         self.assertEqual(
             converter_file, RUBY_ASCIIDOC_DIR.joinpath("asciidoc_text_converter.rb")
         )
 
     def test__get_converter_file_asciidoctor_built_in_format(self):
+        """Test _get_converter_file returns None for asciidoctor built-in format."""
         converter_file = AsciidoctorConverter._get_converter_file("html5")
         self.assertEqual(converter_file, None)
 
     def test__get_converter_file_invalid_format(self):
+        """Test _get_converter_file raises FileNotFoundError for invalid format."""
         with self.assertRaises(FileNotFoundError):
             AsciidoctorConverter._get_converter_file("invalid")
 
     @patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.shutil.which")
     def test__get_asciidoctor_path_missing(self, mock_which):
+        """Test constructor raises FileNotFoundError when asciidoctor is missing."""
         mock_which.return_value = ""
         with self.assertRaises(FileNotFoundError):
             AsciidoctorConverter()
 
     def test__get_attribute_list_valid_yaml(self):
+        """Test _get_attribute_list parses valid YAML attributes file correctly."""
         with patch(
             "builtins.open", mock_open(read_data=self.valid_attributes_file)
         ) as m:
@@ -153,11 +165,13 @@ class TestAsciidoctorConverter(unittest.TestCase):
             m.assert_called_once()
 
     def test__get_attribute_list_invalid_yaml(self):
+        """Test _get_attribute_list raises YAMLError for invalid YAML syntax."""
         with patch("builtins.open", mock_open(read_data=self.invalid_attributes_file)):
             with self.assertRaises(yaml.YAMLError):
                 AsciidoctorConverter._get_attribute_list(Path("invalid.yaml"))
 
     def test__get_attribute_list_empty_yaml(self):
+        """Test _get_attribute_list returns empty list for empty YAML file."""
         with patch("builtins.open", mock_open(read_data="")):
             attributes = AsciidoctorConverter._get_attribute_list(
                 Path("non_existing.yaml")
