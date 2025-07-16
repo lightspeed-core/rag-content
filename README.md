@@ -51,12 +51,17 @@ image (expect `lightspeed-rag-content` in the output):
 
 You can generate the vector database either using
 
-1. [Faiss Vector Store](#faiss-vector-store), or
-2. [Postgres (PGVector) Vector Store](#postgres-pgvector-vector-store)
+1. [Llama-Index Faiss Vector Store](#faiss-vector-store)
+2. [Llama-Index Postgres (PGVector) Vector Store](#postgres-pgvector-vector-store)
+3. [Llama-Stack Faiss Vector-IO](#llama-stack-faiss)
+4. [Llama-Stack SQLite-vec Vector-IO](#llama-stack-sqlite-vec)
 
-Both approaches require you to download the embedding model and to prepare documentation
-in text format that is going to be chunked and map to embeddings generated using
-the model:
+Llama-Index approaches require you to download the embedding model, and we also
+recommend it for Llama-Stack targets even though it should work even without
+manually downloading the model, model-download.
+
+All cases require you to prepare documentation in text format that is going to
+be chunked and map to embeddings generated using the model:
 
 1. Download the embedding model
 ([sentence-transformers/all-mpnet-base-v2](https://huggingface.co/sentence-transformers/all-mpnet-base-v2))
@@ -109,6 +114,7 @@ different:
             embeddings_model_dir=args.model_dir,
             num_workers=args.workers,
             vector_store_type=args.vector_store_type,
+            manual_chunking=args.manual_chunking,
         )
 
         # Load and embed the documents, this method can be called multiple times
@@ -180,6 +186,128 @@ commands:
      public | data_table_name        | table | postgres
     (1 row)
     ```
+
+### Llama-Stack Faiss
+
+The process is basically the same as in the
+[Llama-Index Faiss Vector Store](#faiss-vector-store) but passing the
+`--vector-store-type` parameter; so you generate the documentation using the
+`custom_processor.py` script from earlier section
+ ([Generating the Vector Database](#generating-the-vector-database)):
+
+```bash
+pdm run ./custom_processor.py \
+  -o ./vector_db/custom_docs/0.1 \
+  -f ./custom_docs/0.1/ \
+  -md embeddings_model/ \
+  -mn sentence-transformers/all-mpnet-base-v2 \
+  -i custom_docs-0_1 \
+  --vector-store-type=llamastack-faiss
+```
+
+Once the command is done, you can find the vector database at
+`./vector_db/custom_docs/0.1` with the name `faiss_store.db` as well as a
+barebones llama-stack configuration file named `llama-stack.yaml` for
+reference, since it's not necessary for the final deployment.
+
+The vector-io will be named `custom-docs-0_1`:
+
+```yaml
+providers:
+ vector_io:
+   - provider_id: custom-docs-0_1
+     provider_type: inline::faiss
+     config:
+       kvstore:
+         type: sqlite
+         namespace: null
+         db_path: /home/<user>/rag-content/vector_db/custom_docs/0.1/faiss_store.db
+```
+
+Once we have a database we can use script `query_rag.py` to check some results:
+
+```bash
+python scripts/query_rag.py \
+  -p vector_db/custom_docs/0.1 \
+  -x custom-docs-0_1 \
+  -m embeddings_model \
+  -k 5 \
+  -q "how can I configure a cinder backend"
+```
+
+> [!NOTE]
+> When bringing the vector-io file with our knowledge to a new host/container,
+> configuring the vector-io provider, and running llama-stack, the service
+> automatically register the vector-dbs present in the file; we'll need to
+> manually register them.
+>
+> There are several ways to register the vector-dbs from a vector-io provider
+> in llama-stack, and in this repository we provide a simple script named
+> `register-llama-dbs.py` to this this auto-magically.  This script can be used
+> in the container build process or in a pod's init-container.
+
+
+> [!CAUTION]
+> For some reason the faiss DB files in llama-stack are ridiculously large and
+> due to the 2GB size limitation in sqlite fields the process is likely to fail
+> with any decent amount of documents.
+
+
+### Llama-Stack SQLite-vec
+
+The process is the same as in the
+[Llama-Stack Faiss](#llama-stack-faiss) but passing a different value on the
+`--vector-store-type` parameter; so you generate the documentation using the
+`custom_processor.py` script from earlier section
+ ([Generating the Vector Database](#generating-the-vector-database)):
+
+```bash
+pdm run ./custom_processor.py \
+  -o ./vector_db/custom_docs/0.1 \
+  -f ./custom_docs/0.1/ \
+  -md embeddings_model/ \
+  -mn sentence-transformers/all-mpnet-base-v2 \
+  -i custom_docs-0_1 \
+  --vector-store-type=llamastack-sqlitevec
+```
+
+Once the command is done, you can find the vector database at
+`./vector_db/custom_docs/0.1` with the name `sqlitevec_store.db` as well as a
+barebones llama-stack configuration file named `llama-stack.yaml` for
+reference, since it's not necessary for the final deployment.
+
+The vector-io will be named `custom-docs-0_1`:
+
+```yaml
+providers:
+ vector_io:
+   - provider_id: custom-docs-0_1
+     provider_type: inline::sqlite-vec
+     config:
+       db_path: /home/<user>/rag-content/vector_db/custom_docs/0.1/sqlitevec_store.db
+```
+
+Once we have a database we can use script `query_rag.py` to check some results:
+
+```bash
+python scripts/query_rag.py \
+  -p vector_db/custom_docs/0.1 \
+  -x custom-docs-0_1 \
+  -m embeddings_model \
+  -k 5 \
+  -q "how can I configure a cinder backend"
+```
+
+> [!NOTE]
+> When bringing the vector-io file with our knowledge to a new host/container,
+> configuring the vector-io provider, and running llama-stack, the service
+> automatically register the vector-dbs present in the file; we'll need to
+> manually register them.
+>
+> There are several ways to register the vector-dbs from a vector-io provider
+> in llama-stack, and in this repository we provide a simple script named
+> `register-llama-dbs.py` to this this auto-magically.  This script can be used
+> in the container build process or in a pod's init-container.
 
 ## Update lockfiles
 

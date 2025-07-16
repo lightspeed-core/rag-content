@@ -6,11 +6,16 @@ lint.select = ["D", "E", "F", "W", "C", "S", "I", "TCH", "SLOT", "RUF", "C90", "
 # we need to check 'mood' of all docstrings, this needs to be enabled explicitly
 lint.extend-select = ["D401"]
 
+# ignore TODOs
 lint.ignore = []
 
 target-version = "py311"
 lint.pydocstyle.convention = "google"
 line-length = 100
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "D104", "D100"]
+"scripts/*" = ["S101"]
 
 [tool.mypy]
 disable_error_code = ["union-attr", "return-value", "arg-type", "import-untyped"]
@@ -37,6 +42,10 @@ dependencies = [
     "llama-index-readers-file==0.1.30",
     "faiss-cpu==1.8.0.post1",
     "llama-index-vector-stores-postgres>=0.1.14",
+    "llama-stack>=0.2.12,<0.3",
+    "llama-stack-client>=0.2.12,<0.3",
+    "aiosqlite>=0.21.0",
+    "sqlite-vec>=0.1.6",
     "torch==2.3.1",
 ]
 requires-python = "==3.11.*"
@@ -68,4 +77,4 @@ dev = [
 
 [tool.pylint."MESSAGES CONTROL"]
 good-names = ["e"]
-disable = ["R0902", "R0903", "R0913", "R0917", "W0621"]
+disable = ["R0902", "R0903", "R0913", "R0917", "W0621", "W0511"]
