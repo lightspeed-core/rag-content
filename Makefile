@@ -9,7 +9,7 @@ POSTGRES_DATABASE ?= postgres
 
 .PHONY: install-tools
 install-tools: ## Install required utilities/tools
-	@command -v uv > /dev/null || { echo >&2 "uv is not installed. Installing..."; pip3.11 install --upgrade pip uv; }
+	@command -v uv > /dev/null || { echo >&2 "uv is not installed. Installing..."; pip3.12 install --upgrade pip uv; }
 
 .PHONY: uv-lock-check
 uv-lock-check: ## Check that the uv.lock file is in a good shape
@@ -17,7 +17,7 @@ uv-lock-check: ## Check that the uv.lock file is in a good shape
 
 .PHONY: install-global
 install-global: install-tools ## Install ligthspeed-rag-content into file system.
-	uv pip install --python 3.11 --system .
+	uv pip install --python 3.12 --system .
 
 .PHONY: install-hooks
 install-hooks: install-deps-test ## Install commit hooks
