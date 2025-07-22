@@ -8,7 +8,7 @@ lint.extend-select = ["D401"]
 
 lint.ignore = []
 
-target-version = "py311"
+target-version = "py312"
 lint.pydocstyle.convention = "google"
 line-length = 100
 
@@ -37,9 +37,9 @@ dependencies = [
     "llama-index-readers-file==0.4.11",
     "faiss-cpu==1.11.0.post1",
     "llama-index-vector-stores-postgres>=0.5.4",
-    "torch==2.7.0",
+    "torch==2.7.1",
 ]
-requires-python = "==3.11.*"
+requires-python = "==3.12.*"
 dynamic = ["license", "readme"]
 
 # PyTorch has multiple wheel variants for different backends - cpu, gpu, etc.
