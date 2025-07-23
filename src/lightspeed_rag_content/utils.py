@@ -26,7 +26,7 @@ def get_common_arg_parser() -> argparse.ArgumentParser:
         "-md",
         "--model-dir",
         default="embeddings_model",
-        help="Directory containing the embedding model",
+        help="Directory containing the embedding model.",
     )
     parser.add_argument("-mn", "--model-name", help="HF repo id of the embedding model")
     parser.add_argument(
@@ -57,7 +57,15 @@ def get_common_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--vector-store-type",
         default="faiss",
-        choices=["faiss", "postgres"],
+        choices=["faiss", "postgres", "llamastack-faiss", "llamastack-sqlite-vec"],
         help="vector store type to be used.",
+    )
+    parser.add_argument(
+        "--auto-chunking",
+        action="store_false",
+        default=True,
+        dest="manual_chunking",
+        help="How to do the chunking for llama-stack, manually like in "
+        "llama-index or automatically using the RAG runtime tool.",
     )
     return parser

@@ -1,12 +1,12 @@
 ARG FLAVOR=gpu
 
-FROM registry.access.redhat.com/ubi9/python-311 as cpu-base
+FROM registry.access.redhat.com/ubi9/python-312 as cpu-base
 ARG FLAVOR
 
 FROM nvcr.io/nvidia/cuda:12.6.2-devel-ubi9 as gpu-base
 ARG FLAVOR
-RUN dnf install -y python3.11 python3.11-pip libcudnn8 libnccl git
-RUN ln -sf /usr/bin/python3.11 /usr/bin/python
+RUN dnf install -y python3.12 python3.12-pip libcudnn8 libnccl git
+RUN ln -sf /usr/bin/python3.12 /usr/bin/python
 ENV LD_LIBRARY_PATH=/usr/local/cuda-12.6/compat:$LD_LIBRARY_PATH
 
 FROM ${FLAVOR}-base as lightspeed-core-rag-builder
