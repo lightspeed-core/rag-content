@@ -29,15 +29,15 @@ version = "0.1.0"
 description = "RAG content for OpenShift LightSpeed."
 authors = []
 dependencies = [
-    "PyYAML==6.0.1",
-    "huggingface_hub>=0.23.4",
-    "llama-index==0.10.62",
-    "llama-index-vector-stores-faiss==0.1.2",
-    "llama-index-embeddings-huggingface==0.2.2",
-    "llama-index-readers-file==0.1.30",
-    "faiss-cpu==1.8.0.post1",
-    "llama-index-vector-stores-postgres>=0.1.14",
-    "torch==2.3.1",
+    "PyYAML==6.0.2",
+    "huggingface_hub>=0.33.4",
+    "llama-index==0.12.51",
+    "llama-index-vector-stores-faiss==0.3.0",
+    "llama-index-embeddings-huggingface==0.4.0",
+    "llama-index-readers-file==0.4.11",
+    "faiss-cpu==1.11.0.post1",
+    "llama-index-vector-stores-postgres>=0.5.4",
+    "torch==2.7.0",
 ]
 requires-python = "==3.11.*"
 dynamic = ["license", "readme"]
@@ -54,16 +54,18 @@ torchvision = [{ index = "pytorch-cpu" }]
 
 [dependency-groups]
 dev = [
-    "black==24.10.0",
-    "mypy==1.12.0",
-    "ruff==0.6.9",
-    "types-requests==2.32.0.20240622",
-    "pre-commit==4.0.1",
+    "black>=25.1.0",
+    "mypy>=1.15.0",
+    "ruff>=0.12.4",
+    "types-requests>=2.32.0.20240622",
+    "pre-commit>=4.2.0",
     "coverage>=7.6.12",
-    "huggingface-hub>=0.23.4",
+    "huggingface-hub>=0.33.4",
     "radon>=6.0.1",
     "pyright>=1.1.401",
     "pylint>=3.3.7",
+    "pytest>=8.3.4",
+    "pytest-cov>=6.0.0",
 ]
 
 [tool.pylint."MESSAGES CONTROL"]

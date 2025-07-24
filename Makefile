@@ -1,4 +1,5 @@
 NUM_WORKERS ?= $$(( $(shell nproc --all) / 2))
+ARTIFACT_DIR := $(if $(ARTIFACT_DIR),$(ARTIFACT_DIR),tests/test_results)
 
 # Define arguments for pgvector support
 POSTGRES_USER ?= postgres
@@ -6,6 +7,13 @@ POSTGRES_PASSWORD ?= somesecret
 POSTGRES_HOST ?= localhost
 POSTGRES_PORT ?= 15432
 POSTGRES_DATABASE ?= postgres
+
+
+.PHONY: unit-test
+test-unit: ## Run the unit tests
+	@echo "Running unit tests..."
+	@echo "Reports will be written to ${ARTIFACT_DIR}"
+	COVERAGE_FILE="${ARTIFACT_DIR}/.coverage.unit" uv run pytest tests --cov=src/lightspeed_rag_content --cov-report term-missing --cov-report "json:${ARTIFACT_DIR}/coverage_unit.json" --junit-xml="${ARTIFACT_DIR}/junit_unit.xml" --cov-fail-under=60
 
 .PHONY: install-tools
 install-tools: ## Install required utilities/tools

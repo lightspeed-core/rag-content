@@ -29,5 +29,4 @@ jobs:
         run: uv pip install pdm
       - name: Run unit tests
         run: |
-          uv run coverage run --source=src/lightspeed_rag_content -m unittest discover tests --verbose
-          uv run coverage report -m --fail-under 90
+          uv run pytest tests --cov=src/lightspeed_rag_content --cov=runner --cov-report term-missing --cov-fail-under=90
