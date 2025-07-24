@@ -22,11 +22,13 @@ from llama_index.core.schema import TextNode
 from llama_index.core import Document
 from lightspeed_rag_content import document_processor
 
+from llama_index.core.embeddings.mock_embed_model import MockEmbedding
+
 
 # Mock class for HuggingFaceEmbedding
-class MockEmbedding:
+class RagMockEmbedding(MockEmbedding):
     def __init__(self, model_name="ABC"):
-        pass
+        super().__init__(embed_dim=256)
 
     def get_text_embedding(self, text):
         return "ABC"
@@ -207,7 +209,7 @@ class TestDocumentProcessor(unittest.TestCase):
     )
     @mock.patch(
         "lightspeed_rag_content.document_processor.HuggingFaceEmbedding",
-        new=MockEmbedding,
+        new=RagMockEmbedding,
     )
     def test_pgvector(self):
         self.patcher.stop()  # Remove the mock on the _get_settings() method
@@ -223,7 +225,7 @@ class TestDocumentProcessor(unittest.TestCase):
 
     @mock.patch(
         "lightspeed_rag_content.document_processor.HuggingFaceEmbedding",
-        new=MockEmbedding,
+        new=RagMockEmbedding,
     )
     def test_invalid_vector_store_type(self):
         self.patcher.stop()  # Remove the mock on the _get_settings() method

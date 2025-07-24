@@ -29,4 +29,4 @@ jobs:
         run: uv pip install pdm
       - name: Run unit tests
         run: |
-          uv run pytest tests/unit --cov=src/lightspeed_rag_content --cov=runner --cov-report term-missing --cov-fail-under=90
+          uv run pytest tests --cov=src/lightspeed_rag_content --cov=runner --cov-report term-missing --cov-fail-under=90
