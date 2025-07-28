@@ -37,7 +37,7 @@ follow these steps:
 2. Generate the container image:
 
     ```bash
-    podman run -t localhost/lightspeed-rag-content-cpu:latest
+    podman build -t localhost/lightspeed-rag-content-cpu:latest .
     ```
 
 3. The `lightspeed_rag_content` and its dependencies will be installed in the
