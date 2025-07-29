@@ -53,7 +53,7 @@ check-types: ## Check types in the code.
 .PHONY: check-format
 check-format: ## Check that the code is properly formatted using Black and Ruff formatter.
 	@echo "Running $@ target ..."
-	uv run black --check scripts src
+	uv run black --check scripts src tests
 	uv run ruff check scripts src --per-file-ignores=scripts/*:S101
 
 .PHONY: check-coverage
@@ -70,7 +70,7 @@ check-code-metrics: ## Check the code using Radon.
 
 .PHONY: format
 format: ## Format the code into unified format
-	uv run black scripts src
+	uv run black scripts src tests
 	uv run ruff check scripts src --fix --per-file-ignores=scripts/*:S101
 	uv run pre-commit run
 
