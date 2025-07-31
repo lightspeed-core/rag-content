@@ -7,10 +7,14 @@ lint.select = ["D", "E", "F", "W", "C", "S", "I", "TCH", "SLOT", "RUF", "C90", "
 lint.extend-select = ["D401"]
 
 lint.ignore = []
-
-target-version = "py311"
 lint.pydocstyle.convention = "google"
+
+target-version = "py312"
 line-length = 100
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "D104", "D100"]
+"scripts/*" = ["S101"]
 
 [tool.mypy]
 disable_error_code = ["union-attr", "return-value", "arg-type", "import-untyped"]
@@ -37,9 +41,13 @@ dependencies = [
     "llama-index-readers-file==0.4.11",
     "faiss-cpu==1.11.0.post1",
     "llama-index-vector-stores-postgres>=0.5.4",
-    "torch==2.7.0",
+    "torch==2.7.1",
+    "llama-stack==0.2.16",
+    "llama-stack-client==0.2.16",
+    "aiosqlite==0.21.0",
+    "sqlite-vec==0.1.6",
 ]
-requires-python = "==3.11.*"
+requires-python = "==3.12.*"
 dynamic = ["license", "readme"]
 
 # PyTorch has multiple wheel variants for different backends - cpu, gpu, etc.
@@ -51,6 +59,7 @@ explicit = true
 [tool.uv.sources]
 torch = [{ index = "pytorch-cpu" }]
 torchvision = [{ index = "pytorch-cpu" }]
+llama-stack = { git = "https://github.com/meta-llama/llama-stack.git", rev = "20c319795259f097101917d7304e63aeeeb21c5c" }
 
 [dependency-groups]
 dev = [
@@ -70,4 +79,4 @@ dev = [
 
 [tool.pylint."MESSAGES CONTROL"]
 good-names = ["e"]
-disable = ["R0902", "R0903", "R0913", "R0917", "W0621"]
+disable = ["R0902", "R0903", "R0913", "R0917", "W0621", "W0511"]

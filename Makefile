@@ -17,7 +17,7 @@ test-unit: ## Run the unit tests
 
 .PHONY: install-tools
 install-tools: ## Install required utilities/tools
-	@command -v uv > /dev/null || { echo >&2 "uv is not installed. Installing..."; pip3.11 install --upgrade pip uv; }
+	@command -v uv > /dev/null || { echo >&2 "uv is not installed. Installing..."; pip3.12 install --upgrade pip uv; }
 
 .PHONY: uv-lock-check
 uv-lock-check: ## Check that the uv.lock file is in a good shape
@@ -25,7 +25,7 @@ uv-lock-check: ## Check that the uv.lock file is in a good shape
 
 .PHONY: install-global
 install-global: install-tools ## Install ligthspeed-rag-content into file system.
-	uv pip install --python 3.11 --system .
+	uv pip install --python 3.12 --system .
 
 .PHONY: install-hooks
 install-hooks: install-deps-test ## Install commit hooks
@@ -53,8 +53,8 @@ check-types: ## Check types in the code.
 .PHONY: check-format
 check-format: ## Check that the code is properly formatted using Black and Ruff formatter.
 	@echo "Running $@ target ..."
-	uv run black --check scripts src
-	uv run ruff check scripts src --per-file-ignores=scripts/*:S101
+	uv run black --check scripts src tests
+	uv run ruff check scripts src
 
 .PHONY: check-coverage
 check-coverage: ## Check the coverage of unit tests.
@@ -70,8 +70,8 @@ check-code-metrics: ## Check the code using Radon.
 
 .PHONY: format
 format: ## Format the code into unified format
-	uv run black scripts src
-	uv run ruff check scripts src --fix --per-file-ignores=scripts/*:S101
+	uv run black scripts src tests
+	uv run ruff check scripts src --fix
 	uv run pre-commit run
 
 black:
@@ -81,7 +81,7 @@ pylint:
 	uv run pylint src
 
 ruff:
-	uv run ruff check src --per-file-ignores=tests/*:S101 --per-file-ignores=scripts/*:S101
+	uv run ruff check src
 
 .PHONY: verify
 verify: check-types check-format check-code-metrics check-coverage ## Verify the code using various linters

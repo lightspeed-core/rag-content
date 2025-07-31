@@ -15,227 +15,170 @@
 
 import os
 import unittest
-from pathlib import Path
 from unittest import mock
 
-from llama_index.core.schema import TextNode
-from llama_index.core import Document
 from lightspeed_rag_content import document_processor
-
-from llama_index.core.embeddings.mock_embed_model import MockEmbedding
-
-
-# Mock class for HuggingFaceEmbedding
-class RagMockEmbedding(MockEmbedding):
-    def __init__(self, model_name="ABC"):
-        super().__init__(embed_dim=256)
-
-    def get_text_embedding(self, text):
-        return "ABC"
+from tests import utils
 
 
-class TestDocumentProcessor(unittest.TestCase):
+class TestConfig(unittest.TestCase):
+    """Test cases for the _Config class in document_processor module."""
+
+    def test_config(self):
+        """Test that _Config class properly initializes and stores configuration values."""
+        config = document_processor._Config(
+            chunk_size=380,
+            chunk_overlap=0,
+            model_name="sentence-transformers/all-mpnet-base-v2",
+            embeddings_model_dir="./embeddings_model",
+        )
+        self.assertEqual(380, config.chunk_size)
+        self.assertEqual(0, config.chunk_overlap)
+        self.assertEqual("sentence-transformers/all-mpnet-base-v2", config.model_name)
+        self.assertEqual("./embeddings_model", config.embeddings_model_dir)
+
+
+class TestDocumentProcessor(utils.TestCase):
+    """Test cases for the DocumentProcessor class in document_processor module."""
 
     def setUp(self):
-        self.chunk_size = 380
-        self.chunk_overlap = 0
-        self.model_name = "sentence-transformers/all-mpnet-base-v2"
-        self.embeddings_model_dir = "./embeddings_model"
-        self.num_workers = 10
-
-        # Mock the _get_settings() method
-        self.settings_obj = mock.MagicMock()
-        self.patcher = mock.patch.object(
-            document_processor.DocumentProcessor, "_get_settings"
+        """Set up test fixtures and mock objects for DocumentProcessor tests."""
+        self.patch_object(
+            document_processor, "HuggingFaceEmbedding", new=utils.RagMockEmbedding
         )
-        self._settings = self.patcher.start()
-        self._settings.return_value = self.settings_obj
-        self.addCleanup(self.patcher.stop)
-
-        self.doc_processor = document_processor.DocumentProcessor(
-            self.chunk_size,
-            self.chunk_overlap,
-            self.model_name,
-            Path(self.embeddings_model_dir),
-            self.num_workers,
-        )
-
-    def test__got_whitespace_false(self):
-        text = "NoWhitespace"
-
-        result = self.doc_processor._got_whitespace(text)
-
-        self.assertFalse(result)
-
-    def test__got_whitespace_true(self):
-        text = "Got whitespace"
-
-        result = self.doc_processor._got_whitespace(text)
-
-        self.assertTrue(result)
-
-    def test__filter_out_invalid_nodes(self):
-        fake_node_0 = mock.Mock(spec=TextNode)
-        fake_node_1 = mock.Mock(spec=TextNode)
-        fake_node_0.text = "Got whitespace"
-        fake_node_1.text = "NoWhitespace"
-
-        result = self.doc_processor._filter_out_invalid_nodes(
-            [fake_node_0, fake_node_1]
-        )
-
-        # Only nodes with whitespaces should be returned
-        self.assertEqual([fake_node_0], result)
-
-    @mock.patch.object(document_processor, "VectorStoreIndex")
-    def test__save_index(self, mock_vector_index):
-        fake_index = mock_vector_index.return_value
-
-        self.doc_processor._save_index("fake-index", "/fake/path")
-
-        fake_index.set_index_id.assert_called_once_with("fake-index")
-        fake_index.storage_context.persist.assert_called_once_with(
-            persist_dir="/fake/path"
-        )
-
-    @mock.patch.object(document_processor.json, "dumps")
-    @mock.patch("builtins.open", new_callable=mock.mock_open)
-    def test__save_metadata(self, mock_file, mock_dumps):
-        self.doc_processor._save_metadata("fake-index", "/fake/path")
-
-        mock_file.assert_called_once_with(
-            "/fake/path/metadata.json", "w", encoding="utf-8"
-        )
-        expected_dict = {
-            "execution-time": mock.ANY,
-            "llm": "None",
-            "embedding-model": self.model_name,
-            "index-id": "fake-index",
-            "vector-db": "faiss.IndexFlatIP",
-            "embedding-dimension": mock.ANY,
-            "chunk": self.chunk_size,
-            "overlap": self.chunk_overlap,
-            "total-embedded-files": 0,
+        self.params = {
+            "chunk_size": 380,
+            "chunk_overlap": 0,
+            "model_name": "sentence-transformers/all-mpnet-base-v2",
+            "embeddings_model_dir": "embeddings_model",
+            "num_workers": 10,
         }
-        mock_dumps.assert_called_once_with(expected_dict)
+        self.log = self.patch_object(document_processor, "LOG")
+        self.indexdb = self.patch_object(document_processor, "_LlamaIndexDB")
+        self.llamadb = self.patch_object(document_processor, "_LlamaStackDB")
 
-    @mock.patch.object(document_processor, "SimpleDirectoryReader")
-    def test_process(self, mock_dir_reader):
-        reader = mock_dir_reader.return_value
-        reader.load_data.return_value = ["doc0", "doc1", "doc3"]
-        fake_metadata = mock.MagicMock()
-        fake_good_nodes = [mock.Mock(), mock.Mock()]
+    def test_init_default(self):
+        """Test DocumentProcessor initialization with default vector store type (faiss)."""
+        self.addCleanup(os.environ.pop, "TRANSFORMERS_OFFLINE", None)
+        doc_processor = document_processor.DocumentProcessor(**self.params)
 
-        with mock.patch.object(
-            self.doc_processor, "_filter_out_invalid_nodes"
-        ) as mock_filter:
-            mock_filter.return_value = fake_good_nodes
-            self.doc_processor.process(Path("/fake/path/docs"), fake_metadata)
+        self.log.warning.assert_not_called()
+        self.indexdb.assert_called_once_with(doc_processor.config)
 
-        reader.load_data.assert_called_once_with(num_workers=self.num_workers)
-        self.assertEqual(fake_good_nodes, self.doc_processor._good_nodes)
-        self.assertEqual(3, self.doc_processor._num_embedded_files)
+        self.assertIsNotNone(doc_processor)
 
-    @mock.patch.object(document_processor, "SimpleDirectoryReader")
-    def test_process_drop_unreachable(self, mock_dir_reader):
-        reader = mock_dir_reader.return_value
-        reader.load_data.return_value = [
-            Document(
-                text="doc0",
-                metadata={"url_reachable": False},  # pyright: ignore[reportCallIssue]
-            ),
-            Document(
-                text="doc1",
-                metadata={"url_reachable": True},  # pyright: ignore[reportCallIssue]
-            ),
-            Document(
-                text="doc2",
-                metadata={"url_reachable": False},  # pyright: ignore[reportCallIssue]
-            ),
-        ]
-        fake_metadata = mock.MagicMock()
-        fake_good_nodes = [mock.Mock(), mock.Mock()]
+        self.params.update(  # Add default values
+            embedding_dimension=None,  # Not calculated because class is mocked
+            manual_chunking=True,
+            table_name=None,
+            vector_store_type="faiss",
+        )
+        self.assertEqual(self.params, doc_processor.config._Config__attributes)
+        self.assertEqual(0, doc_processor._num_embedded_files)
 
-        with mock.patch.object(
-            self.doc_processor, "_filter_out_invalid_nodes"
-        ) as mock_filter:
-            mock_filter.return_value = fake_good_nodes
-            self.doc_processor.process(
-                Path("/fake/path/docs"), fake_metadata, unreachable_action="drop"
+        self.assertEqual(self.params["embeddings_model_dir"], os.environ["HF_HOME"])
+        self.assertEqual("1", os.environ["TRANSFORMERS_OFFLINE"])
+
+    @utils.subtest("vector_store_type", ("faiss", "postgres"))
+    def test_init_llama_index(self, vector_store_type):
+        """Test DocumentProcessor initialization with LlamaIndex-compatible vector store types."""
+        params = self.params.copy()
+        params["vector_store_type"] = vector_store_type
+
+        doc_processor = document_processor.DocumentProcessor(**params)
+        self.log.warning.assert_not_called()
+        self.indexdb.assert_called_once_with(doc_processor.config)
+
+        self.assertIsNotNone(doc_processor)
+
+        params.update(  # Add default values
+            embedding_dimension=None,  # Not calculated because class is mocked
+            manual_chunking=True,
+            table_name=None,
+            vector_store_type=vector_store_type,
+        )
+        self.assertEqual(params, doc_processor.config._Config__attributes)
+        self.assertEqual(0, doc_processor._num_embedded_files)
+
+        self.assertEqual(params["embeddings_model_dir"], os.environ["HF_HOME"])
+        self.assertEqual("1", os.environ["TRANSFORMERS_OFFLINE"])
+        os.environ.pop("TRANSFORMERS_OFFLINE")
+        self.indexdb.reset_mock()
+
+    @utils.subtest("vector_store_type", ("llamastack-faiss", "llamastack-sqlite-vec"))
+    def test_init_llama_stack(self, vector_store_type):
+        """Test DocumentProcessor initialization with LlamaStack-compatible vector store types."""
+        params = self.params.copy()
+        params["vector_store_type"] = vector_store_type
+
+        doc_processor = document_processor.DocumentProcessor(**params)
+        self.log.warning.assert_not_called()
+        self.llamadb.assert_called_once_with(doc_processor.config)
+
+        self.assertIsNotNone(doc_processor)
+
+        params.update(  # Add default values
+            embedding_dimension=None,  # Not calculated because class is mocked
+            manual_chunking=True,
+            table_name=None,
+        )
+        self.assertEqual(params, doc_processor.config._Config__attributes)
+        self.assertEqual(0, doc_processor._num_embedded_files)
+
+        self.assertEqual(params["embeddings_model_dir"], os.environ["HF_HOME"])
+        self.assertEqual("1", os.environ["TRANSFORMERS_OFFLINE"])
+        os.environ.pop("TRANSFORMERS_OFFLINE")
+
+    def test__check_config_faiss_auto_chunking(self):
+        """Test that _check_config logs warning when using faiss with auto chunking disabled."""
+        config = document_processor._Config(
+            vector_store_type="faiss",
+            manual_chunking=False,
+            table_name=None,
+        )
+        document_processor.DocumentProcessor._check_config(config)
+        self.log.warning.assert_called_once_with(mock.ANY)
+
+    def test__check_config_faiss_table_name(self):
+        """Test that _check_config logs warning when using faiss with a table name specified."""
+        config = document_processor._Config(
+            vector_store_type="faiss",
+            manual_chunking=True,
+            table_name="table_name",
+        )
+        document_processor.DocumentProcessor._check_config(config)
+        self.log.warning.assert_called_once_with(mock.ANY)
+
+    def test_process(self):
+        """Test the document processing that reads and adds them to the database."""
+        doc_processor = document_processor.DocumentProcessor(**self.params)
+
+        metadata = mock.Mock()
+        docs = list(range(5))
+
+        with mock.patch.object(document_processor, "SimpleDirectoryReader") as reader:
+            reader.return_value.load_data.return_value = docs
+
+            doc_processor.process(
+                mock.sentinel.docs_dir,
+                metadata,
+                mock.sentinel.required_exts,
+                mock.sentinel.file_extractor,
             )
 
-        self.assertEqual(1, self.doc_processor._num_embedded_files)
-
-    @mock.patch.object(document_processor, "SimpleDirectoryReader")
-    def test_process_fail_unreachable(self, mock_dir_reader):
-        reader = mock_dir_reader.return_value
-        reader.load_data.return_value = [
-            Document(
-                text="doc0",
-                metadata={"url_reachable": False},  # pyright: ignore[reportCallIssue]
+            reader.assert_called_once_with(
+                str(mock.sentinel.docs_dir),
+                recursive=True,
+                file_metadata=metadata.populate,
+                required_exts=mock.sentinel.required_exts,
+                file_extractor=mock.sentinel.file_extractor,
             )
-        ]
-        fake_metadata = mock.MagicMock()
-        fake_good_nodes = [mock.Mock(), mock.Mock()]
 
-        with mock.patch.object(
-            self.doc_processor, "_filter_out_invalid_nodes"
-        ) as mock_filter:
-            mock_filter.return_value = fake_good_nodes
-            with self.assertRaises(RuntimeError):
-                self.doc_processor.process(
-                    Path("/fake/path/docs"), fake_metadata, unreachable_action="fail"
-                )
+            doc_processor.db.add_docs.assert_called_once_with(docs)
+            self.assertEqual(len(docs), doc_processor._num_embedded_files)
 
     def test_save(self):
-        with (
-            mock.patch.object(self.doc_processor, "_save_index") as mock_index,
-            mock.patch.object(self.doc_processor, "_save_metadata") as mock_md,
-        ):
-            self.doc_processor.save("fake-index", "/fake/output_dir")
+        """Test saving the document processor's database to disk."""
+        doc_processor = document_processor.DocumentProcessor(**self.params)
 
-        mock_index.assert_called_once_with("fake-index", "/fake/output_dir")
-        mock_md.assert_called_once_with("fake-index", "/fake/output_dir")
-
-    @mock.patch.dict(
-        os.environ,
-        {
-            "POSTGRES_USER": "postgres",
-            "POSTGRES_PASSWORD": "somesecret",
-            "POSTGRES_HOST": "localhost",
-            "POSTGRES_PORT": "15432",
-            "POSTGRES_DATABASE": "postgres",
-        },
-    )
-    @mock.patch(
-        "lightspeed_rag_content.document_processor.HuggingFaceEmbedding",
-        new=RagMockEmbedding,
-    )
-    def test_pgvector(self):
-        self.patcher.stop()  # Remove the mock on the _get_settings() method
-        self.doc_processor = document_processor.DocumentProcessor(
-            self.chunk_size,
-            self.chunk_overlap,
-            self.model_name,
-            Path(self.embeddings_model_dir),
-            self.num_workers,
-            "postgres",
-        )
-        self.assertIsNotNone(self.doc_processor)
-
-    @mock.patch(
-        "lightspeed_rag_content.document_processor.HuggingFaceEmbedding",
-        new=RagMockEmbedding,
-    )
-    def test_invalid_vector_store_type(self):
-        self.patcher.stop()  # Remove the mock on the _get_settings() method
-        self.assertRaises(
-            RuntimeError,
-            document_processor.DocumentProcessor,
-            self.chunk_size,
-            self.chunk_overlap,
-            self.model_name,
-            self.embeddings_model_dir,
-            self.num_workers,
-            "nonexisting",
-        )
+        doc_processor.save(mock.sentinel.index, mock.sentinel.output_dir)

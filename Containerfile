@@ -3,14 +3,14 @@ FROM registry.access.redhat.com/ubi9/ubi-minimal
 
 # Install Python
 RUN microdnf install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
-    python3.11 python3.11-devel python3.11-pip && \
+    python3.12 python3.12-devel python3.12-pip git && \
     microdnf clean all
 # Install asciidoctor
 RUN microdnf install -y rubygems && \
     microdnf clean all && \
     gem install asciidoctor
 # Install uv package manager
-RUN pip3.11 install uv==0.7.20
+RUN pip3.12 install uv==0.7.20
 
 WORKDIR /rag-content
 
