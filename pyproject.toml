@@ -59,7 +59,6 @@ explicit = true
 [tool.uv.sources]
 torch = [{ index = "pytorch-cpu" }]
 torchvision = [{ index = "pytorch-cpu" }]
-llama-stack = { git = "https://github.com/meta-llama/llama-stack.git", rev = "20c319795259f097101917d7304e63aeeeb21c5c" }
 
 [dependency-groups]
 dev = [
