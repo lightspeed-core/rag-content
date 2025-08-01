@@ -1,12 +1,12 @@
 # Image with GPU CUDA only backend.
-FROM nvcr.io/nvidia/cuda:12.8.1-devel-ubi9
+FROM nvcr.io/nvidia/cuda:12.9.1-devel-ubi9
 
 # Install Python
 RUN dnf install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
-    python3.12 python3.12-devel python3.12-pip && \
+    python3.12 python3.12-devel python3.12-pip libcudnn9 libnccl libcusparselt0 && \
     dnf clean all
 RUN ln -sf /usr/bin/python3.12 /usr/bin/python
-ENV LD_LIBRARY_PATH=/usr/local/cuda-12.8/compat:$LD_LIBRARY_PATH
+ENV LD_LIBRARY_PATH=/usr/local/cuda-12/compat:$LD_LIBRARY_PATH
 
 # Install asciidoctor
 RUN dnf install -y rubygems && \
@@ -27,18 +27,19 @@ COPY scripts ./scripts
 ENV UV_COMPILE_BYTECODE=0 \
     UV_PYTHON_DOWNLOADS=0
 
-# Install Python dependencies
-RUN uv sync --locked --no-install-project
+# Remove pytorch-cpu dependency from pyproject.toml
+RUN uv venv && uv pip install tomlkit
+RUN uv run python ./scripts/remove_pytorch_cpu_pyproject.py
+
+# Update uv.lock file and install dependencies
+RUN uv lock && uv sync --locked --no-install-project
 
 # Then, add the rest of the project source code and install it
 # Installing separately from its dependencies allows optimal layer caching
 RUN uv sync --locked
 
-# Override PyTorch installation - install CUDA variant
-RUN uv pip install --upgrade torch --torch-backend=cu128
-
-# Test PyTorch was installed with CUDA backend
-RUN uv run python -c "import torch; print(torch.__version__); assert 'cu128' in torch.__version__;"
+# Test PyTorch was installed with default GPU linux backend (CUDA)
+RUN uv run python -c "import torch; print(torch.__version__); assert 'cpu' not in torch.__version__;"
 
 # Add executables from .venv to system PATH
 ENV PATH="/rag-content/.venv/bin:$PATH"

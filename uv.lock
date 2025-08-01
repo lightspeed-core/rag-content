@@ -746,6 +746,7 @@ dependencies = [
     { name = "llama-stack-client" },
     { name = "pyyaml" },
     { name = "sqlite-vec" },
+    { name = "tomlkit" },
     { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
     { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform != 'darwin'" },
 ]
@@ -780,6 +781,7 @@ requires-dist = [
     { name = "llama-stack-client", specifier = "==0.2.16" },
     { name = "pyyaml", specifier = "==6.0.2" },
     { name = "sqlite-vec", specifier = "==0.1.6" },
+    { name = "tomlkit" },
     { name = "torch", specifier = "==2.7.1", index = "https://download.pytorch.org/whl/cpu" },
 ]
 
