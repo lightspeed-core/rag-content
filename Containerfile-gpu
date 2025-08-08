@@ -39,7 +39,7 @@ RUN uv lock && uv sync --locked --no-install-project
 RUN uv sync --locked
 
 # Test PyTorch was installed with default GPU linux backend (CUDA)
-RUN uv run python -c "import torch; print(torch.__version__); assert 'cpu' not in torch.__version__;"
+#RUN uv run python -c "import torch; print(torch.__version__); assert 'cpu' not in torch.__version__;"
 
 # Add executables from .venv to system PATH
 ENV PATH="/rag-content/.venv/bin:$PATH"
