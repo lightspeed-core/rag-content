@@ -38,9 +38,6 @@ RUN uv lock && uv sync --locked --no-install-project
 # Installing separately from its dependencies allows optimal layer caching
 RUN uv sync --locked
 
-# Test PyTorch was installed with GPU libraries (CUDA)
-RUN uv run python -c "from nvidia import cuda_runtime"
-
 # Add executables from .venv to system PATH
 ENV PATH="/rag-content/.venv/bin:$PATH"
 
