@@ -41,11 +41,11 @@ RUN uv sync --locked
 # Add executables from .venv to system PATH
 ENV PATH="/rag-content/.venv/bin:$PATH"
 
-# Download embeddings model
-ENV EMBEDDING_MODEL=sentence-transformers/all-mpnet-base-v2
-RUN python ./scripts/download_embeddings_model.py \
-       -l ./embeddings_model \
-       -r ${EMBEDDING_MODEL}
+# # Download embeddings model
+# ENV EMBEDDING_MODEL=sentence-transformers/all-mpnet-base-v2
+# RUN python ./scripts/download_embeddings_model.py \
+#        -l ./embeddings_model \
+#        -r ${EMBEDDING_MODEL}
 
 # Reset the entrypoint.
 ENTRYPOINT []
