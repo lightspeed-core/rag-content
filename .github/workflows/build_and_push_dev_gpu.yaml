@@ -3,8 +3,6 @@ name: Build image, main branch push quay.io
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: ["main"]
 
 env:
   IMAGE_NAME: rag-content-gpu
