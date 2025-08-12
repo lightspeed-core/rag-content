@@ -18,12 +18,12 @@ from pathlib import Path
 def remove_sections(file_path: str, sections_to_remove: list[str]) -> None:
     """
     Remove specified sections from a TOML file.
-    
+
     Args:
         file_path (str): Path to the TOML file to modify
-        sections_to_remove (list[str]): List of section paths to remove, 
+        sections_to_remove (list[str]): List of section paths to remove,
                                       using dot notation (e.g., "tool.uv.index")
-    
+
     The function parses the TOML file, removes the specified sections,
     and writes the modified content back to the file.
     """
