@@ -46,6 +46,7 @@ dependencies = [
     "llama-stack-client==0.2.16",
     "aiosqlite==0.21.0",
     "sqlite-vec==0.1.6",
+    "tomlkit",
 ]
 requires-python = "==3.12.*"
 dynamic = ["license", "readme"]
@@ -57,9 +58,7 @@ name = "pytorch-cpu"
 url = "https://download.pytorch.org/whl/cpu"
 explicit = true
 [tool.uv.sources]
-torch = [{ index = "pytorch-cpu" }]
 torchvision = [{ index = "pytorch-cpu" }]
-llama-stack = { git = "https://github.com/meta-llama/llama-stack.git", rev = "20c319795259f097101917d7304e63aeeeb21c5c" }
 
 [dependency-groups]
 dev = [
