@@ -6,7 +6,6 @@ RUN dnf install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
     python3.12 python3.12-devel python3.12-pip libcudnn9 libnccl libcusparselt0 && \
     dnf clean all
 RUN ln -sf /usr/bin/python3.12 /usr/bin/python
-ENV LD_LIBRARY_PATH=/usr/local/cuda-12/compat:$LD_LIBRARY_PATH
 
 # Install asciidoctor
 RUN dnf install -y rubygems && \
