@@ -58,7 +58,7 @@ name = "pytorch-cpu"
 url = "https://download.pytorch.org/whl/cpu"
 explicit = true
 [tool.uv.sources]
-torchvision = [{ index = "pytorch-cpu" }]
+torch = [{ index = "pytorch-cpu" }]
 
 [dependency-groups]
 dev = [
