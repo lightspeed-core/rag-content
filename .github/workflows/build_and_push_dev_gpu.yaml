@@ -1,4 +1,4 @@
-name: Build image, main branch push quay.io
+name: Build GPU image, main branch push quay.io
 
 on:
   push:
@@ -6,8 +6,8 @@ on:
 
 env:
   IMAGE_NAME: rag-content-gpu
-  IMAGE_NAMESPACE: ${{ github.repository_owner }}
-  IMAGE_REGISTRY: ghcr.io
+  IMAGE_NAMESPACE: lightspeed-core
+  IMAGE_REGISTRY: quay.io
   LATEST_TAG: latest
   CONTAINER_FILE: Containerfile-gpu
 
@@ -66,5 +66,5 @@ jobs:
           image: ${{ steps.build_image.outputs.image }}
           tags: ${{ steps.build_image.outputs.tags }}
           registry: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAMESPACE }}
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
+          username: ${{ secrets.QUAY_REGISTRY_USERNAME }}
+          password: ${{ secrets.QUAY_REGISTRY_PASSWORD }}
