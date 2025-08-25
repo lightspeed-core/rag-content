@@ -30,8 +30,27 @@ To install the library via uv, do:
 ### Via Container Image
 
 The base container image can be manually generated or pulled from a container
-registry at `ghcr.io/lightspeed-core/rag-content-cpu:latest`. To build the image locally,
-follow these steps:
+registry.
+
+#### Prebuilt Image
+
+There are prebuilt two images. One with CPU support only (size cca 3.7 GB) and image with GPU support with CUDA support (size cca 12 GB).
+
+1. Pull the CPU variant:
+
+    ```bash
+    podman pull quay.io/lightspeed-core/rag-content-cpu:latest
+    ```
+
+2. Pull the GPU variant:
+
+    ```bash
+    podman pull quay.io/lightspeed-core/rag-content-gpu:latest
+    ```
+ 
+#### Build image locally
+
+To build the image locally, follow these steps:
 
 1. Install the requirements: `make` and `podman`.
 2. Generate the container image:
