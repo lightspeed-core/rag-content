@@ -15,3 +15,8 @@ jobs:
         with:
           path: "src"
           exit_zero: true
+          level: LOW
+          confidence: LOW
+          excluded_paths: ""
+          skips: ""
+          ini_path: ""
