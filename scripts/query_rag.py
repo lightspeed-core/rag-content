@@ -2,6 +2,8 @@
 
 import argparse
 import importlib
+import json
+import logging
 import os
 import sys
 import tempfile
@@ -30,23 +32,77 @@ def _llama_index_query(args: argparse.Namespace) -> None:
         storage_context=storage_context,
         index_id=args.product_index,
     )
+
     if args.node is not None:
-        print(storage_context.docstore.get_node(args.node))
+        node = storage_context.docstore.get_node(args.node)
+        result = {
+            "query": args.query,
+            "type": "single_node",
+            "node_id": args.node,
+            "node": {
+                "id": node.node_id,
+                "text": node.text,
+                "metadata": node.metadata if hasattr(node, 'metadata') else {}
+            }
+        }
+        if args.json:
+            print(json.dumps(result, indent=2))
+        else:
+            print(node)
     else:
         retriever = vector_index.as_retriever(similarity_top_k=args.top_k)
         nodes = retriever.retrieve(args.query)
+
         if len(nodes) == 0:
-            print(f"No nodes retrieved for query: {args.query}")
+            logging.error(f"No nodes retrieved for query: {args.query}")
+            if args.json:
+                result = {
+                    "query": args.query,
+                    "top_k": args.top_k,
+                    "threshold": args.threshold,
+                    "nodes": []
+                }
+                print(json.dumps(result, indent=2))
             exit(1)
+
         if args.threshold > 0.0 and nodes[0].score < args.threshold:
-            print(
+            error_msg = (
                 f"Score {nodes[0].score} of the top retrieved node for query '{args.query}' "
                 f"didn't cross the minimal threshold {args.threshold}."
             )
+            if args.json:
+                result = {
+                    "query": args.query,
+                    "top_k": args.top_k,
+                    "threshold": args.threshold,
+                    "top_score": nodes[0].score,
+                    "nodes": []
+                }
+                print(json.dumps(result, indent=2))
             exit(1)
-        for n in nodes:
-            print("=" * 80)
-            print(n)
+
+        # Format results
+        result = {
+            "query": args.query,
+            "top_k": args.top_k,
+            "threshold": args.threshold,
+            "nodes": []
+        }
+        for node in nodes:
+            node_data = {
+                "id": node.node_id,
+                "score": node.score,
+                "text": node.text,
+                "metadata": node.metadata if hasattr(node, 'metadata') else {}
+            }
+            result["nodes"].append(node_data)
+
+        if args.json:
+            print(json.dumps(result, indent=2))
+        else:
+            for n in nodes:
+                print("=" * 80)
+                print(n)
 
 
 def _get_db_path_dict(vector_type: str, config: dict[str, Any]) -> dict[str, Any]:
@@ -108,20 +164,57 @@ def _llama_stack_query(args: argparse.Namespace) -> None:
 
     md = res.metadata
     if len(md["chunks"]) == 0:
-        print(f"No chunks retrieved for query: {args.query}")
+        logging.error(f"No chunks retrieved for query: {args.query}")
+        if args.json:
+            result = {
+                "query": args.query,
+                "top_k": args.top_k,
+                "threshold": args.threshold,
+                "nodes": []
+            }
+            print(json.dumps(result, indent=2))
         exit(1)
+
     threshold = args.threshold
     if threshold > 0.0 and md.get("scores") and md["scores"][0].score < threshold:
-        print(
+        logging.error(
             f"Score {md['scores'][0].score} of the top retrieved node for query '{args.query}' "
             f"didn't cross the minimal threshold {threshold}."
         )
+        if args.json:
+            result = {
+                "query": args.query,
+                "top_k": args.top_k,
+                "threshold": args.threshold,
+                "top_score": md["scores"][0].score,
+                "nodes": []
+            }
+            print(json.dumps(result, indent=2))
         exit(1)
 
-    # Method 1 to present data:
+    # Format results
+    result = {
+        "query": args.query,
+        "top_k": args.top_k,
+        "threshold": args.threshold,
+        "nodes": []
+    }
+
     for _id, chunk, score in zip(md["document_ids"], md["chunks"], md["scores"]):
-        print("=" * 80)
-        print(f"Node ID: {_id}\nScore: {score}\nText:\n{chunk}")
+        node_data = {
+            "id": _id,
+            "score": score.score if hasattr(score, 'score') else score,
+            "text": chunk,
+            "metadata": {}
+        }
+        result["nodes"].append(node_data)
+
+    if args.json:
+        print(json.dumps(result, indent=2))
+    else:
+        for _id, chunk, score in zip(md["document_ids"], md["chunks"], md["scores"]):
+            print("=" * 80)
+            print(f"Node ID: {_id}\nScore: {score}\nText:\n{chunk}")
 
     # Method 2 to present data:
     # for content in res.content:
@@ -129,7 +222,6 @@ def _llama_stack_query(args: argparse.Namespace) -> None:
     #         print(content.text)
     #     else:
     #         print(content)
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -161,10 +253,16 @@ if __name__ == "__main__":
         choices=["auto", "faiss", "llamastack-faiss", "llamastack-sqlite-vec"],
         help="vector store type to be used.",
     )
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Output results in JSON format",
+    )
 
     args = parser.parse_args()
 
-    print("Command line used: " + " ".join(sys.argv))
+    if not args.json:
+        print("Command line used: " + " ".join(sys.argv))
 
     vector_store_type = args.vector_store_type
     if args.vector_store_type == "auto":
@@ -175,7 +273,16 @@ if __name__ == "__main__":
         elif os.path.exists(os.path.join(args.db_path, "faiss_store.db")):
             args.vector_store_type = "llamastack-faiss"
         else:
-            print("Cannot recognize the DB in", args.db_path)
+            logging.error(f"Cannot recognize the DB in {args.db_path}")
+            if args.json:
+                # In JSON mode, output minimal error info and exit
+                result = {
+                    "query": args.query,
+                    "top_k": args.top_k,
+                    "threshold": args.threshold,
+                    "nodes": []
+                }
+                print(json.dumps(result, indent=2))
             exit(1)
 
     if args.vector_store_type == "faiss":
