@@ -11,12 +11,7 @@ jobs:
       contents: read
       pull-requests: read
     steps:
-      - uses: mdegis/bandit-action@v1.1
+      - uses: mdegis/bandit-action@v1.0.1
         with:
           path: "src"
           exit_zero: true
-          level: LOW
-          confidence: LOW
-          excluded_paths: ""
-          skips: ""
-          ini_path: ""
