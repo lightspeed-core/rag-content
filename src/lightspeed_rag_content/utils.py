@@ -68,4 +68,11 @@ def get_common_arg_parser() -> argparse.ArgumentParser:
         help="How to do the chunking for llama-stack, manually like in "
         "llama-index or automatically using the RAG runtime tool.",
     )
+    parser.add_argument(
+        "-dt",
+        "--document-type",
+        dest="doc_type",
+        default="text",
+        help="The type of the document which is to be added to the RAG",
+    )
     return parser

@@ -25,6 +25,7 @@ from typing import TYPE_CHECKING, Any, Optional, Union
 import faiss
 from llama_index.core import Settings, SimpleDirectoryReader, VectorStoreIndex
 from llama_index.core.llms.utils import resolve_llm
+from llama_index.core.node_parser import MarkdownNodeParser
 from llama_index.core.readers.base import BaseReader
 from llama_index.core.schema import Document, TextNode
 from llama_index.core.storage.storage_context import StorageContext
@@ -72,6 +73,8 @@ class _BaseDB:
                 model_name=str(self.config.embeddings_model_dir)
             )
             Settings.llm = resolve_llm(None)
+        if config.doc_type == "markdown":
+            Settings.node_parser = MarkdownNodeParser()
 
     @staticmethod
     def _got_whitespace(text: str) -> bool:
@@ -391,6 +394,7 @@ class DocumentProcessor:
         vector_store_type: str = "faiss",
         table_name: Optional[str] = None,
         manual_chunking: bool = True,
+        doc_type: str = "text",
     ):
         """Initialize instance."""
         if vector_store_type == "postgres" and not table_name:
@@ -406,6 +410,7 @@ class DocumentProcessor:
             vector_store_type=vector_store_type,
             table_name=table_name,
             manual_chunking=manual_chunking,
+            doc_type=doc_type,
         )
 
         self._check_config(self.config)

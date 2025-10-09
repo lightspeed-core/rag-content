@@ -54,6 +54,7 @@ class TestDocumentProcessorLlamaStack(utils.TestCase):
             vector_store_type="llamastack-faiss",
             embedding_dimension=None,
             manual_chunking=True,
+            doc_type="text",
         )
 
     @mock.patch.object(document_processor.tempfile, "TemporaryDirectory")
