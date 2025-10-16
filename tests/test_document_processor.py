@@ -52,6 +52,7 @@ class TestDocumentProcessor(utils.TestCase):
             "model_name": "sentence-transformers/all-mpnet-base-v2",
             "embeddings_model_dir": "embeddings_model",
             "num_workers": 10,
+            "doc_type": "text",
         }
         self.log = self.patch_object(document_processor, "LOG")
         self.indexdb = self.patch_object(document_processor, "_LlamaIndexDB")
