@@ -88,7 +88,7 @@ from HuggingFace as follows:
 
     ```bash
    mkdir ./embeddings_model
-   pdm run python ./scripts/download_embeddings_model.py -l ./embeddings_model/ -r sentence-transformers/all-mpnet-base-v2
+   uv run python ./scripts/download_embeddings_model.py -l ./embeddings_model/ -r sentence-transformers/all-mpnet-base-v2
     ```
 
 2. Prepare dummy documentation:
@@ -214,7 +214,7 @@ The process is basically the same as in the
  ([Generating the Vector Database](#generating-the-vector-database)):
 
 ```bash
-pdm run ./custom_processor.py \
+uv run ./custom_processor.py \
   -o ./vector_db/custom_docs/0.1 \
   -f ./custom_docs/0.1/ \
   -md embeddings_model/ \
@@ -262,7 +262,7 @@ The process is the same as in the
  ([Generating the Vector Database](#generating-the-vector-database)):
 
 ```bash
-pdm run ./custom_processor.py \
+uv run ./custom_processor.py \
   -o ./vector_db/custom_docs/0.1 \
   -f ./custom_docs/0.1/ \
   -md embeddings_model/ \
