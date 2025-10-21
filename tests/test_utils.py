@@ -14,19 +14,19 @@
 #    under the License.
 
 import argparse
-import unittest
+import pytest
 
 from lightspeed_rag_content import utils
 
 
-class TestUtils(unittest.TestCase):
+class TestUtils:
     """Test cases for the metadata processor."""
 
     def test_get_common_arg_parser(self):
         """Test we get a valid arg parser from get_common_arg_parser."""
         parser = utils.get_common_arg_parser()
 
-        self.assertIsInstance(parser, argparse.ArgumentParser)
+        assert isinstance(parser, argparse.ArgumentParser)
 
     def test_arg_parser_vector_store_type(self):
         """Test arg parser works with valid vector-store-type."""
@@ -39,29 +39,26 @@ class TestUtils(unittest.TestCase):
             "llamastack-sqlite-vec",
         ):
             args = parser.parse_args(["--vector-store-type", vector_store_type])
-            self.assertEqual(args.vector_store_type, vector_store_type)
+            assert args.vector_store_type == vector_store_type
 
     def test_arg_parser_vector_store_type_incorrect(self):
         """Test arg parser fails with incorrect vector-store-type."""
         parser = utils.get_common_arg_parser()
 
         for vector_store_type in ("faisss", "lamastack-faiss"):
-            self.assertRaises(
-                SystemExit,
-                parser.parse_args,
-                ["--vector-store-type", vector_store_type],
-            )
+            with pytest.raises(SystemExit):
+                parser.parse_args(["--vector-store-type", vector_store_type])
 
     def test_arg_parser_auto_chunking(self):
         """Test that arg parser's manual chunking toggle works."""
         parser = utils.get_common_arg_parser()
 
         args = parser.parse_args(["--auto-chunking"])
-        self.assertFalse(args.manual_chunking)
+        assert not args.manual_chunking
 
     def test_arg_parser_auto_chunking_default(self):
         """Test that manual chunking is the default in the arg parser."""
         parser = utils.get_common_arg_parser()
 
         args = parser.parse_args([])
-        self.assertTrue(args.manual_chunking)
+        assert args.manual_chunking

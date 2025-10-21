@@ -1,5 +1,4 @@
-"""
-Removes the pytorch-cpu dependency from the pyproject.toml file.
+"""Removes the pytorch-cpu dependency from the pyproject.toml file.
 
 This script removes the pytorch-cpu dependency from the pyproject.toml file.
 It is used to create a container image with GPU CUDA backend.
@@ -11,13 +10,13 @@ The script will remove the 'tool.uv.index' and 'tool.uv.sources' sections
 from the pyproject.toml file in the current directory.
 """
 
-from tomlkit import parse, dumps
 from pathlib import Path
+
+from tomlkit import dumps, parse
 
 
 def remove_sections(file_path: str, sections_to_remove: list[str]) -> None:
-    """
-    Remove specified sections from a TOML file.
+    """Remove specified sections from a TOML file.
 
     Args:
         file_path (str): Path to the TOML file to modify
