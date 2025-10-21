@@ -97,7 +97,7 @@ class Test__main__:
 
         with pytest.raises(SystemExit) as e:
             main_convert(mock_args)
-            assert e.value.code != 0
+        assert e.value.code != 0
 
     def test_main_convert_missing_asciidoctor_cmd(self, mocker, main_data):
         mock_which = mocker.patch(
@@ -108,7 +108,7 @@ class Test__main__:
 
         with pytest.raises(SystemExit) as e:
             main_convert(mock_args)
-            assert e.value.code != 0
+        assert e.value.code != 0
 
     def test_main_get_structure(self, mocker, main_data):
         mock_which = mocker.patch(
@@ -143,7 +143,7 @@ class Test__main__:
 
         with pytest.raises(SystemExit) as e:
             main_get_structure(mock_args)
-            assert e.value.code != 0
+        assert e.value.code != 0
 
     def test_main_missing_asciidoctor_cmd(self, mocker, main_data, caplog):
         mock_which = mocker.patch(
@@ -156,8 +156,8 @@ class Test__main__:
         with pytest.raises(SystemExit) as e:
             with caplog.at_level(logging.ERROR):
                 main_get_structure(mock_args)
-                assert e.value.code != 0
-                assert "ERROR" in caplog.text
+        assert e.value.code != 0
+        assert "ERROR" in caplog.text
 
     def test_get_argument_parser(self):
         args = get_argument_parser()
