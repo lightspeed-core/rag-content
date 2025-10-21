@@ -58,6 +58,7 @@ def mock_processor(mocker):
             "model_name": "sentence-transformers/all-mpnet-base-v2",
             "embeddings_model_dir": "embeddings_model",
             "num_workers": 10,
+            "doc_type": "text",
         },
     }
 

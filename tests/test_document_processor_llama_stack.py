@@ -47,6 +47,7 @@ def llama_stack_processor(mocker):
         vector_store_type="llamastack-faiss",
         embedding_dimension=None,
         manual_chunking=True,
+        doc_type="text",
     )
     return {"config": config, "model_name": model_name}
 
