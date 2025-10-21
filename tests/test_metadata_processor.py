@@ -14,7 +14,6 @@
 #    under the License.
 
 import logging
-from unittest import mock
 
 import pytest
 import requests

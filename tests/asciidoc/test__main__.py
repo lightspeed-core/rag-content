@@ -112,10 +112,10 @@ class Test__main__:
 
     def test_main_get_structure(self, mocker, main_data):
         mock_which = mocker.patch(
-            "lightspeed_rag_content.asciidoc.asciidoctor_converter.shutil.which"
+            "lightspeed_rag_content.asciidoc.__main__.shutil.which"
         )
         mock_run = mocker.patch(
-            "lightspeed_rag_content.asciidoc.asciidoctor_converter.subprocess.run"
+            "lightspeed_rag_content.asciidoc.__main__.subprocess.run"
         )
         mock_which.return_value = "/usr/bin/ruby"
         mock_args = Mock()
@@ -132,8 +132,12 @@ class Test__main__:
         )
 
     def test_main_incorrect_asciidoctor_cmd(self, mocker, main_data):
+        mock_which = mocker.patch(
+            "lightspeed_rag_content.asciidoc.__main__.shutil.which"
+        )
+        mock_which.return_value = "/usr/bin/ruby"
         mock_run = mocker.patch(
-            "lightspeed_rag_content.asciidoc.asciidoctor_converter.subprocess.run"
+            "lightspeed_rag_content.asciidoc.__main__.subprocess.run"
         )
         mock_run.side_effect = subprocess.CalledProcessError(
             cmd=main_data["asciidoctor_cmd"], returncode=1
@@ -147,7 +151,7 @@ class Test__main__:
 
     def test_main_missing_asciidoctor_cmd(self, mocker, main_data, caplog):
         mock_which = mocker.patch(
-            "lightspeed_rag_content.asciidoc.asciidoctor_converter.shutil.which"
+            "lightspeed_rag_content.asciidoc.__main__.shutil.which"
         )
         mock_which.return_value = ""
         mock_args = Mock()
