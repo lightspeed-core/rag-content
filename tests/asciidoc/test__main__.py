@@ -13,10 +13,12 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 import argparse
+import logging
 import subprocess
-import unittest
 from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
+
+import pytest
 
 from lightspeed_rag_content.asciidoc.__main__ import (
     get_argument_parser,
@@ -26,120 +28,142 @@ from lightspeed_rag_content.asciidoc.__main__ import (
 from lightspeed_rag_content.asciidoc.asciidoctor_converter import RUBY_ASCIIDOC_DIR
 
 
-class Test__main__(unittest.TestCase):
-    def setUp(self):
-        super().setUp()
-
-        self.asciidoctor_cmd = "/usr/bin/asciidoctor"
-        self.input_file = Path("input.adoc")
-        self.output_file = Path("output.adoc")
-        self.text_converter_file = RUBY_ASCIIDOC_DIR.joinpath(
-            "asciidoc_text_converter.rb"
-        )
-        self.structure_dumper_file = RUBY_ASCIIDOC_DIR.joinpath(
+@pytest.fixture
+def main_data():
+    """Fixture for __main__ test data."""
+    return {
+        "asciidoctor_cmd": "/usr/bin/asciidoctor",
+        "input_file": Path("input.adoc"),
+        "output_file": Path("output.adoc"),
+        "text_converter_file": RUBY_ASCIIDOC_DIR.joinpath("asciidoc_text_converter.rb"),
+        "structure_dumper_file": RUBY_ASCIIDOC_DIR.joinpath(
             "asciidoc_structure_dumper.rb"
+        ),
+    }
+
+
+def get_mock_parsed_args(main_data) -> Mock:
+    mock_args = Mock()
+    mock_args.input_file = main_data["input_file"]
+    mock_args.output_file = main_data["output_file"]
+    mock_args.converter_file = main_data["text_converter_file"]
+    mock_args.attributes_file = None
+    mock_args.target_format = "text"
+
+    return mock_args
+
+
+class Test__main__:
+    def test_main_convert(self, mocker, main_data):
+        mock_which = mocker.patch(
+            "lightspeed_rag_content.asciidoc.asciidoctor_converter.shutil.which"
         )
-
-    def get_mock_parsed_args(self) -> Mock:
-        mock_args = Mock()
-        mock_args.input_file = self.input_file
-        mock_args.output_file = self.output_file
-        mock_args.converter_file = self.text_converter_file
-        mock_args.attributes_file = None
-        mock_args.target_format = "text"
-
-        return mock_args
-
-    @patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.subprocess.run")
-    @patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.shutil.which")
-    def test_main_convert(self, mock_which, mock_run):
-        mock_which.return_value = self.asciidoctor_cmd
-        mock_args = self.get_mock_parsed_args()
+        mock_run = mocker.patch(
+            "lightspeed_rag_content.asciidoc.asciidoctor_converter.subprocess.run"
+        )
+        mock_which.return_value = main_data["asciidoctor_cmd"]
+        mock_args = get_mock_parsed_args(main_data)
         main_convert(mock_args)
 
         mock_run.assert_called_with(
             [
                 "/usr/bin/asciidoctor",
                 "-r",
-                str(self.text_converter_file.absolute()),
+                str(main_data["text_converter_file"].absolute()),
                 "-b",
                 "text",
                 "-o",
-                str(self.output_file.absolute()),
+                str(main_data["output_file"].absolute()),
                 "--trace",
                 "--quiet",
-                str(self.input_file.absolute()),
+                str(main_data["input_file"].absolute()),
             ],
             check=True,
             capture_output=True,
         )
 
-    @patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.subprocess.run")
-    @patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.shutil.which")
-    def test_main_convert_incorrect_cmd_error(self, mock_which, mock_run):
-        mock_which.return_value = self.asciidoctor_cmd
-        mock_run.side_effect = subprocess.CalledProcessError(
-            cmd=self.asciidoctor_cmd, returncode=1
+    def test_main_convert_incorrect_cmd_error(self, mocker, main_data):
+        mock_which = mocker.patch(
+            "lightspeed_rag_content.asciidoc.asciidoctor_converter.shutil.which"
         )
-        mock_args = self.get_mock_parsed_args()
+        mock_run = mocker.patch(
+            "lightspeed_rag_content.asciidoc.asciidoctor_converter.subprocess.run"
+        )
+        mock_which.return_value = main_data["asciidoctor_cmd"]
+        mock_run.side_effect = subprocess.CalledProcessError(
+            cmd=main_data["asciidoctor_cmd"], returncode=1
+        )
+        mock_args = get_mock_parsed_args(main_data)
 
-        with self.assertRaises(SystemExit) as e:
+        with pytest.raises(SystemExit) as e:
             main_convert(mock_args)
-            self.assertNotEqual(e.exception.code, 0)
+        assert e.value.code != 0
 
-    @patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.shutil.which")
-    def test_main_convert_missing_asciidoctor_cmd(self, mock_which):
+    def test_main_convert_missing_asciidoctor_cmd(self, mocker, main_data):
+        mock_which = mocker.patch(
+            "lightspeed_rag_content.asciidoc.asciidoctor_converter.shutil.which"
+        )
         mock_which.return_value = ""
-        mock_args = self.get_mock_parsed_args()
+        mock_args = get_mock_parsed_args(main_data)
 
-        with self.assertRaises(SystemExit) as e:
+        with pytest.raises(SystemExit) as e:
             main_convert(mock_args)
-            self.assertNotEqual(e.exception.code, 0)
+        assert e.value.code != 0
 
-    @patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.subprocess.run")
-    @patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.shutil.which")
-    def test_main_get_structure(self, mock_which, mock_run):
+    def test_main_get_structure(self, mocker, main_data):
+        mock_which = mocker.patch(
+            "lightspeed_rag_content.asciidoc.__main__.shutil.which"
+        )
+        mock_run = mocker.patch(
+            "lightspeed_rag_content.asciidoc.__main__.subprocess.run"
+        )
         mock_which.return_value = "/usr/bin/ruby"
         mock_args = Mock()
-        mock_args.input_file = self.input_file
+        mock_args.input_file = main_data["input_file"]
 
         main_get_structure(mock_args)
         mock_run.assert_called_with(
             [
                 "/usr/bin/ruby",
-                str(self.structure_dumper_file),
-                str(self.input_file.absolute()),
+                str(main_data["structure_dumper_file"]),
+                str(main_data["input_file"].absolute()),
             ],
             check=True,
         )
 
-    @patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.subprocess.run")
-    def test_main_incorrect_asciidoctor_cmd(self, mock_run):
+    def test_main_incorrect_asciidoctor_cmd(self, mocker, main_data):
+        mock_which = mocker.patch(
+            "lightspeed_rag_content.asciidoc.__main__.shutil.which"
+        )
+        mock_which.return_value = "/usr/bin/ruby"
+        mock_run = mocker.patch(
+            "lightspeed_rag_content.asciidoc.__main__.subprocess.run"
+        )
         mock_run.side_effect = subprocess.CalledProcessError(
-            cmd=self.asciidoctor_cmd, returncode=1
+            cmd=main_data["asciidoctor_cmd"], returncode=1
         )
         mock_args = Mock()
-        mock_args.input_file = self.input_file
+        mock_args.input_file = main_data["input_file"]
 
-        with self.assertRaises(SystemExit) as e:
+        with pytest.raises(SystemExit) as e:
             main_get_structure(mock_args)
-            self.assertNotEqual(e.exception.code, 0)
+        assert e.value.code != 0
 
-    @patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.shutil.which")
-    def test_main_missing_asciidoctor_cmd(self, mock_which):
+    def test_main_missing_asciidoctor_cmd(self, mocker, main_data, caplog):
+        mock_which = mocker.patch(
+            "lightspeed_rag_content.asciidoc.__main__.shutil.which"
+        )
         mock_which.return_value = ""
         mock_args = Mock()
-        mock_args.input_file = self.input_file
+        mock_args.input_file = main_data["input_file"]
 
-        with self.assertRaises(SystemExit) as e:
-            with self.assertLogs() as logger:
+        with pytest.raises(SystemExit) as e:
+            with caplog.at_level(logging.ERROR):
                 main_get_structure(mock_args)
-                self.assertNotEqual(e.exception.code, 0)
-
-                error_msgs = [output for output in logger.output if "ERROR" in output]
-                self.assertTrue(len(error_msgs) > 0)
+        assert e.value.code != 0
+        assert "ERROR" in caplog.text
 
     def test_get_argument_parser(self):
         args = get_argument_parser()
 
-        self.assertIsInstance(args, argparse.ArgumentParser)
+        assert isinstance(args, argparse.ArgumentParser)
