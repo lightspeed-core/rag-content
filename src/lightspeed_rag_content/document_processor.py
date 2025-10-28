@@ -186,12 +186,13 @@ class _LlamaIndexDB(_BaseDB):
 
 class _LlamaStackDB(_BaseDB):
     # Lllama-stack faiss vector-db uses IndexFlatL2 (it's hardcoded for now)
-    TEMPLATE = """version: '2'
+    TEMPLATE = """version: 2
 image_name: ollama
 apis:
   - inference
   - vector_io
   - tool_runtime
+  - files
 providers:
   inference:
     - provider_id: sentence-transformers
@@ -206,6 +207,14 @@ providers:
           namespace: null
           db_path: {kv_db_path}
         {vector_io_cfg}
+  files:
+    - provider_id: localfs
+      provider_type: inline::localfs
+      config:
+        storage_dir: /tmp/llama-stack-files
+        metadata_store:
+          type: sqlite
+          db_path: files_metadata.db
   tool_runtime:
   - provider_id: rag-runtime
     provider_type: inline::rag-runtime
@@ -225,6 +234,7 @@ vector_dbs:
     embedding_model: {model_name}
     embedding_dimension: {dimension}
     provider_id: {index_id}
+    {provider_vector_db_id}
 """
     CFG_FILENAME = "llama-stack.yaml"
 
@@ -282,13 +292,19 @@ vector_dbs:
 
         self.document_class = llama_stack.apis.tools.rag_tool.RAGDocument  # type: ignore
         self.client_class = (
-            llama_stack.distribution.library_client.LlamaStackAsLibraryClient  # type: ignore
+            llama_stack.core.library_client.LlamaStackAsLibraryClient  # type: ignore
         )
         self.documents: list[
             dict[str, Any] | llama_stack.apis.tools.rag_tool.RAGDocument  # type: ignore
         ] = []
 
-    def write_yaml_config(self, index_id: str, filename: str, db_file: str) -> None:
+    def write_yaml_config(
+        self,
+        index_id: str,
+        filename: str,
+        db_file: str,
+        provider_vector_db_id: Optional[str] = None,
+    ) -> None:
         """Write a llama-stack configuration file using class templates."""
         # remove "llamastack-" from the string
         provider_type = self.config.vector_store_type.split("-", 1)[1]
@@ -306,6 +322,7 @@ vector_dbs:
                 model_name=self.config.model_name,
                 model_name_or_dir=self.model_name_or_dir,
                 dimension=self.config.embedding_dimension,
+                provider_vector_db_id=provider_vector_db_id or "",
             )
             fd.write(data)
 
@@ -313,7 +330,7 @@ vector_dbs:
         """Start llama-stack as a library and return the client.
 
         Return type is really
-          llama_stack.distribution.library_client.LlamaStackAsLibraryClient
+          llama_stack.core.library_client.LlamaStackAsLibraryClient
 
         But we do dynamic import, so we don't have it for static typechecking
         """
@@ -364,9 +381,10 @@ vector_dbs:
         db_file = os.path.realpath(os.path.join(output_dir, self.db_filename))
         cfg_file = os.path.join(output_dir, self.CFG_FILENAME)
         # There's no need to register the DB because the YAML includes it
-        self.write_yaml_config(index, cfg_file, db_file)
+        self.write_yaml_config(
+            index, cfg_file, db_file, f"provider_vector_db_id: {index}"
+        )
         client = self._start_llama_stack(cfg_file)
-
         try:
             if self.config.manual_chunking:
                 client.vector_io.insert(vector_db_id=index, chunks=self.documents)
