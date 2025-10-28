@@ -280,12 +280,10 @@ vector_dbs:
         # Not using importlib to help with typechecking
         import llama_stack  # pylint: disable=C0415
 
-        self.document_class = llama_stack.apis.tools.rag_tool.RAGDocument  # type: ignore
-        self.client_class = (
-            llama_stack.distribution.library_client.LlamaStackAsLibraryClient  # type: ignore
-        )
+        self.document_class = llama_stack.apis.tools.rag_tool.RAGDocument
+        self.client_class = llama_stack.core.library_client.LlamaStackAsLibraryClient
         self.documents: list[
-            dict[str, Any] | llama_stack.apis.tools.rag_tool.RAGDocument  # type: ignore
+            dict[str, Any] | llama_stack.apis.tools.rag_tool.RAGDocument
         ] = []
 
     def write_yaml_config(self, index_id: str, filename: str, db_file: str) -> None:
@@ -313,7 +311,7 @@ vector_dbs:
         """Start llama-stack as a library and return the client.
 
         Return type is really
-          llama_stack.distribution.library_client.LlamaStackAsLibraryClient
+          llama_stack.core.library_client.LlamaStackAsLibraryClient
 
         But we do dynamic import, so we don't have it for static typechecking
         """
