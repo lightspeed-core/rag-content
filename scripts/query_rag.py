@@ -7,11 +7,12 @@ import logging
 import os
 import sys
 import tempfile
-from typing import Any
+from typing import Any, cast
 
 import yaml
 from llama_index.core import Settings, load_index_from_storage
 from llama_index.core.llms.utils import resolve_llm
+from llama_index.core.schema import NodeWithScore, TextNode
 from llama_index.core.storage.storage_context import StorageContext
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.vector_stores.faiss import FaissVectorStore
@@ -35,20 +36,34 @@ def _llama_index_query(args: argparse.Namespace) -> None:
 
     if args.node is not None:
         node = storage_context.docstore.get_node(args.node)
-        result = {
-            "query": args.query,
-            "type": "single_node",
-            "node_id": args.node,
-            "node": {
-                "id": node.node_id,
-                "text": node.text,
-                "metadata": node.metadata if hasattr(node, "metadata") else {},
-            },
-        }
-        if args.json:
-            print(json.dumps(result, indent=2))
+        if isinstance(node, TextNode):
+            result = {
+                "query": args.query,
+                "type": "single_node",
+                "node_id": args.node,
+                "node": {
+                    "id": node.node_id,
+                    "text": node.text,
+                    "metadata": node.metadata if hasattr(node, "metadata") else {},
+                },
+            }
+            if args.json:
+                print(json.dumps(result, indent=2))
+            else:
+                print(node)
         else:
-            print(node)
+            logging.warning(
+                f"Node {args.node} is not a TextNode, type: {type(node).__name__}"
+            )
+            if args.json:
+                result = {
+                    "query": args.query,
+                    "type": "single_node",
+                    "node_id": args.node,
+                    "error": f"Node is not a TextNode (type: {type(node).__name__})",
+                }
+                print(json.dumps(result, indent=2))
+            exit(1)
     else:
         retriever = vector_index.as_retriever(similarity_top_k=args.top_k)
         nodes = retriever.retrieve(args.query)
@@ -88,13 +103,22 @@ def _llama_index_query(args: argparse.Namespace) -> None:
             "nodes": [],
         }
         for node in nodes:  # type: ignore
-            node_data = {
-                "id": node.node_id,
-                "score": node.score,
-                "text": node.text,
-                "metadata": node.metadata if hasattr(node, "metadata") else {},
-            }
-            result["nodes"].append(node_data)
+            if isinstance(node, NodeWithScore):
+                base_node = cast(NodeWithScore, node)
+                text = getattr(base_node, "text", None)
+                if text is None:
+                    text = base_node.node.get_content() or ""
+                node_data = {
+                    "id": node.node_id,
+                    "score": node.score,
+                    "text": text,
+                    "metadata": node.metadata,
+                }
+                result["nodes"].append(node_data)
+            else:
+                logging.debug(
+                    f"Skipping node of type {type(node).__name__}, expected NodeWithScore"
+                )
 
         if args.json:
             print(json.dumps(result, indent=2))
@@ -134,7 +158,7 @@ def _llama_stack_query(args: argparse.Namespace) -> None:
     yaml.safe_dump(cfg, open(cfg_file, "w", encoding="utf-8"))
 
     stack_lib = importlib.import_module("llama_stack")
-    client = stack_lib.distribution.library_client.LlamaStackAsLibraryClient(cfg_file)
+    client = stack_lib.core.library_client.LlamaStackAsLibraryClient(cfg_file)
     client.initialize()
 
     # No need to register the DB as it's defined in llama-stack.yaml

@@ -22,6 +22,57 @@ from llama_index.core.schema import TextNode
 from lightspeed_rag_content import document_processor
 from tests.conftest import RagMockEmbedding
 
+FAISS_EXPECTED = """version: 2
+image_name: ollama
+apis:
+  - inference
+  - vector_io
+  - tool_runtime
+  - files
+providers:
+  inference:
+    - provider_id: sentence-transformers
+      provider_type: inline::sentence-transformers
+      config: {{}}
+  vector_io:
+    - provider_id: {provider_id}
+      provider_type: inline::faiss
+      config:
+        kvstore:
+          type: sqlite
+          namespace: null
+          db_path: {db_file}
+        
+  files:
+    - provider_id: localfs
+      provider_type: inline::localfs
+      config:
+        storage_dir: /tmp/llama-stack-files
+        metadata_store:
+          type: sqlite
+          db_path: files_metadata.db
+  tool_runtime:
+  - provider_id: rag-runtime
+    provider_type: inline::rag-runtime
+    config: {{}}
+models:
+  - metadata:
+      embedding_dimension: 768
+    model_id: sentence-transformers/all-mpnet-base-v2
+    provider_id: sentence-transformers
+    provider_model_id: sentence-transformers/all-mpnet-base-v2
+    model_type: embedding
+tool_groups:
+  - toolgroup_id: builtin::rag
+    provider_id: rag-runtime
+vector_dbs:
+  - vector_db_id: {provider_id}
+    embedding_model: sentence-transformers/all-mpnet-base-v2
+    embedding_dimension: 768
+    provider_id: {provider_id}
+    {vector_store_id}
+"""
+
 
 @pytest.fixture
 def llama_stack_processor(mocker):
@@ -108,52 +159,35 @@ class TestDocumentProcessorLlamaStack:
         provider_id = "my_provider_id"
         yaml_file = "yaml_file"
         db_file = "db_file"
-
+        vector_store_id = ""
         doc.write_yaml_config(provider_id, yaml_file, db_file)
 
         mock_open.assert_called_once_with(yaml_file, "w", encoding="utf-8")
-        expected = f"""version: '2'
-image_name: ollama
-apis:
-  - inference
-  - vector_io
-  - tool_runtime
-providers:
-  inference:
-    - provider_id: sentence-transformers
-      provider_type: inline::sentence-transformers
-      config: {{}}
-  vector_io:
-    - provider_id: {provider_id}
-      provider_type: inline::faiss
-      config:
-        kvstore:
-          type: sqlite
-          namespace: null
-          db_path: {db_file}
-        
-  tool_runtime:
-  - provider_id: rag-runtime
-    provider_type: inline::rag-runtime
-    config: {{}}
-models:
-  - metadata:
-      embedding_dimension: 768
-    model_id: sentence-transformers/all-mpnet-base-v2
-    provider_id: sentence-transformers
-    provider_model_id: sentence-transformers/all-mpnet-base-v2
-    model_type: embedding
-tool_groups:
-  - toolgroup_id: builtin::rag
-    provider_id: rag-runtime
-vector_dbs:
-  - vector_db_id: {provider_id}
-    embedding_model: sentence-transformers/all-mpnet-base-v2
-    embedding_dimension: 768
-    provider_id: {provider_id}
-"""
         data = mock_open.return_value.write.mock_calls[0].args[0]
-        assert data == expected
+        assert data == FAISS_EXPECTED.format(
+            provider_id=provider_id, db_file=db_file, vector_store_id=vector_store_id
+        )
+
+    def test_write_yaml_config_faiss_with_provider_vector_db_id(
+        self, mocker, llama_stack_processor
+    ):
+        """Test YAML configuration generation for FAISS vector store backend."""
+        mock_open = mocker.patch("builtins.open", new_callable=mocker.mock_open)
+        doc = document_processor._LlamaStackDB(llama_stack_processor["config"])
+
+        provider_id = "my_provider_id"
+        yaml_file = "yaml_file"
+        db_file = "db_file"
+        vector_store_id = "provider_vector_db_id: my_provider_vector_db_id"
+        doc.write_yaml_config(
+            provider_id, yaml_file, db_file, provider_vector_db_id=vector_store_id
+        )
+
+        mock_open.assert_called_once_with(yaml_file, "w", encoding="utf-8")
+        data = mock_open.return_value.write.mock_calls[0].args[0]
+        assert data == FAISS_EXPECTED.format(
+            provider_id=provider_id, db_file=db_file, vector_store_id=vector_store_id
+        )
 
     def test_write_yaml_config_sqlitevec(self, mocker, llama_stack_processor):
         """Test YAML configuration generation for SQLiteVec vector store backend."""
@@ -165,16 +199,18 @@ vector_dbs:
         provider_id = "my_provider_id"
         yaml_file = "yaml_file"
         db_file = "db_file"
+        vector_store_id = ""
 
         doc.write_yaml_config(provider_id, yaml_file, db_file)
 
         mock_open.assert_called_once_with(yaml_file, "w", encoding="utf-8")
-        expected = f"""version: '2'
+        expected = f"""version: 2
 image_name: ollama
 apis:
   - inference
   - vector_io
   - tool_runtime
+  - files
 providers:
   inference:
     - provider_id: sentence-transformers
@@ -189,6 +225,14 @@ providers:
           namespace: null
           db_path: {db_file}
         db_path: {db_file}
+  files:
+    - provider_id: localfs
+      provider_type: inline::localfs
+      config:
+        storage_dir: /tmp/llama-stack-files
+        metadata_store:
+          type: sqlite
+          db_path: files_metadata.db
   tool_runtime:
   - provider_id: rag-runtime
     provider_type: inline::rag-runtime
@@ -208,6 +252,7 @@ vector_dbs:
     embedding_model: sentence-transformers/all-mpnet-base-v2
     embedding_dimension: 768
     provider_id: {provider_id}
+    {vector_store_id}
 """
         data = mock_open.return_value.write.mock_calls[0].args[0]
         assert data == expected
@@ -333,7 +378,9 @@ vector_dbs:
             mock.sentinel.index,
             "out_dir/llama-stack.yaml",
             "/cwd/out_dir/vector_store.db",
+            f"provider_vector_db_id: {mock.sentinel.index}",
         )
+
         client.return_value.vector_dbs.register.assert_not_called()
         return client.return_value
 
