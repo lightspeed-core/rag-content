@@ -31,7 +31,7 @@ RUN uv venv && uv pip install tomlkit
 RUN uv run python ./scripts/remove_pytorch_cpu_pyproject.py
 
 # Update uv.lock file and install dependencies
-RUN uv lock && uv sync --locked --no-install-project
+RUN rm -f uv.lock && rm -rf .venv && uv lock && uv sync --locked --no-install-project
 
 # Then, add the rest of the project source code and install it
 # Installing separately from its dependencies allows optimal layer caching
