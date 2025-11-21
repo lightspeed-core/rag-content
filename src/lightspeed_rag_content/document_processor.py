@@ -84,22 +84,35 @@ class _BaseDB:
                 return True
         return False
 
-    @classmethod
-    def _filter_out_invalid_nodes(cls, nodes: list[Any]) -> list[TextNode]:
+    @staticmethod
+    def _got_non_headers(text: str) -> bool:
+        """Check if text has content besides markdown headers."""
+        for line in text.splitlines():
+            line = line.strip()
+            if line and not line.startswith("#"):
+                return True
+        return False
+
+    def _valid_text_node(self, text: str) -> bool:
+        """Check if text node is valid: has whitespace and has content."""
+        if self.config.doc_type == "markdown" and not self._got_non_headers(text):
+            return False
+        return self._got_whitespace(text)
+
+    def _filter_out_invalid_nodes(self, nodes: list[Any]) -> list[TextNode]:
         """Filter out invalid nodes."""
         good_nodes = []
         for node in nodes:
-            if isinstance(node, TextNode) and cls._got_whitespace(node.text):
+            if isinstance(node, TextNode) and self._valid_text_node(node.text):
                 # Exclude given metadata during embedding
                 good_nodes.append(node)
             else:
-                LOG.debug("Skipping node without whitespace: %s", repr(node))
+                LOG.debug("Skipping invalid node: %s", repr(node))
         return good_nodes
 
-    @classmethod
-    def _split_and_filter(cls, docs: list[Document]) -> list[TextNode]:
+    def _split_and_filter(self, docs: list[Document]) -> list[TextNode]:
         nodes = Settings.text_splitter.get_nodes_from_documents(docs)
-        valid_nodes = cls._filter_out_invalid_nodes(nodes)
+        valid_nodes = self._filter_out_invalid_nodes(nodes)
         return valid_nodes
 
 
