@@ -19,6 +19,7 @@ import logging
 import os
 import tempfile
 import time
+import types
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional, Union
 
@@ -76,6 +77,8 @@ class _BaseDB:
         if config.doc_type == "markdown":
             Settings.node_parser = MarkdownNodeParser()
 
+        self.original_model_copy = TextNode.model_copy
+
     @staticmethod
     def _got_whitespace(text: str) -> bool:
         """Indicate if the parameter string contains whitespace."""
@@ -101,6 +104,15 @@ class _BaseDB:
         nodes = Settings.text_splitter.get_nodes_from_documents(docs)
         valid_nodes = cls._filter_out_invalid_nodes(nodes)
         return valid_nodes
+
+    @staticmethod
+    def _remove_metadata(
+        metadata: dict[str, Any], remove: Optional[list[str]]
+    ) -> dict[str, Any]:
+        """Return a metadata dictionary without some keys."""
+        if not remove:
+            return metadata.copy()
+        return {key: value for key, value in metadata.items() if key not in remove}
 
 
 class _LlamaIndexDB(_BaseDB):
@@ -141,6 +153,7 @@ class _LlamaIndexDB(_BaseDB):
         """Add documents to the list of documents to save."""
         valid_nodes = self._split_and_filter(docs)
         self._good_nodes.extend(valid_nodes)
+        self.exclude_metadata(self._good_nodes)
 
     def save(
         self, index: str, output_dir: str, embedded_files: int, exec_time: int
@@ -182,6 +195,49 @@ class _LlamaIndexDB(_BaseDB):
             os.path.join(persist_folder, "metadata.json"), "w", encoding="utf-8"
         ) as file:
             file.write(json.dumps(metadata))
+
+    def _model_copy_excluding_llm_metadata(
+        self, node: TextNode, *args: Any, **kwargs: Any
+    ) -> TextNode:
+        """Replace node's model_copy to remove metadata."""
+        res = self.original_model_copy(node, *args, **kwargs)
+        res.metadata = self._remove_metadata(
+            res.metadata, node.excluded_llm_metadata_keys
+        )
+        return res
+
+    def exclude_metadata(self, documents: list[TextNode]) -> None:
+        """Exclude metadata from documents.
+
+        By default llama-index already excludes the following keys:
+        "file_name", "file_type", "file_size", "creation_date",
+        "last_modified_date", and "last_accessed_date".
+
+        This method adds more metadata keys to be excluded from embedding
+        calculations and from the metadata returned to the LLM.
+        """
+        for doc in documents:
+            doc.excluded_embed_metadata_keys = self.config.exclude_embed_metadata
+
+            # Llama index stores all the metadata and expects that on retrieval
+            # the `doc.excluded_llm_metadata_keys` is used to manually fix the
+            # dict, or call `doc.get_content(metadata_mode=MetadataMode.LLM)`
+            # to get a string representation of the contents + LLM_metadata
+            # We don't want that, we only want to store the LLM metadata, so
+            # we replace the model_copy that happens *after* the embedding has
+            # already happened[1] when adding nodes to index[2], allowing
+            # different embedding and LLM metadata.
+            # [1]: https://github.com/run-llama/llama_index/blob/6bf76bf1ca5c70e479a3adb3327cf896cbcd869f/llama-index-core/llama_index/core/indices/vector_store/base.py#L145  # pylint: disable=line-too-long # noqa: E501
+            # [2]: https://github.com/run-llama/llama_index/blob/6bf76bf1ca5c70e479a3adb3327cf896cbcd869f/llama-index-core/llama_index/core/indices/vector_store/base.py#L231  # pylint: disable=line-too-long # noqa: E501
+            doc.excluded_llm_metadata_keys = self.config.exclude_llm_metadata
+            # Override `model_copy` so we don't store excluded metadata, cannot
+            # use `doc.model_copy = ` or `setattr(doc, "model_copy" ...)`
+            # because pydantic has custom setattr code that rejects it.
+            object.__setattr__(
+                doc,
+                "model_copy",
+                types.MethodType(self._model_copy_excluding_llm_metadata, doc),
+            )
 
 
 class _LlamaStackDB(_BaseDB):
@@ -413,6 +469,8 @@ class DocumentProcessor:
         table_name: Optional[str] = None,
         manual_chunking: bool = True,
         doc_type: str = "text",
+        exclude_embed_metadata: Optional[list[str]] = None,
+        exclude_llm_metadata: Optional[list[str]] = None,
     ):
         """Initialize instance."""
         if vector_store_type == "postgres" and not table_name:
@@ -429,6 +487,8 @@ class DocumentProcessor:
             table_name=table_name,
             manual_chunking=manual_chunking,
             doc_type=doc_type,
+            exclude_embed_metadata=exclude_embed_metadata,
+            exclude_llm_metadata=exclude_llm_metadata,
         )
 
         self._check_config(self.config)
