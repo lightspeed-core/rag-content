@@ -241,6 +241,11 @@ class _LlamaIndexDB(_BaseDB):
 
 
 class _LlamaStackDB(_BaseDB):
+    # Templates for manual creation of embeddings
+    EMBEDDING_METADATA_SEPARATOR = "\n"
+    EMBEDDING_METADATA_TEMPLATE = "{key}: {value}"
+    EMBEDDING_TEMPLATE = "{metadata_str}\n\n{content}"
+
     # Lllama-stack faiss vector-db uses IndexFlatL2 (it's hardcoded for now)
     TEMPLATE = """version: 2
 image_name: ollama
@@ -405,16 +410,26 @@ vector_dbs:
                     "chunk_id": node.id_,
                     "source": node.metadata.get("docs_url", node.metadata["title"]),
                 }
+                embed_metadata = self._remove_metadata(
+                    node.metadata, self.config.exclude_embed_metadata
+                )
+                llm_metadata = self._remove_metadata(
+                    node.metadata, self.config.exclude_llm_metadata
+                )
+                # Add document_id to node's metadata because llama-stack needs it
+                llm_metadata["document_id"] = node.ref_doc_id
                 self.documents.append(
                     {
                         "content": node.text,
                         "mime_type": "text/plain",
-                        "metadata": node.metadata,
+                        "metadata": llm_metadata,
                         "chunk_metadata": chunk_metadata,
+                        "embed_metadata": embed_metadata,  # internal to this script
                     }
                 )
 
         else:
+            LOG.warning("Llama-stack automatic mode doesn't use metadata for Embedding")
             self.documents.extend(
                 self.document_class(
                     document_id=doc.doc_id,
@@ -424,6 +439,41 @@ vector_dbs:
                 )
                 for doc in docs
             )
+
+    def _calculate_embeddings(
+        self, client: Any, documents: list[dict[str, Any]]
+    ) -> None:
+        """Calculate the embeddings with metadata.
+
+        This method is necessary because llama-stack doesn't use the metadata
+        to calculate embeddings, so we need to calculate the embeddings
+        ourselves.
+
+        In the `add_docs` method the `embed_metadata` was added as a key just
+        to have it here, but we will use and remove it now because llama-stack
+        doesn't accept this parameter.
+
+        Embeddings are stored in the `embedding` key that llama-stack expects.
+        """
+        for doc in documents:
+            # Build a str with the metadata
+            embed_metadata = doc.pop("embed_metadata")
+            metadata_str = self.EMBEDDING_METADATA_SEPARATOR.join(
+                self.EMBEDDING_METADATA_TEMPLATE.format(key=key, value=str(value))
+                for key, value in embed_metadata.items()
+            )
+
+            # We'll embed the chunk contents with the metadata
+            data = self.EMBEDDING_TEMPLATE.format(
+                content=doc["content"], metadata_str=metadata_str
+            )
+
+            embedding = client.inference.embeddings(
+                model_id=self.config.model_name,
+                contents=[data],
+            )
+
+            doc["embedding"] = embedding.embeddings[0]
 
     def save(
         self,
@@ -443,6 +493,7 @@ vector_dbs:
         client = self._start_llama_stack(cfg_file)
         try:
             if self.config.manual_chunking:
+                self._calculate_embeddings(client, self.documents)
                 client.vector_io.insert(vector_db_id=index, chunks=self.documents)
             else:
                 client.tool_runtime.rag_tool.insert(
