@@ -243,3 +243,185 @@ class TestDocumentProcessorLlamaIndex:
                 doc_processor["num_workers"],
                 "nonexisting",
             )
+
+    def test_exclude_metadata_sets_keys(self, mocker):
+        """Test that exclude_metadata sets excluded_embed_metadata_keys and excluded_llm_metadata_keys."""
+        mocker.patch.object(
+            document_processor, "HuggingFaceEmbedding", new=RagMockEmbedding
+        )
+        mocker.patch("os.path.exists", return_value=True)
+
+        exclude_embed = ["file_path", "url"]
+        exclude_llm = ["file_path", "url_reachable"]
+
+        processor = document_processor.DocumentProcessor(
+            380,
+            0,
+            "sentence-transformers/all-mpnet-base-v2",
+            Path("./embeddings_model"),
+            10,
+            exclude_embed_metadata=exclude_embed,
+            exclude_llm_metadata=exclude_llm,
+        )
+
+        # Create mock nodes
+        node1 = mock.Mock(spec=TextNode)
+        node1.excluded_embed_metadata_keys = None
+        node1.excluded_llm_metadata_keys = None
+        node1.metadata = {"file_path": "/path", "url": "https://example.com"}
+
+        node2 = mock.Mock(spec=TextNode)
+        node2.excluded_embed_metadata_keys = None
+        node2.excluded_llm_metadata_keys = None
+        node2.metadata = {"file_path": "/path2", "title": "Test"}
+
+        nodes = [node1, node2]
+
+        processor.db.exclude_metadata(nodes)
+
+        assert node1.excluded_embed_metadata_keys == exclude_embed
+        assert node1.excluded_llm_metadata_keys == exclude_llm
+        assert node2.excluded_embed_metadata_keys == exclude_embed
+        assert node2.excluded_llm_metadata_keys == exclude_llm
+
+    def test_exclude_metadata_overrides_model_copy(self, mocker):
+        """Test that exclude_metadata overrides model_copy method on nodes."""
+        mocker.patch.object(
+            document_processor, "HuggingFaceEmbedding", new=RagMockEmbedding
+        )
+        mocker.patch("os.path.exists", return_value=True)
+
+        exclude_embed = ["file_path"]
+        exclude_llm = ["file_path", "url_reachable"]
+
+        processor = document_processor.DocumentProcessor(
+            380,
+            0,
+            "sentence-transformers/all-mpnet-base-v2",
+            Path("./embeddings_model"),
+            10,
+            exclude_embed_metadata=exclude_embed,
+            exclude_llm_metadata=exclude_llm,
+        )
+
+        # Create a real TextNode to test model_copy override
+        node = TextNode(
+            text="Test content",
+            metadata={
+                "file_path": "/path/to/file",
+                "url_reachable": True,
+                "title": "Test Document",
+            },
+        )
+
+        original_model_copy = node.model_copy
+
+        processor.db.exclude_metadata([node])
+
+        # Verify model_copy was overridden
+        assert node.model_copy != original_model_copy
+        # Verify it's a bound method
+        assert hasattr(node.model_copy, "__self__")
+
+    def test__model_copy_excluding_llm_metadata(self, mocker):
+        """Test that _model_copy_excluding_llm_metadata removes excluded metadata."""
+        mocker.patch.object(
+            document_processor, "HuggingFaceEmbedding", new=RagMockEmbedding
+        )
+        mocker.patch("os.path.exists", return_value=True)
+
+        exclude_llm = ["file_path", "url_reachable"]
+
+        processor = document_processor.DocumentProcessor(
+            380,
+            0,
+            "sentence-transformers/all-mpnet-base-v2",
+            Path("./embeddings_model"),
+            10,
+            exclude_llm_metadata=exclude_llm,
+        )
+
+        node = TextNode(
+            text="Test content",
+            metadata={
+                "file_path": "/path/to/file",
+                "url_reachable": True,
+                "title": "Test Document",
+                "url": "https://example.com",
+            },
+        )
+        node.excluded_llm_metadata_keys = exclude_llm
+
+        # Call the method directly
+        result = processor.db._model_copy_excluding_llm_metadata(node)
+
+        # Verify excluded keys are removed
+        assert "file_path" not in result.metadata
+        assert "url_reachable" not in result.metadata
+        # Verify non-excluded keys remain
+        assert "title" in result.metadata
+        assert "url" in result.metadata
+        assert result.metadata["title"] == "Test Document"
+        assert result.metadata["url"] == "https://example.com"
+        # Verify text is preserved
+        assert result.text == "Test content"
+
+    def test_add_docs_calls_exclude_metadata(self, mocker, doc_processor):
+        """Test that add_docs calls exclude_metadata on nodes."""
+        mock_exclude = mocker.patch.object(
+            doc_processor["processor"].db, "exclude_metadata"
+        )
+        mock_split = mocker.patch.object(
+            doc_processor["processor"].db,
+            "_split_and_filter",
+            return_value=[mock.Mock(spec=TextNode), mock.Mock(spec=TextNode)],
+        )
+
+        docs = [Document(text="doc1"), Document(text="doc2")]
+        doc_processor["processor"].db.add_docs(docs)
+
+        mock_split.assert_called_once_with(docs)
+        # exclude_metadata should be called with the good nodes
+        mock_exclude.assert_called_once()
+        assert len(mock_exclude.call_args[0][0]) == 2
+
+    def test_exclude_metadata_defaults_to_none(self, mocker):
+        """Test that exclude_metadata parameters default to None when not provided."""
+        mocker.patch.object(
+            document_processor, "HuggingFaceEmbedding", new=RagMockEmbedding
+        )
+        mocker.patch("os.path.exists", return_value=True)
+
+        processor = document_processor.DocumentProcessor(
+            380,
+            0,
+            "sentence-transformers/all-mpnet-base-v2",
+            Path("./embeddings_model"),
+            10,
+        )
+
+        assert processor.config.exclude_embed_metadata is None
+        assert processor.config.exclude_llm_metadata is None
+
+    def test_exclude_metadata_with_custom_values(self, mocker):
+        """Test that exclude_metadata parameters are stored correctly when provided."""
+        mocker.patch.object(
+            document_processor, "HuggingFaceEmbedding", new=RagMockEmbedding
+        )
+        mocker.patch("os.path.exists", return_value=True)
+
+        exclude_embed = ["custom_key1", "custom_key2"]
+        exclude_llm = ["custom_key3"]
+
+        processor = document_processor.DocumentProcessor(
+            380,
+            0,
+            "sentence-transformers/all-mpnet-base-v2",
+            Path("./embeddings_model"),
+            10,
+            exclude_embed_metadata=exclude_embed,
+            exclude_llm_metadata=exclude_llm,
+        )
+
+        assert processor.config.exclude_embed_metadata == exclude_embed
+        assert processor.config.exclude_llm_metadata == exclude_llm

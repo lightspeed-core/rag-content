@@ -133,6 +133,8 @@ different:
             embeddings_model_dir=args.model_dir,
             num_workers=args.workers,
             vector_store_type=args.vector_store_type,
+            exclude_embed_metadata=args.exclude_metadata,
+            exclude_llm_metadata=args.exclude_llm_metadata,
         )
 
         # Load and embed the documents, this method can be called multiple times

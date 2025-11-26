@@ -15,6 +15,15 @@
 """Utilities for rag-content modules."""
 import argparse
 
+DEFAULT_METADATA_EXCLUSSION = [
+    "file_name",
+    "file_type",
+    "file_size",
+    "creation_date",
+    "last_modified_date",
+    "last_accessed_date",
+]
+
 
 def get_common_arg_parser() -> argparse.ArgumentParser:
     """Provide common CLI arguments to document processing scripts."""
@@ -39,8 +48,15 @@ def get_common_arg_parser() -> argparse.ArgumentParser:
         "-em",
         "--exclude-metadata",
         nargs="+",
-        default=None,
+        default=DEFAULT_METADATA_EXCLUSSION,
         help="Metadata to be excluded during embedding",
+    )
+    parser.add_argument(
+        "-elm",
+        "--exclude-llm-metadata",
+        nargs="+",
+        default=DEFAULT_METADATA_EXCLUSSION,
+        help="Metadata to be excluded on the DB",
     )
     parser.add_argument("-o", "--output", help="Vector DB output folder")
     parser.add_argument("-i", "--index", help="Product index")
