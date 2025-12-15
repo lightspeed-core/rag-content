@@ -47,7 +47,7 @@ dependencies = [
     "llama-index-vector-stores-postgres>=0.5.4",
     "torch>=2.7.1",
     "llama-stack==0.2.22",
-    "llama-stack-client==0.2.22",
+    "llama-stack-client==0.3.5",
     "aiosqlite>=0.21.0",
     "sqlite-vec>=0.1.6",
     "tomlkit",
