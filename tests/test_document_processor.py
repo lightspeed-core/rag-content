@@ -81,6 +81,8 @@ class TestDocumentProcessor:
             manual_chunking=True,
             table_name=None,
             vector_store_type="faiss",
+            exclude_embed_metadata=None,
+            exclude_llm_metadata=None,
         )
         assert expected_params == doc_processor.config._Config__attributes
         assert doc_processor._num_embedded_files == 0
@@ -106,6 +108,8 @@ class TestDocumentProcessor:
             manual_chunking=True,
             table_name=None,
             vector_store_type=vector_store_type,
+            exclude_embed_metadata=None,
+            exclude_llm_metadata=None,
         )
         if vector_store_type == "postgres":
             params["table_name"] = "table_name"
@@ -135,6 +139,8 @@ class TestDocumentProcessor:
             embedding_dimension=None,  # Not calculated because class is mocked
             manual_chunking=True,
             table_name=None,
+            exclude_embed_metadata=None,
+            exclude_llm_metadata=None,
         )
         assert params == doc_processor.config._Config__attributes
         assert doc_processor._num_embedded_files == 0
@@ -196,3 +202,44 @@ class TestDocumentProcessor:
         doc_processor = document_processor.DocumentProcessor(**mock_processor["params"])
 
         doc_processor.save(mock.sentinel.index, mock.sentinel.output_dir)
+
+
+class TestBaseDB:
+    """Test cases for the _BaseDB class in document_processor module."""
+
+    def test__remove_metadata(self):
+        """Test that _remove_metadata removes specified keys from metadata dictionary."""
+        metadata = {
+            "file_path": "/path/to/file",
+            "url": "https://example.com",
+            "title": "Test Document",
+            "file_name": "test.txt",
+        }
+        keys_to_remove = ["file_path", "file_name"]
+
+        result = document_processor._BaseDB._remove_metadata(metadata, keys_to_remove)
+
+        assert "file_path" not in result
+        assert "file_name" not in result
+        assert "url" in result
+        assert "title" in result
+        assert result["url"] == "https://example.com"
+        assert result["title"] == "Test Document"
+
+    def test__remove_metadata_empty_list(self):
+        """Test that _remove_metadata returns original metadata when no keys to remove."""
+        metadata = {"key1": "value1", "key2": "value2"}
+
+        result = document_processor._BaseDB._remove_metadata(metadata, [])
+
+        assert result == metadata
+
+    def test__remove_metadata_nonexistent_keys(self):
+        """Test that _remove_metadata handles nonexistent keys gracefully."""
+        metadata = {"key1": "value1", "key2": "value2"}
+
+        result = document_processor._BaseDB._remove_metadata(
+            metadata, ["nonexistent_key"]
+        )
+
+        assert result == metadata
