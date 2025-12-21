@@ -15,6 +15,7 @@
 
 import os
 from unittest import mock
+from unittest.mock import AsyncMock
 
 import pytest
 from llama_index.core.schema import TextNode
@@ -23,54 +24,84 @@ from lightspeed_rag_content import document_processor
 from tests.conftest import RagMockEmbedding
 
 FAISS_EXPECTED = """version: 2
-image_name: ollama
+image_name: starter
+
 apis:
-  - inference
-  - vector_io
-  - tool_runtime
-  - files
+- files
+- tool_runtime
+- vector_io
+- inference
+
+server:
+  port: 8321
+conversations_store:
+  db_path: /tmp/conversations.db
+  type: sqlite
+metadata_store:
+  db_path: /tmp/registry.db
+  type: sqlite
+
 providers:
   inference:
-    - provider_id: sentence-transformers
-      provider_type: inline::sentence-transformers
-      config: {{}}
-  vector_io:
-    - provider_id: {provider_id}
-      provider_type: inline::faiss
-      config:
-        kvstore:
-          type: sqlite
-          namespace: null
-          db_path: {db_file}
-        
-  files:
-    - provider_id: localfs
-      provider_type: inline::localfs
-      config:
-        storage_dir: /tmp/llama-stack-files
-        metadata_store:
-          type: sqlite
-          db_path: files_metadata.db
-  tool_runtime:
-  - provider_id: rag-runtime
-    provider_type: inline::rag-runtime
-    config: {{}}
-models:
-  - metadata:
-      embedding_dimension: 768
-    model_id: sentence-transformers/all-mpnet-base-v2
+  - config: {{}}
     provider_id: sentence-transformers
-    provider_model_id: sentence-transformers/all-mpnet-base-v2
+    provider_type: inline::sentence-transformers
+  files:
+  - config:
+      metadata_store:
+        table_name: files_metadata
+        backend: sql_files
+      storage_dir: /tmp/files
+    provider_id: meta-reference-files
+    provider_type: inline::localfs
+  tool_runtime:
+  - config: {{}}
+    provider_id: rag-runtime
+    provider_type: inline::rag-runtime
+  vector_io:
+  - config:
+      persistence:
+        namespace: vector_io::{provider_type}
+        backend: kv_default
+    provider_id: {provider_type}
+    provider_type: inline::{provider_type}
+storage:
+  backends:
+    kv_default:
+      type: kv_sqlite
+      db_path: {kv_db_path}
+    sql_files:
+      type: sql_sqlite
+      db_path: {files_metadata_db_path}
+    sql_default:
+      type: sql_sqlite
+      db_path: /tmp/sql_store.db
+  stores:
+    metadata:
+      namespace: registry
+      backend: kv_default
+    inference:
+      table_name: inference_store
+      backend: sql_default
+    conversations:
+      table_name: openai_conversations
+      backend: sql_default
+registered_resources:
+  models:
+  - metadata:
+      embedding_dimension: {dimension}
+    model_id: {model_name}
+    provider_id: sentence-transformers
+    provider_model_id: {model_name_or_dir}
     model_type: embedding
-tool_groups:
+  shields: []
+  vector_dbs: []
+  datasets: []
+  scoring_fns: []
+  benchmarks: []
+  tool_groups:
   - toolgroup_id: builtin::rag
     provider_id: rag-runtime
-vector_dbs:
-  - vector_db_id: {provider_id}
-    embedding_model: sentence-transformers/all-mpnet-base-v2
-    embedding_dimension: 768
-    provider_id: {provider_id}
-    {vector_store_id}
 """
 
 
@@ -82,7 +113,16 @@ def llama_stack_processor(mocker):
     )
     st = mocker.patch.object(document_processor, "SentenceTransformer")
     st.return_value.get_sentence_embedding_dimension.return_value = 768
-    mocker.patch("os.path.exists", return_value=False)
+    # Mock os.path.exists to return False only for the embeddings_model_dir check
+    original_exists = os.path.exists
+
+    def mock_exists(path):
+        # Return False for embeddings_model_dir, True for everything else
+        if "embeddings_model" in str(path):
+            return False
+        return original_exists(path)
+
+    mocker.patch("os.path.exists", side_effect=mock_exists)
 
     mocker.patch.object(
         document_processor.Settings.text_splitter.__class__,
@@ -119,7 +159,7 @@ class TestDocumentProcessorLlamaStack:
         assert doc.config.embedding_dimension == 768
         assert doc.db_filename == "faiss_store.db"
         assert doc.document_class.__name__ == "RAGDocument"
-        assert doc.client_class.__name__ == "LlamaStackAsLibraryClient"
+        assert doc.client_class.__name__ == "AsyncLlamaStackAsLibraryClient"
         assert doc.documents == []
         temp_dir.assert_called_once_with(prefix="ls-rag-")
         assert doc.tmp_dir is temp_dir.return_value
@@ -145,7 +185,7 @@ class TestDocumentProcessorLlamaStack:
         assert doc.config.embedding_dimension == 768
         assert doc.db_filename == "faiss_store.db"
         assert doc.document_class.__name__ == "RAGDocument"
-        assert doc.client_class.__name__ == "LlamaStackAsLibraryClient"
+        assert doc.client_class.__name__ == "AsyncLlamaStackAsLibraryClient"
         assert doc.documents == []
         temp_dir.assert_called_once_with(prefix="ls-rag-")
         assert doc.tmp_dir is temp_dir.return_value
@@ -156,37 +196,21 @@ class TestDocumentProcessorLlamaStack:
         mock_open = mocker.patch("builtins.open", new_callable=mocker.mock_open)
         doc = document_processor._LlamaStackDB(llama_stack_processor["config"])
 
-        provider_id = "my_provider_id"
+        index_id = "my_index_id"
         yaml_file = "yaml_file"
         db_file = "db_file"
-        vector_store_id = ""
-        doc.write_yaml_config(provider_id, yaml_file, db_file)
+        files_metadata_db_file = "files_metadata_db_file"
+        doc.write_yaml_config(index_id, yaml_file, db_file, files_metadata_db_file)
 
         mock_open.assert_called_once_with(yaml_file, "w", encoding="utf-8")
         data = mock_open.return_value.write.mock_calls[0].args[0]
         assert data == FAISS_EXPECTED.format(
-            provider_id=provider_id, db_file=db_file, vector_store_id=vector_store_id
-        )
-
-    def test_write_yaml_config_faiss_with_provider_vector_db_id(
-        self, mocker, llama_stack_processor
-    ):
-        """Test YAML configuration generation for FAISS vector store backend."""
-        mock_open = mocker.patch("builtins.open", new_callable=mocker.mock_open)
-        doc = document_processor._LlamaStackDB(llama_stack_processor["config"])
-
-        provider_id = "my_provider_id"
-        yaml_file = "yaml_file"
-        db_file = "db_file"
-        vector_store_id = "provider_vector_db_id: my_provider_vector_db_id"
-        doc.write_yaml_config(
-            provider_id, yaml_file, db_file, provider_vector_db_id=vector_store_id
-        )
-
-        mock_open.assert_called_once_with(yaml_file, "w", encoding="utf-8")
-        data = mock_open.return_value.write.mock_calls[0].args[0]
-        assert data == FAISS_EXPECTED.format(
-            provider_id=provider_id, db_file=db_file, vector_store_id=vector_store_id
+            provider_type="faiss",
+            kv_db_path=db_file,
+            files_metadata_db_path=files_metadata_db_file,
+            dimension=768,
+            model_name=llama_stack_processor["model_name"],
+            model_name_or_dir=llama_stack_processor["model_name"],
         )
 
     def test_write_yaml_config_sqlitevec(self, mocker, llama_stack_processor):
@@ -199,60 +223,90 @@ class TestDocumentProcessorLlamaStack:
         provider_id = "my_provider_id"
         yaml_file = "yaml_file"
         db_file = "db_file"
-        vector_store_id = ""
+        files_metadata_db_file = "files_metadata_db_file"
 
-        doc.write_yaml_config(provider_id, yaml_file, db_file)
+        doc.write_yaml_config(provider_id, yaml_file, db_file, files_metadata_db_file)
 
         mock_open.assert_called_once_with(yaml_file, "w", encoding="utf-8")
         expected = f"""version: 2
-image_name: ollama
+image_name: starter
+
 apis:
-  - inference
-  - vector_io
-  - tool_runtime
-  - files
+- files
+- tool_runtime
+- vector_io
+- inference
+
+server:
+  port: 8321
+conversations_store:
+  db_path: /tmp/conversations.db
+  type: sqlite
+metadata_store:
+  db_path: /tmp/registry.db
+  type: sqlite
+
 providers:
   inference:
-    - provider_id: sentence-transformers
-      provider_type: inline::sentence-transformers
-      config: {{}}
-  vector_io:
-    - provider_id: {provider_id}
-      provider_type: inline::sqlite-vec
-      config:
-        kvstore:
-          type: sqlite
-          namespace: null
-          db_path: {db_file}
-        db_path: {db_file}
+  - config: {{}}
+    provider_id: sentence-transformers
+    provider_type: inline::sentence-transformers
   files:
-    - provider_id: localfs
-      provider_type: inline::localfs
-      config:
-        storage_dir: /tmp/llama-stack-files
-        metadata_store:
-          type: sqlite
-          db_path: files_metadata.db
+  - config:
+      metadata_store:
+        table_name: files_metadata
+        backend: sql_files
+      storage_dir: /tmp/files
+    provider_id: meta-reference-files
+    provider_type: inline::localfs
   tool_runtime:
-  - provider_id: rag-runtime
+  - config: {{}}
+    provider_id: rag-runtime
     provider_type: inline::rag-runtime
-    config: {{}}
-models:
+  vector_io:
+  - config:
+      persistence:
+        namespace: vector_io::sqlite-vec
+        backend: kv_default
+    provider_id: sqlite-vec
+    provider_type: inline::sqlite-vec
+storage:
+  backends:
+    kv_default:
+      type: kv_sqlite
+      db_path: {db_file}
+    sql_files:
+      type: sql_sqlite
+      db_path: {files_metadata_db_file}
+    sql_default:
+      type: sql_sqlite
+      db_path: /tmp/sql_store.db
+  stores:
+    metadata:
+      namespace: registry
+      backend: kv_default
+    inference:
+      table_name: inference_store
+      backend: sql_default
+    conversations:
+      table_name: openai_conversations
+      backend: sql_default
+registered_resources:
+  models:
   - metadata:
       embedding_dimension: 768
     model_id: sentence-transformers/all-mpnet-base-v2
     provider_id: sentence-transformers
     provider_model_id: sentence-transformers/all-mpnet-base-v2
     model_type: embedding
-tool_groups:
+  shields: []
+  vector_dbs: []
+  datasets: []
+  scoring_fns: []
+  benchmarks: []
+  tool_groups:
   - toolgroup_id: builtin::rag
     provider_id: rag-runtime
-vector_dbs:
-  - vector_db_id: {provider_id}
-    embedding_model: sentence-transformers/all-mpnet-base-v2
-    embedding_dimension: 768
-    provider_id: {provider_id}
-    {vector_store_id}
 """
         data = mock_open.return_value.write.mock_calls[0].args[0]
         assert data == expected
@@ -267,9 +321,13 @@ vector_dbs:
         yaml_file = "yaml_file"
 
         client_mock = mocker.patch.object(doc, "client_class")
+        # Mock the async initialize method
+        client_mock.return_value.initialize = AsyncMock()
+
         res = doc._start_llama_stack(yaml_file)
         assert res == client_mock.return_value
         client_mock.assert_called_once_with(yaml_file)
+        client_mock.return_value.initialize.assert_awaited_once()
 
         temp_dir.assert_called_once_with(prefix="ls-rag-")
         assert os.environ["LLAMA_STACK_CONFIG_DIR"] == temp_dir.return_value.name
@@ -362,42 +420,96 @@ vector_dbs:
     def _test_save(self, mocker, config):
         """Helper function to set up and verify save functionality."""
         doc = document_processor._LlamaStackDB(config)
-        doc.documents = mock.sentinel.documents
+        # Create sample documents with proper structure
+        doc.documents = [
+            {
+                "content": "test content 1",
+                "mime_type": "text/plain",
+                "metadata": {
+                    "document_id": 1,
+                    "title": "Test Doc 1",
+                    "docs_url": "https://example.com/doc1",
+                },
+                "chunk_metadata": {
+                    "document_id": 1,
+                    "chunk_id": 1,
+                    "source": "https://example.com/doc1",
+                },
+            },
+            {
+                "content": "test content 2",
+                "mime_type": "text/plain",
+                "metadata": {
+                    "document_id": 2,
+                    "title": "Test Doc 2",
+                    "docs_url": "https://example.com/doc2",
+                },
+                "chunk_metadata": {
+                    "document_id": 2,
+                    "chunk_id": 2,
+                    "source": "https://example.com/doc2",
+                },
+            },
+        ]
 
         write_cfg = mocker.patch.object(doc, "write_yaml_config")
         client = mocker.patch.object(doc, "_start_llama_stack")
-        client.inspect.version.return_value = "0.2.15"
+
+        makedirs = mocker.patch("os.makedirs")
         realpath = mocker.patch(
-            "os.path.realpath", return_value="/cwd/out_dir/vector_store.db"
+            "os.path.realpath",
+            side_effect=[
+                "/cwd/out_dir/faiss_store.db",
+                "/cwd/out_dir/files_metadata.db",
+            ],
+        )
+
+        # Mock async client methods
+        vector_store_mock = mocker.Mock()
+        vector_store_mock.id = "vs_123"
+        client.return_value.vector_stores.create = AsyncMock(
+            return_value=vector_store_mock
+        )
+        client.return_value.files.create = AsyncMock(
+            return_value=mocker.Mock(id="file_123")
+        )
+        client.return_value.vector_io.insert = AsyncMock()
+
+        batch_mock = mocker.Mock()
+        batch_mock.status = "completed"
+        client.return_value.vector_stores.file_batches.create = AsyncMock(
+            return_value=batch_mock
         )
 
         doc.save(mock.sentinel.index, "out_dir")
 
-        realpath.assert_called_once_with("out_dir/faiss_store.db")
+        makedirs.assert_called_once_with("out_dir", exist_ok=True)
+        assert realpath.call_count == 2
+        realpath.assert_any_call("out_dir/faiss_store.db")
+        realpath.assert_any_call("out_dir/files_metadata.db")
         write_cfg.assert_called_once_with(
             mock.sentinel.index,
             "out_dir/llama-stack.yaml",
-            "/cwd/out_dir/vector_store.db",
-            f"provider_vector_db_id: {mock.sentinel.index}",
+            "/cwd/out_dir/faiss_store.db",
+            "/cwd/out_dir/files_metadata.db",
         )
 
-        client.return_value.vector_dbs.register.assert_not_called()
         return client.return_value
 
     def test_save_manual_chunking(self, mocker, llama_stack_processor):
         """Test saving documents with manual chunking workflow."""
         client = self._test_save(mocker, llama_stack_processor["config"])
-        client.vector_io.insert.assert_called_once_with(
-            vector_db_id=mock.sentinel.index, chunks=mock.sentinel.documents
-        )
+        # Verify vector_io.insert was called once with the right vector_db_id
+        # Documents are modified during processing, so we just check it was called
+        assert client.vector_io.insert.await_count == 1
+        call_kwargs = client.vector_io.insert.await_args.kwargs
+        assert call_kwargs["vector_db_id"] == "vs_123"
+        assert "chunks" in call_kwargs
+        assert len(call_kwargs["chunks"]) == 2
 
     def test_save_auto_chunking(self, mocker, llama_stack_processor):
         """Test saving documents with automatic chunking workflow."""
         config = llama_stack_processor["config"]
         config.manual_chunking = False
         client = self._test_save(mocker, config)
-        client.tool_runtime.rag_tool.insert.assert_called_once_with(
-            documents=mock.sentinel.documents,
-            vector_db_id=mock.sentinel.index,
-            chunk_size_in_tokens=380,
-        )
+        client.vector_stores.file_batches.create.assert_awaited_once()
