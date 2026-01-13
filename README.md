@@ -205,6 +205,29 @@ commands:
     (1 row)
     ```
 
+### Llama-Stack Vector Stores
+
+#### Important: Embedding Model Path Portability
+
+When using Llama-Stack vector stores (Faiss or SQLite-vec), the embedding model path
+specified via the `-md` (or `--model-dir`) parameter is written into the generated
+`llama-stack.yaml` configuration file as an absolute path. This path is also registered
+in the llama-stack kv_store database.
+
+When llama-stack later consumes the vector database, it reads the embedding model
+location from the kv_store. Therefore, **the embedding model must be available at the
+exact same path** that was specified during database creation.
+
+**Recommendation:**
+- Use absolute paths for the `-md` parameter to avoid ambiguity
+  (e.g., `-md /app/embeddings` instead of `-md embeddings_model`).
+- Alternatively, set `-md ''` (empty string) and use only the `-mn` flag with a
+  HuggingFace model ID (e.g., `-md "" -mn sentence-transformers/all-mpnet-base-v2`).
+  Setting `-md` to empty forces the tool to use the HuggingFace model ID instead of
+  checking for a local directory. This allows llama-stack to download the model from
+  HuggingFace automatically, making the vector database fully portable without path
+  dependencies.
+
 ### Llama-Stack Faiss
 
 The process is basically the same as in the
@@ -223,10 +246,12 @@ pdm run ./custom_processor.py \
   --vector-store-type=llamastack-faiss
 ```
 
-Once the command is done, you can find the vector database at
+Once the command is done, you can find the vector database (embedded with the registry metadata) at
 `./vector_db/custom_docs/0.1` with the name `faiss_store.db` as well as a
 barebones llama-stack configuration file named `llama-stack.yaml` for
 reference, since it's not necessary for the final deployment.
+
+A `files_metadata.db` will also be generated, containing metadata for `files`. This is needed to get file citations downstream (currently only way of embedding chunk metadata such as *url* and *title*).
 
 The vector-io will be named `custom-docs-0_1`:
 

@@ -46,11 +46,13 @@ dependencies = [
     "faiss-cpu>=1.11.0.post1",
     "llama-index-vector-stores-postgres>=0.5.4",
     "torch>=2.7.1",
-    "llama-stack==0.2.22",
-    "llama-stack-client==0.2.22",
+    "llama-stack==0.3.5",
+    "llama-stack-client==0.3.5",
     "aiosqlite>=0.21.0",
     "sqlite-vec>=0.1.6",
     "tomlkit",
+    "chardet>=5.2.0",
+    "einops>=0.8.1",
 ]
 requires-python = "==3.12.*"
 dynamic = ["license", "readme"]
