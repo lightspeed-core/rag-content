@@ -45,7 +45,10 @@ dependencies = [
     "llama-index-readers-file>=0.4.11",
     "faiss-cpu>=1.11.0.post1",
     "llama-index-vector-stores-postgres>=0.5.4",
-    "torch>=2.7.1",
+    # Pin torch/torchvision to versions available as CPU wheels
+    # torch 2.5.x pairs with torchvision 0.20.x
+    "torch>=2.5.0,<2.6.0",
+    "torchvision>=0.20.0,<0.21.0",
     "llama-stack==0.3.5",
     "llama-stack-client==0.3.5",
     "aiosqlite>=0.21.0",
@@ -67,6 +70,7 @@ url = "https://download.pytorch.org/whl/cpu"
 explicit = true
 [tool.uv.sources]
 torch = [{ index = "pytorch-cpu" }]
+torchvision = [{ index = "pytorch-cpu" }]
 
 [dependency-groups]
 dev = [
