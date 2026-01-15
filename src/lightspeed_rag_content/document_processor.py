@@ -72,7 +72,7 @@ class _BaseDB:
             if config.manual_chunking:
                 Settings.chunk_size = self.config.chunk_size
                 Settings.chunk_overlap = self.config.chunk_overlap
-            if config.doc_type == "markdown":
+            if config.doc_type in ("markdown", "html"):
                 Settings.node_parser = MarkdownNodeParser()
             return
 
@@ -83,7 +83,8 @@ class _BaseDB:
                 model_name=str(self.config.embeddings_model_dir)
             )
             Settings.llm = resolve_llm(None)
-        if config.doc_type == "markdown":
+        # HTML uses MarkdownNodeParser since HTMLReader converts to Markdown
+        if config.doc_type in ("markdown", "html"):
             Settings.node_parser = MarkdownNodeParser()
 
     @staticmethod

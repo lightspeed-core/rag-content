@@ -104,7 +104,7 @@ def _llama_index_query(args: argparse.Namespace) -> None:
         }
         for node in nodes:  # type: ignore
             if isinstance(node, NodeWithScore):
-                base_node = cast(NodeWithScore, node)
+                base_node = cast("NodeWithScore", node)
                 text = getattr(base_node, "text", None)
                 if text is None:
                     text = base_node.node.get_content() or ""

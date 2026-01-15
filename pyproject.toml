@@ -53,6 +53,8 @@ dependencies = [
     "tomlkit",
     "chardet>=5.2.0",
     "einops>=0.8.1",
+    # For HTML to Markdown conversion in BYOK workflows
+    "docling>=2.68.0",
 ]
 requires-python = "==3.12.*"
 dynamic = ["license", "readme"]
