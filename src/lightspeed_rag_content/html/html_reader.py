@@ -103,7 +103,7 @@ class HTMLReader(BaseReader):
 
         LOG.debug("Successfully converted %s to Markdown", file_path)
 
-        metadata = extra_info or {}
+        metadata = dict(extra_info) if extra_info else {}
         metadata["file_path"] = str(file_path)
         metadata["file_name"] = file_path.name
 

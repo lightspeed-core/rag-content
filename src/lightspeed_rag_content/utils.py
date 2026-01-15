@@ -55,8 +55,9 @@ def run_cli_command(
     """
     args = parser.parse_args()
     handler = command_handlers.get(args.command)
-    if handler:
-        handler(args)
+    if handler is None:
+        raise SystemExit(f"Unknown command: {args.command}")
+    handler(args)
 
 
 def add_input_file_argument(

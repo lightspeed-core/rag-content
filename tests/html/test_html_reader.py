@@ -96,6 +96,19 @@ class TestHTMLReader:
         assert documents[0].metadata["custom_key"] == "custom_value"
         assert documents[0].metadata["file_path"] == str(html_file)
 
+    def test_load_data_does_not_mutate_extra_info(self, mock_docling, html_file):
+        """Test that the caller's extra_info dict is not mutated."""
+        reader = HTMLReader()
+        extra_info = {"custom_key": "custom_value"}
+        original_keys = set(extra_info.keys())
+
+        reader.load_data(html_file, extra_info=extra_info)
+
+        # Verify extra_info was not mutated - should still have only original keys
+        assert set(extra_info.keys()) == original_keys
+        assert "file_path" not in extra_info
+        assert "file_name" not in extra_info
+
     def test_load_data_conversion_error(self, mock_docling, html_file):
         """Test that RuntimeError is raised on conversion failure."""
         mock_docling["converter"].convert.side_effect = Exception("Conversion failed")
