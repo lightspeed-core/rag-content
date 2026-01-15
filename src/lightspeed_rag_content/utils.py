@@ -14,6 +14,68 @@
 #    under the License.
 """Utilities for rag-content modules."""
 import argparse
+import logging
+from collections.abc import Callable
+from pathlib import Path
+
+# Standard log format for CLI modules
+CLI_LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+
+def setup_cli_logging(package_name: str | None = None) -> logging.Logger:
+    """Configure logging for CLI modules with a standard format.
+
+    Args:
+        package_name: The package name to use for the logger. If None,
+            uses the root logger.
+
+    Returns:
+        A configured Logger instance for the specified package.
+    """
+    logging.basicConfig(
+        level=logging.INFO,
+        format=CLI_LOG_FORMAT,
+    )
+    return logging.getLogger(package_name)
+
+
+def run_cli_command(
+    parser: argparse.ArgumentParser,
+    command_handlers: dict[str, Callable[[argparse.Namespace], None]],
+) -> None:
+    """Parse CLI arguments and dispatch to the appropriate command handler.
+
+    Args:
+        parser: The argument parser to use for parsing command line arguments.
+        command_handlers: A dictionary mapping command names to handler functions.
+            Each handler receives the parsed arguments Namespace.
+
+    Raises:
+        SystemExit: If the command is not found in handlers.
+    """
+    args = parser.parse_args()
+    handler = command_handlers.get(args.command)
+    if handler:
+        handler(args)
+
+
+def add_input_file_argument(
+    parser: argparse.ArgumentParser,
+    help_text: str = "Input file to process.",
+) -> None:
+    """Add a standard -i/--input-file argument to an argument parser.
+
+    Args:
+        parser: The argument parser to add the argument to.
+        help_text: Help text for the argument.
+    """
+    parser.add_argument(
+        "-i",
+        "--input-file",
+        required=True,
+        type=Path,
+        help=help_text,
+    )
 
 
 def get_common_arg_parser() -> argparse.ArgumentParser:
