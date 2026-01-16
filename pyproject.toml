@@ -59,7 +59,7 @@ dependencies = [
     # For HTML to Markdown conversion in BYOK workflows
     "docling>=2.68.0",
 ]
-requires-python = "==3.12.*"
+requires-python = "==3.14.*"
 dynamic = ["license", "readme"]
 
 # PyTorch has multiple wheel variants for different backends - cpu, gpu, etc.
