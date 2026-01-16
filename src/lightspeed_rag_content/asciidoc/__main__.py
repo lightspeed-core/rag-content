@@ -15,7 +15,6 @@
 """This module can be used to convert and investigate AsciiDoc files."""
 
 import argparse
-import logging
 import shutil
 import subprocess
 import sys
@@ -27,12 +26,13 @@ from lightspeed_rag_content.asciidoc.asciidoctor_converter import (
     RUBY_ASCIIDOC_DIR,
     AsciidoctorConverter,
 )
-
-LOG: logging.Logger = logging.getLogger(__package__)
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+from lightspeed_rag_content.utils import (
+    add_input_file_argument,
+    run_cli_command,
+    setup_cli_logging,
 )
+
+LOG = setup_cli_logging(__package__)
 
 
 def main_convert(args: argparse.Namespace) -> None:
@@ -89,12 +89,9 @@ def get_argument_parser() -> argparse.ArgumentParser:
         "convert",
         help="Convert AsciiDoc to text formatted file.",
     )
-    convert_parser.add_argument(
-        "-i",
-        "--input-file",
-        required=True,
-        type=Path,
-        help="AsciiDoc formatted file that should be converted to requested format.",
+    add_input_file_argument(
+        convert_parser,
+        "AsciiDoc formatted file that should be converted to requested format.",
     )
     convert_parser.add_argument(
         "-o",
@@ -141,10 +138,7 @@ def get_argument_parser() -> argparse.ArgumentParser:
 
 
 if __name__ == "__main__":
-    parser = get_argument_parser()
-    args = parser.parse_args()
-
-    if args.command == "convert":
-        main_convert(args)
-    else:
-        main_get_structure(args)
+    run_cli_command(
+        get_argument_parser(),
+        {"convert": main_convert, "get_structure": main_get_structure},
+    )

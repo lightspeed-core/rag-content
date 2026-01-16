@@ -62,3 +62,50 @@ class TestUtils:
 
         args = parser.parse_args([])
         assert args.manual_chunking
+
+    def test_run_cli_command_unknown_command(self):
+        """Test run_cli_command raises SystemExit for unknown commands."""
+        parser = argparse.ArgumentParser()
+        subparsers = parser.add_subparsers(dest="command")
+        subparsers.add_parser("known")
+
+        handlers = {"known": lambda args: None}
+
+        # Simulate parsing an unknown command by mocking parse_args
+        with pytest.raises(SystemExit) as exc_info:
+            parser_with_unknown = argparse.ArgumentParser()
+            parser_with_unknown.parse_args = lambda: argparse.Namespace(
+                command="unknown"
+            )
+            utils.run_cli_command(parser_with_unknown, handlers)
+
+        assert "Unknown command: unknown" in str(exc_info.value)
+
+    def test_run_cli_command_executes_handler(self, mocker):
+        """Test run_cli_command executes the correct handler."""
+        mock_handler = mocker.Mock()
+        parser = argparse.ArgumentParser()
+        parser.parse_args = lambda: argparse.Namespace(command="test")
+
+        utils.run_cli_command(parser, {"test": mock_handler})
+
+        mock_handler.assert_called_once()
+
+    def test_setup_cli_logging(self):
+        """Test setup_cli_logging returns a logger."""
+        import logging
+
+        logger = utils.setup_cli_logging("test_package")
+
+        assert isinstance(logger, logging.Logger)
+        assert logger.name == "test_package"
+
+    def test_add_input_file_argument(self):
+        """Test add_input_file_argument adds the expected argument."""
+        from pathlib import Path
+
+        parser = argparse.ArgumentParser()
+        utils.add_input_file_argument(parser, help_text="Test file input")
+
+        args = parser.parse_args(["-i", "/tmp/test.txt"])
+        assert args.input_file == Path("/tmp/test.txt")
