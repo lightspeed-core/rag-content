@@ -692,12 +692,13 @@ class DocumentProcessor:
         if unreachable_action != "warn":
             # Separate docs into those we should check and those in ignore_list
             if ignore_list:
-                docs_to_check = [
-                    doc for doc in docs if doc.metadata.get("title") not in ignore_list
-                ]
-                ignored_docs = [
-                    doc for doc in docs if doc.metadata.get("title") in ignore_list
-                ]
+                docs_to_check = []
+                ignored_docs = []
+                for doc in docs:
+                    if doc.metadata.get("title") in ignore_list:
+                        ignored_docs.append(doc)
+                    else:
+                        docs_to_check.append(doc)
             else:
                 docs_to_check = docs
                 ignored_docs = []
