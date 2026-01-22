@@ -101,6 +101,9 @@ start-postgres-debug: ## Start postgresql from the pgvector container image with
 	 -v ./postgresql/data:/var/lib/postgresql/data:Z pgvector/pgvector:pg16 \
 	 postgres -c log_statement=all -c log_destination=stderr
 
+konflux-requirements:	## generate hermetic requirements.*.txt file for konflux build
+	./scripts/konflux_requirements.sh
+
 .PHONY: help
 help: ## Show this help screen
 	@echo 'Usage: make <OPTIONS> ... <TARGETS>'
