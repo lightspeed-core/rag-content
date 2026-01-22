@@ -1,0 +1,14 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    asciidoctor (2.0.26)
+
+PLATFORMS
+  aarch64-linux
+  x86_64-linux-gnu
+
+DEPENDENCIES
+  asciidoctor
+
+BUNDLED WITH
+   2.2.33
