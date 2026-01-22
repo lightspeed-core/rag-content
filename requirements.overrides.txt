@@ -1,0 +1,22 @@
+# override these package to the version available on RHOAI wheels index:
+# https://console.redhat.com/api/pypi/public-rhai/rhoai/3.2/cpu-ubi9/simple
+transformers==4.57.3
+tokenizers==0.22.1
+scipy==1.16.3
+numpy==2.3.5
+aiohttp==3.13.3
+aiosqlite==0.22.0
+anyio==4.12.0
+datasets==4.4.1
+pillow==11.3.0
+faiss-cpu==1.12.0
+setuptools==80.9
+jiter==0.12
+cryptography==46.0.3
+docling-parse==4.7.2
+docling==2.55.1
+docling-core==2.50.1
+docling-ibm-models==3.10
+triton==3.5.0
+greenlet==3.3.0
+torch==2.9.0

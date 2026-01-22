@@ -101,6 +101,16 @@ start-postgres-debug: ## Start postgresql from the pgvector container image with
 	 -v ./postgresql/data:/var/lib/postgresql/data:Z pgvector/pgvector:pg16 \
 	 postgres -c log_statement=all -c log_destination=stderr
 
+konflux-requirements:	## generate hermetic requirements.*.txt file and gemfile.lock for konflux build
+	./scripts/konflux_requirements.sh
+	bundle _2.2.33_ lock --add-platform aarch64-linux
+
+konflux-rpm-lock:	## generate rpm.lock.yaml file for konflux build
+	./scripts/generate-rpm-lock.sh
+
+ruby-bundler: # Install bundler 2.2.33, this is the version used by the container image.
+	gem install bundler -v 2.2.33
+
 .PHONY: help
 help: ## Show this help screen
 	@echo 'Usage: make <OPTIONS> ... <TARGETS>'

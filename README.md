@@ -47,7 +47,7 @@ There are prebuilt two images. One with CPU support only (size cca 3.7 GB) and i
     ```bash
     podman pull quay.io/lightspeed-core/rag-content-gpu:latest
     ```
- 
+
 #### Build image locally
 
 To build the image locally, follow these steps:
@@ -385,23 +385,65 @@ uv lock --upgrade
 uv sync
 ```
 
-## `requirements*` Files Generation for Konflux
+## Updating Dependencies for Hermetic Builds
 
-To generate all `requirements*` files:
+Konflux builds run in **hermetic mode** (air-gapped from the internet), so all dependencies must be prefetched and locked. When you add or update dependencies, you need to regenerate the lock files.
 
+### When to Update Dependency Files
+
+Update these files when you:
+- Add/remove/update Python packages in the project
+- Add/remove/update RPM packages in the Containerfile
+- Change the base image version
+
+### Updating Python Dependencies
+
+**Quick command:**
+```shell
+make konflux-requirements
 ```
-requirements-build.in
-requirements-build.txt
-requirements.txt
+
+This compiles Python dependencies from `pyproject.toml` using `uv`, splits packages by their source index (PyPI vs Red Hat's internal registry), and generates hermetic requirements files with pinned versions and hashes for Konflux builds.
+
+**Files produced:**
+- `requirements.hashes.source.txt` – PyPI packages with hashes
+- `requirements.hashes.wheel.txt` – Red Hat registry packages with hashes
+- `requirements.hashes.wheel.pypi.txt` - PyPI wheels packages with hashes
+- `requirements-build.txt` – Build-time dependencies for source packages
+
+The script also updates the Tekton pipeline configurations (`.tekton/lightspeed-stack-*.yaml`) with the list of pre-built wheel packages.
+
+### Updating RPM Dependencies
+
+**Prerequisites:**
+- Install [rpm-lockfile-prototype](https://github.com/konflux-ci/rpm-lockfile-prototype?tab=readme-ov-file#installation)
+- Have an active RHEL Subscription, get activation keys from [RH console](https://console.redhat.com/insights/connector/activation-keys)
+- Have `dnf` installed in system
+
+**Steps:**
+
+1. **List your RPM packages** in `rpms.in.yaml` under the `packages` field
+
+2. **If you changed the base image**, extract its repo file:
+```shell
+# UBI images
+podman run -it $BASE_IMAGE cat /etc/yum.repos.d/ubi.repo > ubi.repo
+# RHEL images, the current base image.
+podman run -it $BASE_IMAGE cat /etc/yum.repos.d/redhat.repo > redhat.repo
+```
+If the repo file contains too many entries, we can filter them and keep only required repositories.
+Here is the command to check active repositories:
+```shell
+dnf repolist
+```
+Replace the architecture tag (`uname -m`) to `$basearch` so that rpm-lockfile-prototype can replace it with requested architecture names.
+```shell
+sed -i "s/$(uname -m)/\$basearch/g" redhat.repo
 ```
 
-The following command must be executed:
-
-```bash
-scripts/generate_packages_to_prefetch.py
+1. **Generate the lock file**:
+```shell
+make konflux-rpm-lock
 ```
 
-# License
-
-This project is licensed under the Apache License 2.0. See the **LICENSE** file
-for details.
+This creates `rpms.lock.yaml` with pinned RPM versions.
