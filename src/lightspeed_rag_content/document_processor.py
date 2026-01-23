@@ -663,6 +663,7 @@ class DocumentProcessor:
         required_exts: Optional[list[str]] = None,
         file_extractor: Optional[dict[str, BaseReader]] = None,
         unreachable_action: Optional[str] = "warn",
+        ignore_list: Optional[list[str]] = None,
     ) -> None:
         """Read documents from a path and split them into nodes for a vector database.
 
@@ -670,6 +671,11 @@ class DocumentProcessor:
         "warn": Just log a warning message for links that are unreacheable
         "fail": Fail in case of an unreachable link. Raises RuntimeError
         "drop": Drop the document, do not include it into the vector database
+
+        ignore_list:
+        List of document titles to exclude from unreachable URL validation.
+        Documents with titles in this list will be included in the vector database
+        regardless of their url_reachable status.
         """
         reader = SimpleDirectoryReader(
             str(docs_dir),
@@ -684,16 +690,32 @@ class DocumentProcessor:
 
         # Check for unreachable URLs if we are not ignoring them
         if unreachable_action != "warn":
+            # Separate docs into those we should check and those in ignore_list
+            if ignore_list:
+                docs_to_check = []
+                ignored_docs = []
+                for doc in docs:
+                    if doc.metadata.get("title") in ignore_list:
+                        ignored_docs.append(doc)
+                    else:
+                        docs_to_check.append(doc)
+            else:
+                docs_to_check = docs
+                ignored_docs = []
+
+            # Find reachable docs among those we're checking
             reachable_docs = [
-                doc for doc in docs if doc.metadata["url_reachable"] is True
+                doc for doc in docs_to_check if doc.metadata["url_reachable"] is True
             ]
-            if len(docs) != len(reachable_docs):
+
+            if len(docs_to_check) != len(reachable_docs):
                 # Optionally fail on unreachable URLs
                 if unreachable_action == "fail":
                     raise RuntimeError("Some documents have unreachable URLs. ")
-                # Optionally drop unreachable URLs
+                # Optionally drop unreachable URLs (but keep ignored docs)
                 if unreachable_action == "drop":
-                    docs = reachable_docs
+                    docs = reachable_docs + ignored_docs
+
 
         self.db.add_docs(docs)
 
