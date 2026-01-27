@@ -33,6 +33,7 @@ The reader can be used with llama-index's SimpleDirectoryReader via file_extract
     ... )
     >>> docs = reader.load_data()
 """
+
 import logging
 from pathlib import Path
 from typing import Any, Optional

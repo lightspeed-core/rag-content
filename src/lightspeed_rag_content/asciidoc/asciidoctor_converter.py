@@ -44,6 +44,7 @@ Please read: https://docs.asciidoctor.org/asciidoctor/latest/extensions/
 You can also investigate the default text converter 'asciidoc_text_converter.rb'
 stored in the asciidoc package.
 """
+
 import logging
 import shutil
 import subprocess

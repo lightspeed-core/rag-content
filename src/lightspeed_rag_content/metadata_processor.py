@@ -58,23 +58,23 @@ class MetadataProcessor:
     def populate(self, file_path: str) -> dict[str, typing.Any]:
         """Populate title and metadata with docs URL.
 
-        Populate the docs_url and title metadata elements with docs URL
-        and the page's title.
+        Populate the docs_url, title and url_reachable metadata elements with docs URL,
+        the page's title and if the url is reachable.
 
         Args:
             file_path: str: file path in str
         """
-        docs_url = self.url_function(file_path)
+        doc_url = self.url_function(file_path)
         title = self.get_file_title(file_path)
 
         document = {
             "file_path": file_path,
             "title": title,
-            "url": docs_url,
+            "url": doc_url,
         }
 
         url_reachable = True
-        if not self.ping_url(docs_url):
+        if not self.ping_url(doc_url):
             LOG.warning(
                 'URL not reachable: %(url)s (Title: "%(title)s", '
                 "File path: %(file_path)s)",
@@ -88,7 +88,7 @@ class MetadataProcessor:
             document,
         )
 
-        return {"docs_url": docs_url, "title": title, "url_reachable": url_reachable}
+        return {"docs_url": doc_url, "title": title, "url_reachable": url_reachable}
 
     @abc.abstractmethod
     def url_function(self, file_path: str) -> str:

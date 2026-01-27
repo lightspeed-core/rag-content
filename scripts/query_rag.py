@@ -18,7 +18,7 @@ from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.vector_stores.faiss import FaissVectorStore
 
 
-def _llama_index_query(args: argparse.Namespace) -> None:
+def _llama_index_query(args: argparse.Namespace) -> None:  # noqa: C901
     os.environ["TRANSFORMERS_CACHE"] = args.model_path
     os.environ["TRANSFORMERS_OFFLINE"] = "1"
 
@@ -131,15 +131,36 @@ def _llama_index_query(args: argparse.Namespace) -> None:
 def _get_db_path_dict(vector_type: str, config: dict[str, Any]) -> dict[str, Any]:
     """Return the dict where db_path key is from our llama-stack config."""
     try:
-        res: dict[str, Any] = config["providers"]["vector_io"][0]["config"]
+        provider_config: dict[str, Any] = config["providers"]["vector_io"][0]["config"]
+
+        # New llama-stack 0.3.x format
+        if "persistence" in provider_config:
+            backend_name = provider_config["persistence"]["backend"]
+            result: dict[str, Any] = config["storage"]["backends"][backend_name]
+            return result
+
+        # Old 0.2.x format
         if vector_type == "llamastack-faiss":
-            res = res["kvstore"]
-        return res
+            kvstore: dict[str, Any] = provider_config["kvstore"]
+            return kvstore
+        return provider_config
     except (KeyError, IndexError) as e:
         raise ValueError(f"Invalid configuration structure: {e}")
 
 
-def _llama_stack_query(args: argparse.Namespace) -> None:
+def _get_chunk_text(chunk: Any) -> str:
+    """Extract text content from a chunk object."""
+    if hasattr(chunk, "content"):
+        if isinstance(chunk.content, str):
+            return chunk.content
+        if isinstance(chunk.content, list):
+            return " ".join(
+                c.text if hasattr(c, "text") else str(c) for c in chunk.content
+            )
+    return str(chunk)
+
+
+def _llama_stack_query(args: argparse.Namespace) -> None:  # noqa: C901
     tmp_dir = tempfile.TemporaryDirectory(prefix="ls-rag-")
     os.environ["LLAMA_STACK_CONFIG_DIR"] = tmp_dir.name
 
@@ -152,98 +173,85 @@ def _llama_stack_query(args: argparse.Namespace) -> None:
     db_dict["db_path"] = os.path.realpath(os.path.join(args.db_path, db_filename))
 
     if args.model_path:
-        cfg["models"][0]["provider_model_id"] = os.path.realpath(args.model_path)
+        model_path = os.path.realpath(args.model_path)
+        # New 0.3.x format
+        if "registered_resources" in cfg and "models" in cfg["registered_resources"]:
+            cfg["registered_resources"]["models"][0]["provider_model_id"] = model_path
+            if "vector_stores" in cfg["registered_resources"]:
+                for vs in cfg["registered_resources"]["vector_stores"]:
+                    vs["embedding_model"] = f"sentence-transformers/{model_path}"
+        # Old 0.2.x format
+        elif "models" in cfg:
+            cfg["models"][0]["provider_model_id"] = model_path
 
     cfg_file = os.path.join(tmp_dir.name, "llama-stack.yaml")
     yaml.safe_dump(cfg, open(cfg_file, "w", encoding="utf-8"))
 
-    stack_lib = importlib.import_module("llama_stack")
-    client = stack_lib.core.library_client.LlamaStackAsLibraryClient(cfg_file)
-    client.initialize()
-
-    # No need to register the DB as it's defined in llama-stack.yaml
-    # model_id = cfg["models"][0]["model_id"]
-    # client.vector_dbs.register(
-    #     vector_db_id=args.product_index, embedding_model=model_id
-    # )
-
-    query_cfg = {
-        "chunk_size_in_tokens": 380,  # Not configurable on this script
-        "mode": "vector",  # "vector", "keyword", or "hybrid". Default "vector"
-        "max_chunks": args.top_k,
-        "chunk_overlap_in_tokens": 0,  # Not configurable on this script
-        # "chunk_template": "Result {index}\\nContent: {chunk.content}\\n"
-        #                   "Metadata: {metadata}\\n"
-        #      Available placeholders:
-        #        {index}: 1-based chunk ordinal
-        #        {chunk.content}: chunk content string
-        #        {metadata}: chunk metadata dict
-        # "max_tokens_in_context": Maximum number of tokens in the context.
-        # "ranker": Ranker to use in hybrid search. Defaults to RRF ranker.
-    }
-    res = client.tool_runtime.rag_tool.query(
-        vector_db_ids=[args.product_index], content=args.query, query_config=query_cfg
-    )
-
-    md = res.metadata
-    if len(md["chunks"]) == 0:
-        logging.warning(f"No chunks retrieved for query: {args.query}")
-        if args.json:
-            result = {
-                "query": args.query,
-                "top_k": args.top_k,
-                "threshold": args.threshold,
-                "nodes": [],
-            }
-            print(json.dumps(result, indent=2))
-        exit(1)
-
-    threshold = args.threshold
-    if threshold > 0.0 and md.get("scores") and md["scores"][0].score < threshold:
-        logging.warning(
-            f"Score {md['scores'][0].score} of the top retrieved node for query '{args.query}' "
-            f"didn't cross the minimal threshold {threshold}."
-        )
-        if args.json:
-            result = {
-                "query": args.query,
-                "top_k": args.top_k,
-                "threshold": args.threshold,
-                "nodes": [],
-            }
-            print(json.dumps(result, indent=2))
-        exit(1)
-
-    # Format results
-    result = {
-        "query": args.query,
-        "top_k": args.top_k,
-        "threshold": args.threshold,
-        "nodes": [],
-    }
-
-    for _id, chunk, score in zip(md["document_ids"], md["chunks"], md["scores"]):
-        node_data = {
-            "id": _id,
-            "score": score.score if hasattr(score, "score") else score,
-            "text": chunk,
-            "metadata": {},
+    lib_client = importlib.import_module("llama_stack.core.library_client")
+    with lib_client.LlamaStackAsLibraryClient(cfg_file) as client:
+        query_cfg = {
+            "max_chunks": args.top_k,
+            "mode": "vector",  # "vector", "keyword", or "hybrid". Default "vector"
+            "score_threshold": 0,
         }
-        result["nodes"].append(node_data)
+        res = client.vector_io.query(
+            vector_store_id=args.product_index, query=args.query, params=query_cfg
+        )
 
-    if args.json:
-        print(json.dumps(result, indent=2))
-    else:
-        for _id, chunk, score in zip(md["document_ids"], md["chunks"], md["scores"]):
-            print("=" * 80)
-            print(f"Node ID: {_id}\nScore: {score}\nText:\n{chunk}")
+        if len(res.chunks) == 0:
+            logging.warning(f"No chunks retrieved for query: {args.query}")
+            if args.json:
+                result = {
+                    "query": args.query,
+                    "top_k": args.top_k,
+                    "threshold": args.threshold,
+                    "nodes": [],
+                }
+                print(json.dumps(result, indent=2))
+            exit(1)
 
-    # Method 2 to present data:
-    # for content in res.content:
-    #     if content.type == 'text':
-    #         print(content.text)
-    #     else:
-    #         print(content)
+        threshold = args.threshold
+        if threshold > 0.0 and res.scores and res.scores[0] < threshold:
+            logging.warning(
+                f"Score {res.scores[0]} of the top retrieved node for query '{args.query}' "
+                f"didn't cross the minimal threshold {threshold}."
+            )
+            if args.json:
+                result = {
+                    "query": args.query,
+                    "top_k": args.top_k,
+                    "threshold": args.threshold,
+                    "nodes": [],
+                }
+                print(json.dumps(result, indent=2))
+            exit(1)
+
+        # Format results
+        result = {
+            "query": args.query,
+            "top_k": args.top_k,
+            "threshold": args.threshold,
+            "nodes": [],
+        }
+
+        for chunk, score in zip(res.chunks, res.scores):
+            node_data = {
+                "id": chunk.chunk_id if hasattr(chunk, "chunk_id") else "",
+                "score": score,
+                "text": _get_chunk_text(chunk),
+                "metadata": chunk.metadata if hasattr(chunk, "metadata") else {},
+            }
+            result["nodes"].append(node_data)
+
+        if args.json:
+            print(json.dumps(result, indent=2))
+        else:
+            for chunk, score in zip(res.chunks, res.scores):
+                print("=" * 80)
+                chunk_id = chunk.chunk_id if hasattr(chunk, "chunk_id") else ""
+                print(
+                    f"Chunk ID: {chunk_id}\nScore: {score}\nText:\n{_get_chunk_text(chunk)}"
+                )
 
 
 if __name__ == "__main__":
