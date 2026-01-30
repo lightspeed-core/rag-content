@@ -251,8 +251,6 @@ Once the command is done, you can find the vector database (embedded with the re
 barebones llama-stack configuration file named `llama-stack.yaml` for
 reference, since it's not necessary for the final deployment.
 
-A `files_metadata.db` will also be generated, containing metadata for `files`. This is needed to get file citations downstream (currently only way of embedding chunk metadata such as *url* and *title*).
-
 The vector-io will be named `custom-docs-0_1`:
 
 ```yaml

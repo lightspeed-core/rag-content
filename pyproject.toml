@@ -49,8 +49,8 @@ dependencies = [
     # torch 2.5.x pairs with torchvision 0.20.x
     "torch>=2.5.0,<2.6.0",
     "torchvision>=0.20.0,<0.21.0",
-    "llama-stack==0.3.5",
-    "llama-stack-client==0.3.5",
+    "llama-stack==0.4.3",
+    "llama-stack-client==0.4.3",
     "aiosqlite>=0.21.0",
     "sqlite-vec>=0.1.6",
     "tomlkit",
@@ -58,6 +58,7 @@ dependencies = [
     "einops>=0.8.1",
     # For HTML to Markdown conversion in BYOK workflows
     "docling>=2.68.0",
+    "certifi>=2025.10.5",
 ]
 requires-python = "==3.12.*"
 dynamic = ["license", "readme"]

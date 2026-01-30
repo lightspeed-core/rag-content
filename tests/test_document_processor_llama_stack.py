@@ -50,7 +50,7 @@ providers:
   - config:
       metadata_store:
         table_name: files_metadata
-        backend: sql_files
+        backend: sql_default
       storage_dir: /tmp/files
     provider_id: meta-reference-files
     provider_type: inline::localfs
@@ -62,17 +62,17 @@ providers:
   - config:
       persistence:
         namespace: vector_io::{provider_type}
-        backend: kv_default
-    provider_id: {provider_type}
+        backend: kv_rag
+    provider_id: {index_id}
     provider_type: inline::{provider_type}
 storage:
   backends:
-    kv_default:
+    kv_rag:
       type: kv_sqlite
       db_path: {kv_db_path}
-    sql_files:
-      type: sql_sqlite
-      db_path: {files_metadata_db_path}
+    kv_default:
+      type: kv_sqlite
+      db_path: /tmp/kv_store.db
     sql_default:
       type: sql_sqlite
       db_path: /tmp/sql_store.db
@@ -94,8 +94,8 @@ registered_resources:
     provider_id: sentence-transformers
     provider_model_id: {model_name_or_dir}
     model_type: embedding
+  vector_stores: []
   shields: []
-  vector_dbs: []
   datasets: []
   scoring_fns: []
   benchmarks: []
@@ -206,8 +206,8 @@ class TestDocumentProcessorLlamaStack:
         data = mock_open.return_value.write.mock_calls[0].args[0]
         assert data == FAISS_EXPECTED.format(
             provider_type="faiss",
+            index_id=index_id,
             kv_db_path=db_file,
-            files_metadata_db_path=files_metadata_db_file,
             dimension=768,
             model_name=llama_stack_processor["model_name"],
             model_name_or_dir=llama_stack_processor["model_name"],
@@ -255,7 +255,7 @@ providers:
   - config:
       metadata_store:
         table_name: files_metadata
-        backend: sql_files
+        backend: sql_default
       storage_dir: /tmp/files
     provider_id: meta-reference-files
     provider_type: inline::localfs
@@ -267,17 +267,17 @@ providers:
   - config:
       persistence:
         namespace: vector_io::sqlite-vec
-        backend: kv_default
-    provider_id: sqlite-vec
+        backend: kv_rag
+    provider_id: {provider_id}
     provider_type: inline::sqlite-vec
 storage:
   backends:
-    kv_default:
+    kv_rag:
       type: kv_sqlite
       db_path: {db_file}
-    sql_files:
-      type: sql_sqlite
-      db_path: {files_metadata_db_file}
+    kv_default:
+      type: kv_sqlite
+      db_path: /tmp/kv_store.db
     sql_default:
       type: sql_sqlite
       db_path: /tmp/sql_store.db
@@ -299,8 +299,8 @@ registered_resources:
     provider_id: sentence-transformers
     provider_model_id: sentence-transformers/all-mpnet-base-v2
     model_type: embedding
+  vector_stores: []
   shields: []
-  vector_dbs: []
   datasets: []
   scoring_fns: []
   benchmarks: []
@@ -311,8 +311,10 @@ registered_resources:
         data = mock_open.return_value.write.mock_calls[0].args[0]
         assert data == expected
 
-    def test_start_llama_stack(self, mocker, llama_stack_processor):
-        """Test starting the Llama Stack client."""
+    def test_run_llama_stack(self, mocker, llama_stack_processor):
+        """Test running with llama-stack client lifecycle management."""
+        import asyncio
+
         temp_dir = mocker.patch.object(
             document_processor.tempfile, "TemporaryDirectory"
         )
@@ -320,14 +322,23 @@ registered_resources:
         doc = document_processor._LlamaStackDB(llama_stack_processor["config"])
         yaml_file = "yaml_file"
 
+        # Mock the client class to support async context manager
+        client_instance = mocker.Mock()
         client_mock = mocker.patch.object(doc, "client_class")
-        # Mock the async initialize method
-        client_mock.return_value.initialize = AsyncMock()
+        client_mock.return_value.__aenter__ = AsyncMock(return_value=client_instance)
+        client_mock.return_value.__aexit__ = AsyncMock(return_value=None)
 
-        res = doc._start_llama_stack(yaml_file)
-        assert res == client_mock.return_value
+        # Mock the processing method
+        insert_mock = mocker.patch.object(
+            doc, "_insert_prechunked_documents", new=AsyncMock(return_value="vs_123")
+        )
+
+        res = asyncio.run(doc._run_llama_stack(yaml_file, "test-index"))
+        assert res == "vs_123"
         client_mock.assert_called_once_with(yaml_file)
-        client_mock.return_value.initialize.assert_awaited_once()
+        client_mock.return_value.__aenter__.assert_awaited_once()
+        client_mock.return_value.__aexit__.assert_awaited_once()
+        insert_mock.assert_awaited_once()
 
         temp_dir.assert_called_once_with(prefix="ls-rag-")
         assert os.environ["LLAMA_STACK_CONFIG_DIR"] == temp_dir.return_value.name
@@ -354,7 +365,6 @@ registered_resources:
         expect = [
             {
                 "content": "1",
-                "mime_type": "text/plain",
                 "metadata": {
                     "document_id": 1,
                     "title": "title1",
@@ -365,10 +375,10 @@ registered_resources:
                     "chunk_id": 3,
                     "source": "https://redhat.com/1",
                 },
+                "chunk_id": 3,
             },
             {
                 "content": "2",
-                "mime_type": "text/plain",
                 "metadata": {
                     "document_id": 2,
                     "title": "title2",
@@ -379,6 +389,7 @@ registered_resources:
                     "chunk_id": 6,
                     "source": "https://redhat.com/2",
                 },
+                "chunk_id": 6,
             },
         ]
         assert doc.documents == expect
@@ -421,39 +432,68 @@ registered_resources:
         """Helper function to set up and verify save functionality."""
         doc = document_processor._LlamaStackDB(config)
         # Create sample documents with proper structure
-        doc.documents = [
-            {
-                "content": "test content 1",
-                "mime_type": "text/plain",
-                "metadata": {
-                    "document_id": 1,
-                    "title": "Test Doc 1",
-                    "docs_url": "https://example.com/doc1",
-                },
-                "chunk_metadata": {
-                    "document_id": 1,
+        if config.manual_chunking:
+            # Manual chunking uses dicts
+            doc.documents = [
+                {
+                    "content": "test content 1",
+                    "metadata": {
+                        "document_id": "doc1",
+                        "title": "Test Doc 1",
+                        "docs_url": "https://example.com/doc1",
+                    },
+                    "chunk_metadata": {
+                        "document_id": "doc1",
+                        "chunk_id": 1,
+                        "source": "https://example.com/doc1",
+                    },
                     "chunk_id": 1,
-                    "source": "https://example.com/doc1",
                 },
-            },
-            {
-                "content": "test content 2",
-                "mime_type": "text/plain",
-                "metadata": {
-                    "document_id": 2,
-                    "title": "Test Doc 2",
-                    "docs_url": "https://example.com/doc2",
-                },
-                "chunk_metadata": {
-                    "document_id": 2,
+                {
+                    "content": "test content 2",
+                    "metadata": {
+                        "document_id": "doc2",
+                        "title": "Test Doc 2",
+                        "docs_url": "https://example.com/doc2",
+                    },
+                    "chunk_metadata": {
+                        "document_id": "doc2",
+                        "chunk_id": 2,
+                        "source": "https://example.com/doc2",
+                    },
                     "chunk_id": 2,
-                    "source": "https://example.com/doc2",
                 },
-            },
-        ]
+            ]
+        else:
+            doc.documents = [
+                mocker.Mock(
+                    document_id="doc1",
+                    content="test content 1",
+                    metadata={
+                        "title": "Test Doc 1",
+                        "docs_url": "https://example.com/doc1",
+                    },
+                ),
+                mocker.Mock(
+                    document_id="doc2",
+                    content="test content 2",
+                    metadata={
+                        "title": "Test Doc 2",
+                        "docs_url": "https://example.com/doc2",
+                    },
+                ),
+            ]
 
         write_cfg = mocker.patch.object(doc, "write_yaml_config")
-        client = mocker.patch.object(doc, "_start_llama_stack")
+        update_yaml = mocker.patch.object(doc, "_update_yaml_config")
+
+        # Mock client_class to support async context manager
+        client_instance = mocker.Mock()
+        client_class_mock = mocker.patch.object(doc, "client_class")
+        client_class_mock.return_value.__aenter__ = AsyncMock(
+            return_value=client_instance
+        )
+        client_class_mock.return_value.__aexit__ = AsyncMock(return_value=None)
 
         makedirs = mocker.patch("os.makedirs")
         realpath = mocker.patch(
@@ -467,18 +507,33 @@ registered_resources:
         # Mock async client methods
         vector_store_mock = mocker.Mock()
         vector_store_mock.id = "vs_123"
-        client.return_value.vector_stores.create = AsyncMock(
-            return_value=vector_store_mock
-        )
-        client.return_value.files.create = AsyncMock(
+        client_instance.vector_stores.create = AsyncMock(return_value=vector_store_mock)
+        client_instance.files.create = AsyncMock(
             return_value=mocker.Mock(id="file_123")
         )
-        client.return_value.vector_io.insert = AsyncMock()
+        client_instance.vector_io.insert = AsyncMock()
+
+        # Mock embeddings.create for manual chunking
+        embedding_response_mock = mocker.Mock()
+        embedding_response_mock.data = [mocker.Mock(embedding=[0.1] * 768)]
+        client_instance.embeddings.create = AsyncMock(
+            return_value=embedding_response_mock
+        )
 
         batch_mock = mocker.Mock()
         batch_mock.status = "completed"
-        client.return_value.vector_stores.file_batches.create = AsyncMock(
+        client_instance.vector_stores.file_batches.create = AsyncMock(
             return_value=batch_mock
+        )
+
+        # Mock vector_stores.files methods for auto chunking
+        vs_file_mock = mocker.Mock()
+        vs_file_mock.status = "completed"
+        client_instance.vector_stores.files.create = AsyncMock(
+            return_value=vs_file_mock
+        )
+        client_instance.vector_stores.files.retrieve = AsyncMock(
+            return_value=vs_file_mock
         )
 
         doc.save(mock.sentinel.index, "out_dir")
@@ -493,17 +548,25 @@ registered_resources:
             "/cwd/out_dir/faiss_store.db",
             "/cwd/out_dir/files_metadata.db",
         )
+        update_yaml.assert_called_once_with(
+            "out_dir/llama-stack.yaml",
+            mock.sentinel.index,
+            "vs_123",
+        )
+        # Verify client lifecycle (async context manager)
+        client_class_mock.return_value.__aenter__.assert_awaited_once()
+        client_class_mock.return_value.__aexit__.assert_awaited_once()
 
-        return client.return_value
+        return client_instance
 
     def test_save_manual_chunking(self, mocker, llama_stack_processor):
         """Test saving documents with manual chunking workflow."""
         client = self._test_save(mocker, llama_stack_processor["config"])
-        # Verify vector_io.insert was called once with the right vector_db_id
+        # Verify vector_io.insert was called once with the right vector_store_id
         # Documents are modified during processing, so we just check it was called
         assert client.vector_io.insert.await_count == 1
         call_kwargs = client.vector_io.insert.await_args.kwargs
-        assert call_kwargs["vector_db_id"] == "vs_123"
+        assert call_kwargs["vector_store_id"] == "vs_123"
         assert "chunks" in call_kwargs
         assert len(call_kwargs["chunks"]) == 2
 
@@ -512,4 +575,6 @@ registered_resources:
         config = llama_stack_processor["config"]
         config.manual_chunking = False
         client = self._test_save(mocker, config)
-        client.vector_stores.file_batches.create.assert_awaited_once()
+        # Verify files.create was called for each document (single file upload)
+        assert client.files.create.await_count == 2
+        assert client.vector_stores.files.create.await_count == 2
