@@ -49,7 +49,7 @@ dependencies = [
     # torch 2.5.x pairs with torchvision 0.20.x
     "torch>=2.5.0,<2.6.0",
     "torchvision>=0.20.0,<0.21.0",
-    "llama-stack==0.4.3",
+    "llama-stack==0.4.4",
     "llama-stack-client==0.4.3",
     "aiosqlite>=0.21.0",
     "sqlite-vec>=0.1.6",
