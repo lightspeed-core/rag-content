@@ -234,11 +234,9 @@ providers:
     provider_type: inline::rag-runtime
   vector_io:
   - config:
-      persistence:
-        namespace: vector_io::{provider_type}
-        backend: kv_rag
+      {vector_io_cfg}
     provider_id: {index_id}
-    provider_type: inline::{provider_type}
+    provider_type: {provider_type_prefix}::{provider_type}
 storage:
   backends:
     kv_rag:
@@ -284,6 +282,19 @@ registered_resources:
     provider_id: {vector_io_provider_id}
     vector_store_id: {vector_store_id}"""
 
+    # Template for vector_io/config section
+    VECTOR_IO_CONFIG_TEMPLATE_FOR_SQLITE = """persistence:
+        namespace: vector_io::{provider_type}
+        backend: kv_rag"""
+    VECTOR_IO_CONFIG_TEMPLATE_FOR_PGVECTOR = """persistence:
+        namespace: vector_io::{provider_type}
+        backend: kv_default
+      host: {host}
+      port: {port}
+      db: {database}
+      user: {user}
+      password: {password}"""
+
     CFG_FILENAME = "llama-stack.yaml"
 
     def __init__(self, config: _Config):
@@ -317,6 +328,7 @@ registered_resources:
         assert config.vector_store_type in (  # noqa: S101
             "llamastack-faiss",
             "llamastack-sqlite-vec",
+            "llamastack-pgvector",
         )
 
         super().__init__(config)
@@ -363,14 +375,26 @@ registered_resources:
         self, index_id: str, filename: str, db_file: str, files_metadata_db_file: str
     ) -> None:
         """Write a llama-stack configuration file using class templates."""
-        if self.config.vector_store_type == "llamastack-faiss":
-            vector_io_cfg = ""
+        if self.config.vector_store_type == "llamastack-pgvector":
+            provider_type_prefix = "remote"
+            vector_io_cfg = self.VECTOR_IO_CONFIG_TEMPLATE_FOR_PGVECTOR.format(
+                provider_type=self.provider_type,
+                user=os.getenv("POSTGRES_USER"),
+                password=os.getenv("POSTGRES_PASSWORD"),
+                host=os.getenv("POSTGRES_HOST"),
+                port=os.getenv("POSTGRES_PORT"),
+                database=os.getenv("POSTGRES_DATABASE"),
+            )
         else:
-            vector_io_cfg = "db_path: " + db_file
+            provider_type_prefix = "inline"
+            vector_io_cfg = self.VECTOR_IO_CONFIG_TEMPLATE_FOR_SQLITE.format(
+                provider_type=self.provider_type,
+            )
 
         with open(filename, "w", encoding="utf-8") as fd:
             data = self.TEMPLATE.format(
                 index_id=index_id,
+                provider_type_prefix=provider_type_prefix,
                 provider_type=self.provider_type,
                 vector_io_cfg=vector_io_cfg,
                 kv_db_path=db_file,

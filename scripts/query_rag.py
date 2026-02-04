@@ -194,8 +194,13 @@ def _llama_stack_query(args: argparse.Namespace) -> None:  # noqa: C901
             "mode": "vector",  # "vector", "keyword", or "hybrid". Default "vector"
             "score_threshold": 0,
         }
+        vector_store_id = cfg["registered_resources"]["vector_stores"][0][
+            "vector_store_id"
+        ]
         res = client.vector_io.query(
-            vector_store_id=args.product_index, query=args.query, params=query_cfg
+            vector_store_id=vector_store_id,
+            query=args.query,
+            params=query_cfg,
         )
 
         if len(res.chunks) == 0:
@@ -314,6 +319,8 @@ if __name__ == "__main__":
             args.vector_store_type = "llamastack-sqlite-vec"
         elif os.path.exists(os.path.join(args.db_path, "faiss_store.db")):
             args.vector_store_type = "llamastack-faiss"
+        elif os.path.exists(os.path.join(args.db_path, "pgvector_store.db")):
+            args.vector_store_type = "llamastack-pgvector"
         else:
             logging.error(f"Cannot recognize the DB in {args.db_path}")
             exit(1)

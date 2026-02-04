@@ -74,6 +74,7 @@ You can generate the vector database either using
 2. [Llama-Index Postgres (PGVector) Vector Store](#postgres-pgvector-vector-store)
 3. [Llama-Stack Faiss Vector-IO](#llama-stack-faiss)
 4. [Llama-Stack SQLite-vec Vector-IO](#llama-stack-sqlite-vec)
+5. [Llama-Stack Postgres (PGVector) Vector Store](#llama-stack-postgres-pgvector-vector-store)
 
 Llama-Index approaches require you to download the embedding model, and we also
 recommend it for Llama-Stack targets even though it should work even without
@@ -320,6 +321,39 @@ python scripts/query_rag.py \
   -k 5 \
   -q "how can I configure a cinder backend"
 ```
+### Llama-Stack Postgres (PGVector) Vector Store
+
+To generate a vector database stored in Postgres (PGVector) for Llama-Stack, run the following
+commands:
+
+1. Start Postgres with the pgvector extension by running:
+
+    ```bash
+    make start-postgres-debug
+    ```
+
+    The `data` folder of Postgres is created at `./postgresql/data`. Note that this command
+    also creates `./output`, which is not used for the Llama-Stack version while it is used for Llama-Index version.
+
+2. Run:
+
+    ```bash
+    POSTGRES_USER=postgres \
+    POSTGRES_PASSWORD=somesecret \
+    POSTGRES_HOST=localhost \
+    POSTGRES_PORT=15432 \
+    POSTGRES_DATABASE=postgres \
+    uv run python ./custom_processor.py \
+     -o ./output \
+     -f custom_docs/0.1/ \
+     -md embeddings_model/ \
+     -mn sentence-transformers/all-mpnet-base-v2 \
+     -i custom_docs-0_1 \
+     --vector-store-type llamastack-pgvector
+    ```
+
+    Which generates embeddings on PostgreSQL, which can be used for RAG.
+
 
 ## Update lockfiles
 
