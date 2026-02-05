@@ -121,7 +121,13 @@ def get_common_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--vector-store-type",
         default="faiss",
-        choices=["faiss", "postgres", "llamastack-faiss", "llamastack-sqlite-vec"],
+        choices=[
+            "faiss",
+            "postgres",
+            "llamastack-faiss",
+            "llamastack-sqlite-vec",
+            "llamastack-pgvector",
+        ],
         help="vector store type to be used.",
     )
     parser.add_argument(
