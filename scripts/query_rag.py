@@ -194,9 +194,11 @@ def _llama_stack_query(args: argparse.Namespace) -> None:  # noqa: C901
             "mode": "vector",  # "vector", "keyword", or "hybrid". Default "vector"
             "score_threshold": 0,
         }
-        vector_store_id = cfg["registered_resources"]["vector_stores"][0][
-            "vector_store_id"
-        ]
+        vector_stores = cfg.get("registered_resources", {}).get("vector_stores", [])
+        if not vector_stores:
+            logging.error("No vector stores found in configuration")
+            exit(1)
+        vector_store_id = vector_stores[0]["vector_store_id"]
         res = client.vector_io.query(
             vector_store_id=vector_store_id,
             query=args.query,
@@ -313,14 +315,14 @@ if __name__ == "__main__":
 
     vector_store_type = args.vector_store_type
     if args.vector_store_type == "auto":
-        if os.path.exists(os.path.join(args.db_path, "metadata.json")):
+        if os.environ.get("POSTGRES_DATABASE"):
+            args.vector_store_type = "llamastack-pgvector"
+        elif os.path.exists(os.path.join(args.db_path, "metadata.json")):
             args.vector_store_type = "faiss"
         elif os.path.exists(os.path.join(args.db_path, "sqlite-vec_store.db")):
             args.vector_store_type = "llamastack-sqlite-vec"
         elif os.path.exists(os.path.join(args.db_path, "faiss_store.db")):
             args.vector_store_type = "llamastack-faiss"
-        elif os.path.exists(os.path.join(args.db_path, "pgvector_store.db")):
-            args.vector_store_type = "llamastack-pgvector"
         else:
             logging.error(f"Cannot recognize the DB in {args.db_path}")
             exit(1)

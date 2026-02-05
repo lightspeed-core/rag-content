@@ -289,11 +289,11 @@ registered_resources:
     VECTOR_IO_CONFIG_TEMPLATE_FOR_PGVECTOR = """persistence:
         namespace: vector_io::{provider_type}
         backend: kv_default
-      host: {host}
-      port: {port}
-      db: {database}
-      user: {user}
-      password: {password}"""
+      host: ${{env.POSTGRES_HOST}}
+      port: ${{env.POSTGRES_PORT}}
+      db: ${{env.POSTGRES_DATABASE}}
+      user: ${{env.POSTGRES_USER}}
+      password: ${{env.POSTGRES_PASSWORD}}"""
 
     CFG_FILENAME = "llama-stack.yaml"
 
@@ -377,13 +377,20 @@ registered_resources:
         """Write a llama-stack configuration file using class templates."""
         if self.config.vector_store_type == "llamastack-pgvector":
             provider_type_prefix = "remote"
+            required_vars = [
+                "POSTGRES_USER",
+                "POSTGRES_PASSWORD",
+                "POSTGRES_HOST",
+                "POSTGRES_PORT",
+                "POSTGRES_DATABASE",
+            ]
+            missing = [v for v in required_vars if not os.getenv(v)]
+            if missing:
+                raise ValueError(
+                    f"Missing required environment variables: {', '.join(missing)}"
+                )
             vector_io_cfg = self.VECTOR_IO_CONFIG_TEMPLATE_FOR_PGVECTOR.format(
                 provider_type=self.provider_type,
-                user=os.getenv("POSTGRES_USER"),
-                password=os.getenv("POSTGRES_PASSWORD"),
-                host=os.getenv("POSTGRES_HOST"),
-                port=os.getenv("POSTGRES_PORT"),
-                database=os.getenv("POSTGRES_DATABASE"),
             )
         else:
             provider_type_prefix = "inline"

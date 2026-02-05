@@ -354,7 +354,21 @@ commands:
 
     Which generates embeddings on PostgreSQL, which can be used for RAG.
 
+3. When you run `query_rag.py` to check some results, specify these environment variables for database access:
 
+   ```bash
+    POSTGRES_USER=postgres \
+    POSTGRES_PASSWORD=somesecret \
+    POSTGRES_HOST=localhost \
+    POSTGRES_PORT=15432 \
+    POSTGRES_DATABASE=postgres \
+    uv run python scripts/query_rag.py \
+    -p vector_db/custom_docs/0.1 \
+    -x custom-docs-0_1 \
+    -m embeddings_model \
+    -k 5 \
+    -q "how can I configure a cinder backend"
+   ```
 ## Update lockfiles
 
 The lock file is used in this repository:
