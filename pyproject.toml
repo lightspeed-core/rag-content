@@ -48,7 +48,7 @@ dependencies = [
     # Pin torch/torchvision to versions available as CPU wheels
     # torch 2.8.x pairs with torchvision 0.23.x
     "llama-stack==0.4.3",
-    "llama-stack-client==0.4.3",
+    "llama-stack-client==0.5.0",
     "torch>=2.8.0,<2.9.0",
     "torchvision>=0.23.0,<0.24.0",
     "aiosqlite>=0.21.0",
