@@ -30,7 +30,7 @@ hatch-vcs==0.5.0
     #   jsonschema
     #   termcolor
     #   urllib3
-hatchling==1.26.3
+hatchling==1.28.0
     # via
     #   hatch-fancy-pypi-readme
     #   llama-stack-client
