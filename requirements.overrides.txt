@@ -1,7 +1,7 @@
 # override these package to the version available on RHOAI wheels index:
 # https://console.redhat.com/api/pypi/public-rhai/rhoai/3.2/cpu-ubi9/simple
 transformers==4.57.3
-tokenizers==0.22.1
+tokenizers==0.22.2
 scipy==1.16.3
 numpy==2.3.5
 aiohttp==3.13.3
