@@ -61,6 +61,7 @@ hatchling==1.28.0
     #   polyfactory
     #   python-multipart
     #   soupsieve
+    #   starlette
     #   termcolor
     #   urllib3
     #   uvicorn
@@ -77,8 +78,8 @@ pathspec==1.0.4
 pdm-backend==2.4.7
     # via
     #   fastapi
-    #   griffe
     #   marko
+    #   typer
 pluggy==1.6.0
     # via hatchling
 poetry-core==2.3.1
@@ -108,17 +109,23 @@ wheel==0.46.3
     # via
     #   pycparser
     #   sentence-transformers
+    #   tree-sitter-c
+    #   tree-sitter-javascript
+    #   tree-sitter-python
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==80.10.2
+setuptools==82.0.0
     # via
     #   calver
     #   certifi
+    #   colorlog
+    #   dill
     #   importlib-metadata
     #   llama-stack
     #   llama-stack-api
     #   maturin
     #   multidict
+    #   multiprocess
     #   pathspec
     #   pgvector
     #   pluggy
@@ -132,4 +139,8 @@ setuptools==80.10.2
     #   sqlalchemy
     #   tenacity
     #   tqdm
+    #   tree-sitter
+    #   tree-sitter-c
+    #   tree-sitter-javascript
+    #   tree-sitter-python
     #   trove-classifiers
