@@ -15,7 +15,7 @@ jiter==0.12
 cryptography==46.0.3
 docling-parse==4.7.2
 docling==2.55.1
-docling-core==2.50.1
+docling-core==2.64.0
 docling-ibm-models==3.10
 triton==3.5.0
 greenlet==3.3.0
