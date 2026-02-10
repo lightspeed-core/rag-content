@@ -16,7 +16,7 @@ RUN pip3.12 install uv>=0.7.20
 
 WORKDIR /rag-content
 
-COPY Makefile pyproject.toml uv.lock README.md Gemfile Gemfile.lock requirements.hashes.wheel.txt requirements.hashes.source.txt requirements-build.txt ./
+COPY Makefile pyproject.toml uv.lock README.md Gemfile Gemfile.lock requirements.hashes.wheel.txt requirements.hashes.wheel.pypi.txt requirements.hashes.source.txt requirements-build.txt ./
 COPY src ./src
 COPY tests ./tests
 COPY scripts ./scripts
@@ -38,7 +38,8 @@ RUN if [ -f /cachi2/cachi2.env ]; then \
     . /cachi2/cachi2.env && \
     uv venv --seed --no-index --find-links ${PIP_FIND_LINKS} && \
     . .venv/bin/activate && \
-    pip install --no-cache-dir --ignore-installed --no-index --find-links ${PIP_FIND_LINKS} --no-deps -r requirements.hashes.wheel.txt -r requirements.hashes.source.txt && \
+    pip install --no-cache-dir --ignore-installed --no-index --find-links ${PIP_FIND_LINKS} --no-deps -r requirements.hashes.wheel.txt -r requirements.hashes.wheel.pypi.txt -r requirements.hashes.source.txt && \
+    pip install --no-cache-dir --no-deps . && \
     pip check; \
     else \
     uv sync --locked --no-dev; \

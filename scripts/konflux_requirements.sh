@@ -19,7 +19,7 @@ RHOAI_INDEX_URL="https://console.redhat.com/api/pypi/public-rhai/rhoai/3.2/cpu-u
 
 # extra wheels to be included in the wheel list, often come from build-time dependencies
 EXTRA_WHEELS="uv-build,uv,pip,maturin"
-PYPI_WHEELS="opencv-python,rapidocr,sqlite-vec"
+PYPI_WHEELS="opencv-python,omegaconf,rapidocr,sqlite-vec,griffe,griffecli,griffelib,pyclipper,tree-sitter-typescript"
 
 # Generate requirements list from pyproject.toml from both indexes
 uv pip compile pyproject.toml -o "$RAW_REQ_FILE" \
