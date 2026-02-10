@@ -19,4 +19,4 @@ triton==3.5.0
 greenlet==3.3.0
 torch==2.9.0
 torchvision==0.24.0
-pypdfium2==4.30.0
+pypdfium2==5.4.0
