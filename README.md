@@ -231,6 +231,12 @@ exact same path** that was specified during database creation.
 
 ### Llama-Stack Faiss
 
+> [!IMPORTANT]
+> When using the `--auto-chunking` flag, chunking happens within llama-stack using the
+> OpenAI-compatible Files API. This makes vector stores significantly larger than manual
+> chunking because the Files API stores a redundant copy of the embeddings. 
+> Manual chunking results in smaller database files.
+
 The process is basically the same as in the
 [Llama-Index Faiss Vector Store](#faiss-vector-store) but passing the
 `--vector-store-type` parameter; so you generate the documentation using the
