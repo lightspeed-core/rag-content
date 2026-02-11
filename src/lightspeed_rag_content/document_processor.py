@@ -208,12 +208,6 @@ apis:
 
 server:
   port: 8321
-conversations_store:
-  db_path: /tmp/conversations.db
-  type: sqlite
-metadata_store:
-  db_path: /tmp/registry.db
-  type: sqlite
 
 providers:
   inference:
