@@ -17,6 +17,6 @@ docling-parse==4.7.2
 docling-ibm-models==3.10
 triton==3.5.0
 greenlet==3.3.0
-torch==2.9.0
+torch==2.10.0
 torchvision==0.24.0
 pypdfium2==4.30.0
