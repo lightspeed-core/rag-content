@@ -1,5 +1,3 @@
-TEST TEST TEST
-
 # RAG Content
 
 RAG Content provides a shared codebase for generating vector databases.
