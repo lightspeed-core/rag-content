@@ -14,7 +14,7 @@ setuptools==80.9
 jiter==0.12
 cryptography==46.0.3
 docling-parse==4.7.2
-docling-ibm-models==3.10
+docling-ibm-models==3.11.0
 triton==3.5.0
 greenlet==3.3.0
 torch==2.9.0
