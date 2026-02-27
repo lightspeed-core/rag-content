@@ -48,6 +48,23 @@ There are prebuilt two images. One with CPU support only (size cca 3.7 GB) and i
     podman pull quay.io/lightspeed-core/rag-content-gpu:latest
     ```
 
+#### Official image
+
+An official image is available on https://catalog.redhat.com/en/software/containers/explore
+It is needed search for "Lightspeed RAG Tool" in the catalog.
+
+A Red Hat official image can be retrieved using the following command:
+
+```bash
+podman pull registry.redhat.io/lightspeed-core/rag-tool-rhel9
+```
+
+NOTE: you need to register to RH registry first. Run the following command, then enter your registry token credentials when prompted by the terminal.
+
+```bash
+$ podman login registry.redhat.io
+```
+
 #### Build image locally
 
 To build the image locally, follow these steps:
