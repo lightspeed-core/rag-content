@@ -10,6 +10,8 @@ coherent-licensed==0.5.2
     # via importlib-metadata
 cython==3.2.4
     # via sqlalchemy
+expandvars==1.1.2
+    # via yarl
 flit-core==3.12.0
     # via
     #   coherent-licensed
@@ -17,6 +19,7 @@ flit-core==3.12.0
     #   packaging
     #   pathspec
     #   pypdf
+    #   tinytag
     #   wheel
 hatch-fancy-pypi-readme==25.1.0
     # via
@@ -25,9 +28,11 @@ hatch-fancy-pypi-readme==25.1.0
     #   openai
 hatch-vcs==0.5.0
     # via
+    #   chardet
     #   filelock
     #   fsspec
     #   jsonschema
+    #   platformdirs
     #   termcolor
     #   urllib3
 hatchling==1.26.3
@@ -35,10 +40,12 @@ hatchling==1.26.3
     #   hatch-fancy-pypi-readme
     #   llama-stack-client
     #   openai
-hatchling==1.28.0
+hatchling==1.29.0
     # via
     #   banks
+    #   chardet
     #   einops
+    #   expandvars
     #   filelock
     #   fsspec
     #   hatch-fancy-pypi-readme
@@ -58,7 +65,9 @@ hatchling==1.28.0
     #   llama-index-vector-stores-faiss
     #   llama-index-vector-stores-postgres
     #   llama-parse
+    #   platformdirs
     #   polyfactory
+    #   pydantic-settings
     #   python-multipart
     #   soupsieve
     #   starlette
@@ -67,7 +76,9 @@ hatchling==1.28.0
     #   uvicorn
     #   wcwidth
 maturin==1.10.2
-    # via uv-build
+    # via
+    #   hf-xet
+    #   uv-build
 packaging==26.0
     # via
     #   hatchling
@@ -132,6 +143,7 @@ setuptools==82.0.0
     #   psutil
     #   pycparser
     #   pyjwt
+    #   python-dotenv
     #   regex
     #   sentence-transformers
     #   setuptools-rust
@@ -144,3 +156,4 @@ setuptools==82.0.0
     #   tree-sitter-javascript
     #   tree-sitter-python
     #   trove-classifiers
+    #   yarl
