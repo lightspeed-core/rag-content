@@ -165,6 +165,7 @@ class _LlamaIndexDB(_BaseDB):
         idx = VectorStoreIndex(
             self._good_nodes,
             storage_context=self.storage_context,
+            show_progress=self.config.show_progress,
         )
         idx.set_index_id(index)
         idx.storage_context.persist(persist_dir=persist_folder)
@@ -739,6 +740,7 @@ class DocumentProcessor:
         table_name: Optional[str] = None,
         manual_chunking: bool = True,
         doc_type: str = "text",
+        show_progress: bool = False,
     ):
         """Initialize instance."""
         if vector_store_type == "postgres" and not table_name:
@@ -755,6 +757,7 @@ class DocumentProcessor:
             table_name=table_name,
             manual_chunking=manual_chunking,
             doc_type=doc_type,
+            show_progress=show_progress,
         )
 
         self._check_config(self.config)

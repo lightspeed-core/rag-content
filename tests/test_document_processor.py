@@ -80,6 +80,7 @@ class TestDocumentProcessor:
             embedding_dimension=None,  # Not calculated because class is mocked
             manual_chunking=True,
             table_name=None,
+            show_progress=False,
             vector_store_type="faiss",
         )
         assert expected_params == doc_processor.config._Config__attributes
@@ -105,6 +106,7 @@ class TestDocumentProcessor:
             embedding_dimension=None,  # Not calculated because class is mocked
             manual_chunking=True,
             table_name=None,
+            show_progress=False,
             vector_store_type=vector_store_type,
         )
         if vector_store_type == "postgres":
@@ -135,6 +137,7 @@ class TestDocumentProcessor:
             embedding_dimension=None,  # Not calculated because class is mocked
             manual_chunking=True,
             table_name=None,
+            show_progress=False,
         )
         assert params == doc_processor.config._Config__attributes
         assert doc_processor._num_embedded_files == 0
