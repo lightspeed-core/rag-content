@@ -47,7 +47,7 @@ dependencies = [
     "llama-index-vector-stores-postgres>=0.5.4",
     # Pin torch/torchvision to versions available as CPU wheels
     # torch 2.9.x pairs with torchvision 0.24.x
-    "llama-stack==0.4.3",
+    "llama-stack==0.6.0",
     # User 0.4.4 instead of 0.4.3 to include CVE fix
     "llama-stack-api==0.4.4",
     "llama-stack-client==0.4.3",
