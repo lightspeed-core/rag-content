@@ -23,6 +23,7 @@ PYPI_WHEELS="opencv-python,omegaconf,rapidocr,sqlite-vec,griffe,griffecli,griffe
 
 # Generate requirements list from pyproject.toml from both indexes
 uv pip compile pyproject.toml -o "$RAW_REQ_FILE" \
+		--python-platform x86_64-unknown-linux-gnu \
 		--python-version 3.12 \
 		--refresh \
 		--index $RHOAI_INDEX_URL \
