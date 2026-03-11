@@ -167,9 +167,9 @@ dill==0.4.1 \
 dirtyjson==1.0.8 \
     --hash=sha256:125e27248435a58acace26d5c2c4c11a1c0de0a9c5124c5a94ba78e517d74f53 \
     --hash=sha256:90ca4a18f3ff30ce849d100dcf4a003953c79d3a2348ef056f1d9c22231a25fd
-docling==2.78.0 \
-    --hash=sha256:237ba66a253962c87e9278c15d872154c750e08ea424bccf8bc91adebaf45ddc \
-    --hash=sha256:46ac9fb208cbbbbc9feba7bc650b660df4706a92f1ed6b26a952a9bcaf72cf04
+docling==2.72.0 \
+    --hash=sha256:261a5fdfa3276783c18a29aa0ec623b259450765421bebeec87de523f07adcf3 \
+    --hash=sha256:3edd48bb7b6e5737647441b96fba8811f69cac495883fa28dbf2444a0322cabd
 docling-core==2.69.0 \
     --hash=sha256:4c3817ce00c7cb5622e59ddb4e5268a58083ae67f6e1436b36a84b6b4bbf6899 \
     --hash=sha256:9760e13063de5f373dbc3417de3ef9a3709c6eb18c0e60ada3c1f96c8b37c14e

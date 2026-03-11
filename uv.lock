@@ -1058,7 +1058,7 @@ requires-dist = [
     { name = "aiosqlite", specifier = ">=0.21.0" },
     { name = "certifi", specifier = ">=2025.10.5" },
     { name = "chardet", specifier = ">=5.2.0" },
-    { name = "docling", specifier = ">=2.68.0" },
+    { name = "docling", specifier = ">=2.68.0,<2.73.0" },
     { name = "einops", specifier = ">=0.8.1" },
     { name = "faiss-cpu", specifier = ">=1.11.0.post1" },
     { name = "hf-xet", specifier = ">=1.2.0" },
