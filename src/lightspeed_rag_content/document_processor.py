@@ -540,10 +540,11 @@ registered_resources:
                 )
                 embedding = embedding_response.data[0].embedding
 
+                metadata = {**doc.get("metadata", {}), "source": index}
                 chunk = {
                     "content": doc["content"],
                     "chunk_id": doc["chunk_id"],
-                    "metadata": doc.get("metadata", {}),
+                    "metadata": metadata,
                     "chunk_metadata": doc["chunk_metadata"],
                     "embedding": embedding,
                     "embedding_model": embedding_model,
@@ -613,6 +614,7 @@ registered_resources:
                     attributes = {
                         **rag_doc.metadata,  # type: ignore[union-attr]
                         "document_id": doc_uuid,
+                        "source": index,
                     }
                     vs_file = await client.vector_stores.files.create(
                         vector_store_id=vector_store.id,

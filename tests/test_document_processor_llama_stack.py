@@ -557,6 +557,12 @@ registered_resources:
         assert call_kwargs["vector_store_id"] == "vs_123"
         assert "chunks" in call_kwargs
         assert len(call_kwargs["chunks"]) == 2
+        # Verify index name is embedded in chunk metadata as "source"
+        # and existing metadata keys are preserved
+        for chunk in call_kwargs["chunks"]:
+            assert chunk["metadata"]["source"] == mock.sentinel.index
+            assert "title" in chunk["metadata"]
+            assert "docs_url" in chunk["metadata"]
 
     def test_save_auto_chunking(self, mocker, llama_stack_processor):
         """Test saving documents with automatic chunking workflow."""
@@ -566,3 +572,9 @@ registered_resources:
         # Verify files.create was called for each document (single file upload)
         assert client.files.create.await_count == 2
         assert client.vector_stores.files.create.await_count == 2
+        # Verify index name is embedded in file attributes as "source"
+        # and existing metadata keys are preserved
+        for call in client.vector_stores.files.create.await_args_list:
+            assert call.kwargs["attributes"]["source"] == mock.sentinel.index
+            assert "title" in call.kwargs["attributes"]
+            assert "document_id" in call.kwargs["attributes"]
