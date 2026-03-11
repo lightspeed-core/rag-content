@@ -82,7 +82,7 @@ hatchling==1.29.0
     #   urllib3
     #   uvicorn
     #   wcwidth
-maturin==1.10.2
+maturin==1.12.6
     # via uv-build
 packaging==26.0
     # via
