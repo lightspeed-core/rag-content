@@ -5,7 +5,8 @@ GEM
 
 PLATFORMS
   aarch64-linux
-  x86_64-linux-gnu
+  universal-darwin-25
+  x86_64-linux
 
 DEPENDENCIES
   asciidoctor
