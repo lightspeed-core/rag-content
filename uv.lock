@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = "==3.12.*"
 resolution-markers = [
     "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and sys_platform == 'linux') or (sys_platform != 'darwin' and sys_platform != 'linux')",
@@ -1069,7 +1069,7 @@ requires-dist = [
     { name = "llama-index-vector-stores-faiss", specifier = ">=0.3.0" },
     { name = "llama-index-vector-stores-postgres", specifier = ">=0.5.4" },
     { name = "llama-stack", specifier = "==0.4.3" },
-    { name = "llama-stack-api", specifier = "==0.4.4" },
+    { name = "llama-stack-api", specifier = "==0.6.0" },
     { name = "llama-stack-client", specifier = "==0.4.3" },
     { name = "pyyaml", specifier = ">=6.0.2" },
     { name = "sqlite-vec", specifier = ">=0.1.6" },
@@ -1393,7 +1393,7 @@ wheels = [
 
 [[package]]
 name = "llama-stack-api"
-version = "0.4.4"
+version = "0.6.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "fastapi" },
@@ -1403,9 +1403,9 @@ dependencies = [
     { name = "opentelemetry-sdk" },
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a9/84/075d5e4b2419777f7dc92a1153c683d82180739754c39ccb3ae01a9dc535/llama_stack_api-0.4.4.tar.gz", hash = "sha256:3973ca3bacf86916e04e521f77e7909533eec7364d32c3eabc35dc2976dbfe7d", size = 106579, upload-time = "2026-01-30T16:28:38.051Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f3/4f/0c6fbc861fb9f6074f877f9c39ea40b02ad1fc81c9a455b020b32dcc471f/llama_stack_api-0.6.0.tar.gz", hash = "sha256:f0f3a1a6239a5d3b8c7ef02cefdf817c96c6461dcd8a82c1689ac67ec3107270", size = 136402, upload-time = "2026-03-11T15:05:30.843Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/2d/a0/e32f5b39a029c6fd120216d122a5333e8e4889103da56ff9efd6601eb987/llama_stack_api-0.4.4-py3-none-any.whl", hash = "sha256:7bbc63330ed186502dcd48f65cae014dbeb788ba5690be738c98693cfcd2f599", size = 107030, upload-time = "2026-01-30T16:28:36.725Z" },
+    { url = "https://files.pythonhosted.org/packages/4d/44/3c7a8dc82ddcc45a375681051450979837f28b27250ee057cabcfb8421f3/llama_stack_api-0.6.0-py3-none-any.whl", hash = "sha256:b99a03aba3659736b6b540c9e5e674b1daac2bf5eeb2a68795113d62b8250672", size = 161069, upload-time = "2026-03-11T15:05:29.072Z" },
 ]
 
 [[package]]
