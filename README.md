@@ -90,8 +90,7 @@ You can generate the vector database either using
 1. [Llama-Index Faiss Vector Store](#faiss-vector-store)
 2. [Llama-Index Postgres (PGVector) Vector Store](#postgres-pgvector-vector-store)
 3. [Llama-Stack Faiss Vector-IO](#llama-stack-faiss)
-4. [Llama-Stack SQLite-vec Vector-IO](#llama-stack-sqlite-vec)
-5. [Llama-Stack Postgres (PGVector) Vector Store](#llama-stack-postgres-pgvector-vector-store)
+4. [Llama-Stack Postgres (PGVector) Vector Store](#llama-stack-postgres-pgvector-vector-store)
 
 Llama-Index approaches require you to download the embedding model, and we also
 recommend it for Llama-Stack targets even though it should work even without
@@ -270,7 +269,7 @@ commands:
 
 #### Important: Embedding Model Path Portability
 
-When using Llama-Stack vector stores (Faiss or SQLite-vec), the embedding model path
+When using Llama-Stack vector stores (Faiss or Pgvector), the embedding model path
 specified via the `-md` (or `--model-dir`) parameter is written into the generated
 `llama-stack.yaml` configuration file as an absolute path. This path is also registered
 in the llama-stack kv_store database.
@@ -343,50 +342,6 @@ python scripts/query_rag.py \
   -q "how can I configure a cinder backend"
 ```
 
-### Llama-Stack SQLite-vec
-
-The process is the same as in the
-[Llama-Stack Faiss](#llama-stack-faiss) but passing a different value on the
-`--vector-store-type` parameter; so you generate the documentation using the
-`custom_processor.py` script from earlier section
- ([Generating the Vector Database](#generating-the-vector-database)):
-
-```bash
-uv run ./custom_processor.py \
-  -o ./vector_db/custom_docs/0.1 \
-  -f ./custom_docs/0.1/ \
-  -md embeddings_model/ \
-  -mn sentence-transformers/all-mpnet-base-v2 \
-  -i custom_docs-0_1 \
-  --vector-store-type=llamastack-sqlite-vec
-```
-
-Once the command is done, you can find the vector database at
-`./vector_db/custom_docs/0.1` with the name `sqlitevec_store.db` as well as a
-barebones llama-stack configuration file named `llama-stack.yaml` for
-reference, since it's not necessary for the final deployment.
-
-The vector-io will be named `custom-docs-0_1`:
-
-```yaml
-providers:
- vector_io:
-   - provider_id: custom-docs-0_1
-     provider_type: inline::sqlite-vec
-     config:
-       db_path: /home/<user>/rag-content/vector_db/custom_docs/0.1/sqlitevec_store.db
-```
-
-Once we have a database we can use script `query_rag.py` to check some results:
-
-```bash
-python scripts/query_rag.py \
-  -p vector_db/custom_docs/0.1 \
-  -x custom-docs-0_1 \
-  -m embeddings_model \
-  -k 5 \
-  -q "how can I configure a cinder backend"
-```
 ### Llama-Stack Postgres (PGVector) Vector Store
 
 To generate a vector database stored in Postgres (PGVector) for Llama-Stack, run the following
