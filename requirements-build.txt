@@ -23,11 +23,14 @@ flit-core==3.12.0
     #   wheel
 hatch-fancy-pypi-readme==25.1.0
     # via
+    #   attrs
     #   jsonschema
+    #   llama-cloud
     #   llama-stack-client
     #   openai
 hatch-vcs==0.5.0
     # via
+    #   attrs
     #   chardet
     #   filelock
     #   fsspec
@@ -38,10 +41,12 @@ hatch-vcs==0.5.0
 hatchling==1.26.3
     # via
     #   hatch-fancy-pypi-readme
+    #   llama-cloud
     #   llama-stack-client
     #   openai
 hatchling==1.29.0
     # via
+    #   attrs
     #   banks
     #   chardet
     #   einops
@@ -51,7 +56,7 @@ hatchling==1.29.0
     #   hatch-fancy-pypi-readme
     #   hatch-vcs
     #   jsonschema
-    #   llama-cloud-services
+    #   latex2mathml
     #   llama-index
     #   llama-index-cli
     #   llama-index-core
@@ -64,7 +69,6 @@ hatchling==1.29.0
     #   llama-index-readers-llama-parse
     #   llama-index-vector-stores-faiss
     #   llama-index-vector-stores-postgres
-    #   llama-parse
     #   opentelemetry-api
     #   opentelemetry-exporter-otlp-proto-common
     #   opentelemetry-exporter-otlp-proto-http
@@ -100,7 +104,7 @@ pluggy==1.6.0
     # via hatchling
 poetry-core==2.3.1
     # via
-    #   llama-cloud
+    #   llama-parse
     #   rich
     #   tomlkit
 semantic-version==2.10.0
@@ -130,6 +134,7 @@ wheel==0.46.3
     #   tree-sitter-c
     #   tree-sitter-javascript
     #   tree-sitter-python
+    #   wrapt
 
 # The following packages are considered to be unsafe in a requirements file:
 setuptools==82.0.0
@@ -168,4 +173,5 @@ setuptools==82.0.1
     #   tree-sitter-javascript
     #   tree-sitter-python
     #   trove-classifiers
+    #   wrapt
     #   yarl
