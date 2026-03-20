@@ -19,6 +19,7 @@ import logging
 import os
 import typing
 
+import frontmatter
 import requests
 
 LOG = logging.getLogger(__name__)
@@ -32,15 +33,40 @@ class MetadataProcessor:
     from the name of a document, is not implemented.
     """
 
+    def __init__(self, hermetic_build: bool = False):
+        """Initialize MetadataProcessor.
+
+        Args:
+            hermetic_build: Skip URL reachability checks when True (for offline/CI builds).
+        """
+        self.hermetic_build = hermetic_build
+
     def get_file_title(self, file_path: str) -> str:
         """Extract title from the plaintext doc file."""
         title = ""
         try:
             with open(file_path, "r", encoding="utf-8") as file:
-                title = file.readline().rstrip("\n").lstrip("# ")
+                first_line = file.readline()
+                if first_line.startswith("---"):
+                    post = frontmatter.load(file_path)
+                    title = post.get("title", "")
+                else:
+                    title = first_line.rstrip("\n").lstrip("# ")
         except Exception:  # noqa: S110 pylint: disable=broad-exception-caught
             pass
         return title
+
+    def _get_frontmatter_url(self, file_path: str) -> str | None:
+        """Extract URL from YAML frontmatter if present, returns None otherwise."""
+        try:
+            with open(file_path, "r", encoding="utf-8") as file:
+                if file.readline().startswith("---"):
+                    post = frontmatter.load(file_path)
+                    url = post.get("url")
+                    return str(url) if url is not None else None
+        except Exception:  # noqa: S110 pylint: disable=broad-exception-caught
+            pass
+        return None
 
     def ping_url(self, url: str, retries: int = 3) -> bool:
         """Check if the URL parameter is live."""
@@ -65,17 +91,18 @@ class MetadataProcessor:
         Args:
             file_path: str: file path in str
         """
-        doc_url = self.url_function(file_path)
+        fm_url = self._get_frontmatter_url(file_path)
+        docs_url = fm_url if fm_url else self.url_function(file_path)
         title = self.get_file_title(file_path)
 
         document = {
             "file_path": file_path,
             "title": title,
-            "url": doc_url,
+            "url": docs_url,
         }
 
         url_reachable = True
-        if not self.ping_url(doc_url):
+        if not self.hermetic_build and not self.ping_url(docs_url):
             LOG.warning(
                 'URL not reachable: %(url)s (Title: "%(title)s", '
                 "File path: %(file_path)s)",
@@ -89,7 +116,7 @@ class MetadataProcessor:
             document,
         )
 
-        return {"docs_url": doc_url, "title": title, "url_reachable": url_reachable}
+        return {"docs_url": docs_url, "title": title, "url_reachable": url_reachable}
 
     @abc.abstractmethod
     def url_function(self, file_path: str) -> str:

@@ -99,6 +99,25 @@ class TestMetadataProcessor:
 
         assert processor_data["title"] == result
 
+    def test_get_file_title_frontmatter(self, md_processor, mocker, processor_data):
+        """Test get_file_title method extracts title from YAML frontmatter."""
+        mocker.patch(
+            "builtins.open",
+            new_callable=mocker.mock_open,
+            read_data="---\n",
+        )
+        mock_fm = mocker.MagicMock()
+        mock_fm.get.return_value = processor_data["title"]
+        mocker.patch(
+            "lightspeed_rag_content.metadata_processor.frontmatter.load",
+            return_value=mock_fm,
+        )
+
+        result = md_processor.get_file_title(processor_data["file_path"])
+
+        assert processor_data["title"] == result
+        mock_fm.get.assert_called_once_with("title", "")
+
     def test_get_file_title_exception(self, md_processor, mocker, processor_data):
         """Test get_file_title method handles file access exceptions."""
         mock_file = mocker.patch("builtins.open", new_callable=mocker.mock_open)
@@ -113,6 +132,7 @@ class TestMetadataProcessor:
 
     def test_populate(self, md_processor, mocker, processor_data):
         """Test populate method returns complete metadata when URL is reachable."""
+        mocker.patch.object(md_processor, "_get_frontmatter_url", return_value=None)
         mock_url_func = mocker.patch.object(md_processor, "url_function")
         mock_get_title = mocker.patch.object(md_processor, "get_file_title")
         mock_ping_url = mocker.patch.object(md_processor, "ping_url")
@@ -137,6 +157,7 @@ class TestMetadataProcessor:
         self, md_processor, mocker, caplog, processor_data
     ):
         """Test populate method handles unreachable URLs and logs warning."""
+        mocker.patch.object(md_processor, "_get_frontmatter_url", return_value=None)
         mock_url_func = mocker.patch.object(md_processor, "url_function")
         mock_get_title = mocker.patch.object(md_processor, "get_file_title")
         mock_ping_url = mocker.patch.object(md_processor, "ping_url")
@@ -160,6 +181,50 @@ class TestMetadataProcessor:
         mock_url_func.assert_called_once_with(processor_data["file_path"])
         mock_get_title.assert_called_once_with(processor_data["file_path"])
         mock_ping_url.assert_called_once_with(processor_data["url"])
+
+    def test_populate_frontmatter_url(self, md_processor, mocker, processor_data):
+        """Test populate uses frontmatter URL instead of url_function when available."""
+        frontmatter_url = "https://docs.example.com/page"
+        mocker.patch.object(
+            md_processor, "_get_frontmatter_url", return_value=frontmatter_url
+        )
+        mock_url_func = mocker.patch.object(md_processor, "url_function")
+        mock_get_title = mocker.patch.object(
+            md_processor, "get_file_title", return_value=processor_data["title"]
+        )
+        mock_ping_url = mocker.patch.object(md_processor, "ping_url", return_value=True)
+
+        result = md_processor.populate(processor_data["file_path"])
+
+        assert result == {
+            "docs_url": frontmatter_url,
+            "title": processor_data["title"],
+            "url_reachable": True,
+        }
+        mock_url_func.assert_not_called()
+        mock_get_title.assert_called_once_with(processor_data["file_path"])
+        mock_ping_url.assert_called_once_with(frontmatter_url)
+
+    def test_populate_hermetic_build_skips_ping(self, mocker, processor_data):
+        """Test populate skips URL ping when hermetic_build=True."""
+        processor = metadata_processor.MetadataProcessor(hermetic_build=True)
+        mocker.patch.object(processor, "_get_frontmatter_url", return_value=None)
+        mocker.patch.object(
+            processor, "url_function", return_value=processor_data["url"]
+        )
+        mocker.patch.object(
+            processor, "get_file_title", return_value=processor_data["title"]
+        )
+        mock_ping_url = mocker.patch.object(processor, "ping_url")
+
+        result = processor.populate(processor_data["file_path"])
+
+        assert result == {
+            "docs_url": processor_data["url"],
+            "title": processor_data["title"],
+            "url_reachable": True,
+        }
+        mock_ping_url.assert_not_called()
 
 
 class TestDefaultMetadataProcessor:
