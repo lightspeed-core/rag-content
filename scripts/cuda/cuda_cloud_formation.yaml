@@ -1,0 +1,236 @@
+# aws cloudformation create-stack --stack-name $USERNAME-cuda-stack --template-body file://cuda_cloud_formation.yaml \
+#   --parameters ParameterKey=username,ParameterValue=$USERNAME \
+#     ParameterKey=PublicSubnetAAvailabilityZone,ParameterValue=$AZ_A ParameterKey=PublicSubnetBAvailabilityZone,ParameterValue=$AZ_B \
+#     ParameterKey=AllowedIngressCidr,ParameterValue=$MY_IP_CIDR
+# (use provision_cuda_lab.sh: it defaults AllowedIngressCidr to this host's public IPv4/32 unless you pass a CIDR)
+# aws cloudformation delete-stack --stack-name $USERNAME-cuda-stack
+#
+# End-to-end (stack + CUDA on both instances): see provision_cuda_lab.sh in this directory.
+
+Parameters:
+  username:
+    Type: String
+    Description: "The username used to prefix AWS resource names."
+  PublicSubnetAAvailabilityZone:
+    Type: AWS::EC2::AvailabilityZone::Name
+    Description: "AZ for public subnet A (x86_64 g6.2xlarge). Must offer that instance type in this region."
+  PublicSubnetBAvailabilityZone:
+    Type: AWS::EC2::AvailabilityZone::Name
+    Description: "AZ for public subnet B (aarch64 g5g.4xlarge). Must offer that instance type in this region."
+  AllowedIngressCidr:
+    Type: String
+    Description: "IPv4 CIDR allowed for inbound SSH (22) and HTTP/S (80, 8000, 443, 8443). Use a specific range (e.g. 203.0.113.4/32); do not use 0.0.0.0/0."
+    AllowedPattern: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])/(3[0-2]|[12]?[0-9])$'
+    ConstraintDescription: "Must be a valid IPv4 CIDR (e.g. 198.51.100.0/24 or 198.51.100.7/32)."
+
+Rules:
+  DisallowWorldWideIngress:
+    Assertions:
+      - Assert: !Not [!Equals [!Ref AllowedIngressCidr, "0.0.0.0/0"]]
+        AssertDescription: "AllowedIngressCidr must not be 0.0.0.0/0; restrict SSH and app ports to your IP or network."
+
+# RHEL 9.4.0 Hourly2-GP3 (build 20260217). RegionAMIs lists only regions where
+# g5g.4xlarge (aarch64) is offered alongside the x86_64 AMI; add AMIs before expanding.
+# provision_cuda_lab.sh refuses --region values not listed here.
+Mappings:
+  RegionAMIs:
+    eu-central-1:
+      X8664: ami-028d1ae9d549ba4ac
+      Aarch64: ami-0af6cf2ab16222ad5
+    eu-south-2:
+      X8664: ami-0be796bb3e0ad3fbb
+      Aarch64: ami-0ba0b8c8c306a84df
+    us-east-1:
+      X8664: ami-03137f1c4d12e4ac5
+      Aarch64: ami-0798fdf3c5ed66227
+    us-west-2:
+      X8664: ami-0b2a6471005dabfcf
+      Aarch64: ami-034307b2ae921da82
+  # Instance types vary by arch; AMIs vary by region (RegionAMIs).
+  CudaInstanceTypes:
+    X8664:
+      InstanceType: "g6.2xlarge"
+    Aarch64:
+      InstanceType: "g5g.4xlarge"
+
+Resources:
+  # Create a VPC
+  VPC:
+    Type: "AWS::EC2::VPC"
+    Properties:
+      CidrBlock: "10.0.0.0/16"
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: "Name"
+          Value: !Sub "${username}-vpc"
+
+  # Public subnets: AZs come from parameters (provision_cuda_lab.sh sets them from
+  # describe-instance-type-offerings for g6.2xlarge / g5g.4xlarge).
+  PublicSubnetA:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: "10.0.1.0/24"
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Ref PublicSubnetAAvailabilityZone
+      Tags:
+        - Key: "Name"
+          Value: !Sub "${username}-subnet-a"
+
+  PublicSubnetB:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: "10.0.2.0/24"
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Ref PublicSubnetBAvailabilityZone
+      Tags:
+        - Key: "Name"
+          Value: !Sub "${username}-subnet-b"
+
+  # Create an Internet Gateway
+  InternetGateway:
+    Type: "AWS::EC2::InternetGateway"
+    Properties:
+      Tags:
+        - Key: "Name"
+          Value: !Sub "${username}-internet-gateway"
+
+  # Attach the Internet Gateway to the VPC
+  VPCGatewayAttachment:
+    Type: "AWS::EC2::VPCGatewayAttachment"
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  # Create a Route Table
+  RouteTable:
+    Type: "AWS::EC2::RouteTable"
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: "Name"
+          Value: !Sub "${username}-route-table"
+
+  # Create a Route for the Internet Gateway
+  Route:
+    Type: "AWS::EC2::Route"
+    DependsOn: VPCGatewayAttachment
+    Properties:
+      RouteTableId: !Ref RouteTable
+      DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId: !Ref InternetGateway
+
+  # Associate the route table with both public subnets
+  SubnetRouteTableAssociationA:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId: !Ref PublicSubnetA
+      RouteTableId: !Ref RouteTable
+
+  SubnetRouteTableAssociationB:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId: !Ref PublicSubnetB
+      RouteTableId: !Ref RouteTable
+
+  # Security Group for EC2 Instance
+  SecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: !Sub "Enable SSH, HTTP, and HTTPS access for ${username}"
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: "tcp"
+          FromPort: 22  # SSH
+          ToPort: 22
+          CidrIp: !Ref AllowedIngressCidr
+        - IpProtocol: "tcp"
+          FromPort: 80  # HTTP
+          ToPort: 80
+          CidrIp: !Ref AllowedIngressCidr
+        - IpProtocol: "tcp"
+          FromPort: 8000  # HTTP
+          ToPort: 8000
+          CidrIp: !Ref AllowedIngressCidr
+        - IpProtocol: "tcp"
+          FromPort: 443  # HTTPS
+          ToPort: 443
+          CidrIp: !Ref AllowedIngressCidr
+        - IpProtocol: "tcp"
+          FromPort: 8443  # HTTPS
+          ToPort: 8443
+          CidrIp: !Ref AllowedIngressCidr
+      SecurityGroupEgress:
+        - IpProtocol: "-1"  # All traffic
+          CidrIp: "0.0.0.0/0"
+      Tags:
+        - Key: "Name"
+          Value: !Sub "${username}-security-group"
+
+  # Shared EC2 settings (key pair, SG, root volume). Per-instance AMI, instance type,
+  # and Name tag differ — YAML merge/aliases are not valid in CloudFormation templates.
+  CudaLaunchTemplate:
+    Type: "AWS::EC2::LaunchTemplate"
+    Properties:
+      LaunchTemplateName: !Sub "${username}-cuda-common"
+      LaunchTemplateData:
+        KeyName: !Sub "${username}-keys"
+        SecurityGroupIds:
+          - !Ref SecurityGroup
+        BlockDeviceMappings:
+          - DeviceName: "/dev/sda1"  # Primary volume (root device)
+            Ebs:
+              VolumeSize: 200  # Size in GB
+              VolumeType: "gp3"
+        # IMDSv2 only (disables IMDSv1). Hop limit 2 for container workloads using instance metadata.
+        MetadataOptions:
+          HttpTokens: required
+          HttpPutResponseHopLimit: 2
+
+  # EC2 instances (logical IDs must be alphanumeric — no underscores).
+  EC2InstanceX8664:
+    Type: "AWS::EC2::Instance"
+    DependsOn: VPCGatewayAttachment
+    Properties:
+      LaunchTemplate:
+        LaunchTemplateId: !Ref CudaLaunchTemplate
+        Version: !GetAtt CudaLaunchTemplate.DefaultVersionNumber
+      InstanceType: !FindInMap [CudaInstanceTypes, X8664, InstanceType]
+      ImageId: !FindInMap [RegionAMIs, !Ref "AWS::Region", X8664]
+      SubnetId: !Ref PublicSubnetA
+      Tags:
+        - Key: "Name"
+          Value: !Sub "${username}-cuda-x86_64"
+
+  EC2InstanceAarch64:
+    Type: "AWS::EC2::Instance"
+    DependsOn: VPCGatewayAttachment
+    Properties:
+      LaunchTemplate:
+        LaunchTemplateId: !Ref CudaLaunchTemplate
+        Version: !GetAtt CudaLaunchTemplate.DefaultVersionNumber
+      InstanceType: !FindInMap [CudaInstanceTypes, Aarch64, InstanceType]
+      ImageId: !FindInMap [RegionAMIs, !Ref "AWS::Region", Aarch64]
+      SubnetId: !Ref PublicSubnetB
+      Tags:
+        - Key: "Name"
+          Value: !Sub "${username}-cuda-aarch64"
+
+Outputs:
+  StackName:
+    Description: CloudFormation stack name (same as created name)
+    Value: !Ref AWS::StackName
+  X8664PublicIp:
+    Description: Public IPv4 of the x86_64 (G6 / L4) instance
+    Value: !GetAtt EC2InstanceX8664.PublicIp
+  Aarch64PublicIp:
+    Description: Public IPv4 of the aarch64 (G5g / T4G) instance
+    Value: !GetAtt EC2InstanceAarch64.PublicIp
+  X8664InstanceId:
+    Description: Instance ID (x86_64)
+    Value: !Ref EC2InstanceX8664
+  Aarch64InstanceId:
+    Description: Instance ID (aarch64)
+    Value: !Ref EC2InstanceAarch64
