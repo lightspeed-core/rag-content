@@ -173,3 +173,10 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Local Hermeto prefetch (scripts/run_hermeto_fetch_deps.sh)
+.hermeto-output/
+.hermeto-output-verify-cpu/
+.hermeto-output-verify-cuda/
+# Local hermetic build simulation (scripts/simulate_hermetic_build.sh)
+.hermetic-staging/
