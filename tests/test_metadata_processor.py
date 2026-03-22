@@ -19,6 +19,7 @@ import pytest
 import requests
 
 from lightspeed_rag_content import metadata_processor
+from lightspeed_rag_content.metadata_processor import DefaultMetadataProcessor
 
 
 @pytest.fixture
@@ -159,3 +160,62 @@ class TestMetadataProcessor:
         mock_url_func.assert_called_once_with(processor_data["file_path"])
         mock_get_title.assert_called_once_with(processor_data["file_path"])
         mock_ping_url.assert_called_once_with(processor_data["url"])
+
+
+class TestDefaultMetadataProcessor:
+    """Test cases for the DefaultMetadataProcessor class."""
+
+    def test_url_function_returns_basename(self):
+        """Test url_function returns just the filename, not the full path."""
+        processor = DefaultMetadataProcessor()
+        result = processor.url_function("/some/nested/path/document.md")
+        assert result == "document.md"
+
+    def test_url_function_filename_only(self):
+        """Test url_function with a bare filename (no directory) is unchanged."""
+        processor = DefaultMetadataProcessor()
+        result = processor.url_function("document.md")
+        assert result == "document.md"
+
+    def test_url_function_deeply_nested_path(self):
+        """Test url_function extracts basename from a deeply nested path."""
+        processor = DefaultMetadataProcessor()
+        result = processor.url_function("/a/b/c/d/e/file.md")
+        assert result == "file.md"
+
+    def test_is_concrete_class(self):
+        """Test DefaultMetadataProcessor can be instantiated without subclassing."""
+        processor = DefaultMetadataProcessor()
+        assert isinstance(processor, DefaultMetadataProcessor)
+        assert isinstance(processor, metadata_processor.MetadataProcessor)
+
+    def test_importable_from_public_api(self):
+        """Test DefaultMetadataProcessor is accessible from the package public API."""
+        import lightspeed_rag_content
+
+        assert hasattr(lightspeed_rag_content, "DefaultMetadataProcessor")
+        assert lightspeed_rag_content.DefaultMetadataProcessor is DefaultMetadataProcessor
+
+    def test_populate_uses_url_function_as_url(self, mocker):
+        """Test populate delegates to url_function for the document URL."""
+        processor = DefaultMetadataProcessor()
+        mocker.patch.object(processor, "ping_url", return_value=True)
+        mocker.patch.object(processor, "get_file_title", return_value="My Doc")
+
+        result = processor.populate("/docs/getting-started.md")
+
+        assert result["docs_url"] == "getting-started.md"
+        assert result["title"] == "My Doc"
+        assert result["url_reachable"] is True
+
+    def test_populate_url_unreachable(self, mocker, caplog):
+        """Test populate marks url_reachable False and logs a warning when URL is unreachable."""
+        processor = DefaultMetadataProcessor()
+        mocker.patch.object(processor, "ping_url", return_value=False)
+        mocker.patch.object(processor, "get_file_title", return_value="My Doc")
+
+        with caplog.at_level(logging.WARNING, logger=metadata_processor.__name__):
+            result = processor.populate("/docs/getting-started.md")
+
+        assert result["url_reachable"] is False
+        assert "URL not reachable" in caplog.text
