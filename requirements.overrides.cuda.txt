@@ -1,0 +1,31 @@
+# CUDA build: same as requirements.overrides.txt but omit torch/torchvision overrides
+# so uv can resolve them from the primary index (RHOAI cuda12.9-ubi9 before PyPI).
+# Hermetic install always uses RHOAI pulp wheels for torch/torchvision (see
+# requirements.hashes.wheel.pypi.cuda.{x86_64,aarch64}.txt); the script injects those URLs.
+# RHOAI package list: https://packages.redhat.com/api/pypi/public-rhai/rhoai/3.3/cuda12.9-ubi9/simple/
+transformers==4.57.3
+tokenizers==0.22.1
+scipy==1.16.3
+numpy==2.3.5
+omegaconf==2.3.0
+aiohttp==3.13.3
+aiosqlite==0.22.0
+anyio==4.12.0
+datasets==4.4.1
+pillow==11.3.0
+faiss-cpu==1.12.0
+setuptools==80.9
+# 0.12.x sdist breaks Hermeto cargo vendor --locked; align with PyPI wheels (uv.lock).
+jiter==0.13.0
+cryptography==46.0.3
+docling-parse==5.3.2
+docling-ibm-models==3.12.0
+# Matches RHOAI torch wheel Requires-Dist: triton==3.5.0; use RHOAI cpu-ubi9 wheels in arch requirement files.
+triton==3.5.0
+greenlet==3.3.0
+pypdfium2==4.30.0
+deprecated==1.2.18
+wrapt==1.17.3
+# hf-xet: pin wheel-only 1.2.0 (same as CPU). Newer releases (e.g. 1.4.x) use Rust edition 2024; image Cargo
+# (~1.84) cannot build the sdist — pip must never fall back to building hf-xet.
+hf-xet==1.2.0

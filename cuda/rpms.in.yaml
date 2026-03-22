@@ -8,13 +8,16 @@ packages:
     python3.12-devel,
     python3.12-pip,
     git,
-    skopeo,
     libpq-devel,
     swig,
     autoconf,
     automake,
-    libtool
+    libtool,
+    skopeo,
+    libcudnn9,
+    libnccl,
+    libcusparselt0
   ]
 contentOrigin:
-  repofiles: ["./redhat.repo"]
+  repofiles: ["redhat.repo", "cuda.repo"]
 arches: [x86_64, aarch64]

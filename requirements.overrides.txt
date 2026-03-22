@@ -1,5 +1,5 @@
 # override these package to the version available on RHOAI wheels index:
-# https://console.redhat.com/api/pypi/public-rhai/rhoai/3.2/cpu-ubi9/simple
+# https://packages.redhat.com/api/pypi/public-rhai/rhoai/3.2/cpu-ubi9/simple
 transformers==4.57.3
 tokenizers==0.22.1
 scipy==1.16.3
@@ -11,7 +11,9 @@ datasets==4.4.1
 pillow==11.3.0
 faiss-cpu==1.12.0
 setuptools==80.9
-jiter==0.12
+# 0.12.x sdist Cargo.lock is inconsistent with Cargo.toml; Hermeto cargo vendor --locked fails.
+# Align with uv.lock / PyPI manylinux wheels (cp312).
+jiter==0.13.0
 cryptography==46.0.3
 docling-parse==4.7.2
 docling-ibm-models==3.10
@@ -21,3 +23,5 @@ hf-xet==1.2.0
 torch==2.9.0
 torchvision==0.24.0
 pypdfium2==4.30.0
+# Pin to 1.2.0; we fetch as wheel only (PYPI_WHEELS) — sdists need Rust 1.85+.
+hf-xet==1.2.0

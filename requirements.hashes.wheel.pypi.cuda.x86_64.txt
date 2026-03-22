@@ -1,0 +1,11 @@
+faiss-cpu @ https://files.pythonhosted.org/packages/4c/c9/be4e52fd96be601fefb313c26e1259ac2e6b556fb08cc392db641baba8c7/faiss_cpu-1.12.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl \
+    --hash=sha256:c2e4963c7188f57cfba248f09ebd8a14c76b5ffb87382603ccd4576f2da39d74
+
+# x86_64: torch and torchvision from RHOAI cuda12.9-ubi9 (same version as aarch64)
+torch @ https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.3/cuda12.9-ubi9/torch-2.9.0-13-cp312-cp312-linux_x86_64.whl \
+    --hash=sha256:6a331fdd10983a88751dcc0e5175a2e4c432225774bbb7931c1d249b55a40816
+torchvision @ https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.3/cuda12.9-ubi9/torchvision-0.24.0-9-cp312-cp312-linux_x86_64.whl \
+    --hash=sha256:c1b4ffe7435b2a6e4c849b1be3b1f50d8f1fcb5a9c1bbe6f38e59af57eb27abb
+# triton from RHOAI cpu-ubi9 (declared by RHOAI torch METADATA)
+triton @ https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.3/cpu-ubi9/triton-3.5.0-3-cp312-cp312-linux_x86_64.whl \
+    --hash=sha256:a916a1758674bbc35545f3aed9c1e83ed581b59a277cfffca1926c6f5f567a96

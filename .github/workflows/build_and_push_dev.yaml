@@ -2,7 +2,7 @@ name: Build CPU image, main branch push quay.io
 
 on:
   push:
-    branches: [ main ]
+    branches: [ syedriko-lcore-1440-cuda ]
   pull_request:
     branches: ["main"]
 
