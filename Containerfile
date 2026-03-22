@@ -20,6 +20,7 @@ COPY Makefile pyproject.toml uv.lock README.md Gemfile Gemfile.lock requirements
 COPY src ./src
 COPY tests ./tests
 COPY scripts ./scripts
+COPY embeddings_model ./embeddings_model
 COPY LICENSE /licenses/LICENSE
 
 # Install Ruby Gems

@@ -27,7 +27,8 @@ reviews:
   auto_assign_reviewers: false
   in_progress_fortune: true
   poem: false
-  path_filters: []
+  path_filters:
+    - "!**/embeddings_model/**"
   path_instructions: []
   abort_on_close: true
   disable_cache: false

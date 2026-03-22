@@ -12,10 +12,18 @@ lint.flake8-tidy-imports.banned-api = { "unittest" = { msg = "use pytest instead
 
 target-version = "py312"
 line-length = 100
+exclude = ["embeddings_model"]
+force-exclude = true
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101", "D104", "D100"]
 "scripts/*" = ["S101"]
+
+[tool.black]
+force-exclude = "embeddings_model"
+
+[tool.pydocstyle]
+match-dir = "(?!embeddings_model)[^\\.].*"
 
 [tool.mypy]
 disable_error_code = ["union-attr", "return-value", "arg-type", "import-untyped"]
@@ -23,6 +31,7 @@ ignore_missing_imports = true
 mypy_path = ["src"]
 namespace_packages = true
 explicit_package_bases = true
+exclude = ["^embeddings_model/"]
 
 [tool.pdm]
 distribution = true
@@ -104,6 +113,9 @@ dev = [
     "pybuild-deps>=0.5.0",
     "pip==24.3.1",
 ]
+
+[tool.pylint.main]
+ignore-paths = ["^embeddings_model/"]
 
 [tool.pylint."MESSAGES CONTROL"]
 good-names = ["e"]
