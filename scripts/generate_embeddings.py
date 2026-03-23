@@ -1,4 +1,4 @@
-"""Utility script for generating a vector database from Markdown files.
+r"""Utility script for generating a vector database from Markdown files.
 
 Provides a ready-made CLI so that users do not need to write a custom
 Python script to drive the embedding pipeline.  The default settings
@@ -82,6 +82,7 @@ def _parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
+    """Run the embedding pipeline using CLI arguments."""
     args = _parse_args()
 
     metadata_processor = DefaultMetadataProcessor()

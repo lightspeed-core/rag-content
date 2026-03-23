@@ -194,7 +194,9 @@ class TestDefaultMetadataProcessor:
         import lightspeed_rag_content
 
         assert hasattr(lightspeed_rag_content, "DefaultMetadataProcessor")
-        assert lightspeed_rag_content.DefaultMetadataProcessor is DefaultMetadataProcessor
+        assert (
+            lightspeed_rag_content.DefaultMetadataProcessor is DefaultMetadataProcessor
+        )
 
     def test_populate_uses_url_function_as_url(self, mocker):
         """Test populate delegates to url_function for the document URL."""

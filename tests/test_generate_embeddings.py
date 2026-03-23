@@ -54,15 +54,28 @@ class TestGenerateEmbeddingsCLI:
 
     def test_override_all_optional_args(self):
         """Test that all optional flags override their defaults."""
-        args = self._parse([
-            "-f", "/input", "-o", "/output", "-i", "my-index",
-            "-c", "512",
-            "-v", "50",
-            "-m", "custom/model",
-            "-d", "/custom/embeddings",
-            "-s", "faiss",
-            "-t", "asciidoc",
-        ])
+        args = self._parse(
+            [
+                "-f",
+                "/input",
+                "-o",
+                "/output",
+                "-i",
+                "my-index",
+                "-c",
+                "512",
+                "-v",
+                "50",
+                "-m",
+                "custom/model",
+                "-d",
+                "/custom/embeddings",
+                "-s",
+                "faiss",
+                "-t",
+                "asciidoc",
+            ]
+        )
         assert args.chunk_size == 512
         assert args.chunk_overlap == 50
         assert args.model_name == "custom/model"
@@ -70,11 +83,14 @@ class TestGenerateEmbeddingsCLI:
         assert args.vector_store == "faiss"
         assert args.doc_type == "asciidoc"
 
-    @pytest.mark.parametrize("missing_flag,remaining", [
-        ("-f", ["-o", "/output", "-i", "my-index"]),
-        ("-o", ["-f", "/input", "-i", "my-index"]),
-        ("-i", ["-f", "/input", "-o", "/output"]),
-    ])
+    @pytest.mark.parametrize(
+        "missing_flag,remaining",
+        [
+            ("-f", ["-o", "/output", "-i", "my-index"]),
+            ("-o", ["-f", "/input", "-i", "my-index"]),
+            ("-i", ["-f", "/input", "-o", "/output"]),
+        ],
+    )
     def test_missing_required_arg_exits(self, missing_flag, remaining):
         """Test that omitting any required flag causes SystemExit."""
         with pytest.raises(SystemExit):
@@ -113,5 +129,7 @@ class TestGenerateEmbeddingsMain:
             vector_store_type=_generate_embeddings.DEFAULT_VECTOR_STORE,
             doc_type=_generate_embeddings.DEFAULT_DOC_TYPE,
         )
-        mock_doc_processor.process.assert_called_once_with("/in", metadata=mock_metadata)
+        mock_doc_processor.process.assert_called_once_with(
+            "/in", metadata=mock_metadata
+        )
         mock_doc_processor.save.assert_called_once_with("idx", "/out")
