@@ -49,7 +49,7 @@ class MetadataProcessor:
                 first_line = file.readline()
                 if first_line.startswith("---"):
                     post = frontmatter.load(file_path)
-                    title = post.get("title", "")
+                    title = str(post.get("title", ""))
                 else:
                     title = first_line.rstrip("\n").lstrip("# ")
         except Exception:  # noqa: S110 pylint: disable=broad-exception-caught
