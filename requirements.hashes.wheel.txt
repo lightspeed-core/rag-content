@@ -22,8 +22,6 @@ anyio==4.12.0 \
 asyncpg==0.31.0 \
     --hash=sha256:24fc75787a74ed076025b7eaaf29dab8b072d353ab653d670eeb6f122dfd2399 \
     --hash=sha256:8bbd3aac5003539d4aece38b90c4e736a5725fe6d7b255abdf85a759ee8a264a
-attrs==25.4.0 \
-    --hash=sha256:06d555c93c3d6ca4286a4a10a7ab7e6a1a63f658d59496378491861c05db3637
 beautifulsoup4==4.14.3 \
     --hash=sha256:a49cf181ffbf8064fef69ddd5279587e5ee161951f0f0d787ec361136f011464
 cffi==2.0.0 \
@@ -91,8 +89,6 @@ jsonref==1.1.0 \
     --hash=sha256:026a471f509247d8d9bd745ae788b242f7fd63ca37e7339f1d4d4e6f0e29146f
 jsonschema-specifications==2025.9.1 \
     --hash=sha256:6dd96a9b7b6fc38afd50e0bd85f741036d63e69497df508d22295653c61b8320
-latex2mathml==3.78.1 \
-    --hash=sha256:51464425cf8156b09149ebedbda34f4ef76a7e455910c0f0189cd22428df2cbe
 lxml==6.0.2 \
     --hash=sha256:24b30860c922d98d63395514957a9a13a171c59aed72a4de97190e39eb1e7d6e \
     --hash=sha256:4c6c1194bbdaba3a57b0cc34f0e665d5be4d2ebe9e263ec64c0034b746b9f112 \
@@ -251,9 +247,6 @@ typing-inspection==0.4.2 \
     --hash=sha256:e084b600a03bf1f5dbeb042825e8af22c569b2187e43b7bbf7dc4d455620dfe7
 tzdata==2025.3 \
     --hash=sha256:79f5502eb2eeaa6025d5ce885f1f969aeb83cb43ab7a0bca20cface0d1929ca6
-wrapt==1.17.3 \
-    --hash=sha256:5cbcf7b34ec8a8d671f70756abdc3bd9f71ce58c732698042997e5a4e7777f4e \
-    --hash=sha256:7cbc716eb652c1848ca0d57c36fd69670dffbe22b123d7f3f5a682f78e5685a6
 xlsxwriter==3.2.9 \
     --hash=sha256:c371357b21a1bb3f80f77d4bb3238b1f95fd5cbe97dc6328e839f1e4f57c15e4
 zipp==3.23.0 \
