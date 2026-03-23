@@ -16,6 +16,7 @@
 
 import abc
 import logging
+import os
 import typing
 
 import requests
@@ -94,3 +95,16 @@ class MetadataProcessor:
     def url_function(self, file_path: str) -> str:
         """Derive URL to document source from given file path."""
         raise NotImplementedError
+
+
+class DefaultMetadataProcessor(MetadataProcessor):
+    """Concrete MetadataProcessor that falls back to the filename as the URL.
+
+    Suitable for documents that carry a ``url`` field in their YAML frontmatter
+    (the base class will use that value directly) or when the bare filename is
+    an acceptable reference for RAG retrieval.
+    """
+
+    def url_function(self, file_path: str) -> str:
+        """Return the basename of the file as the document URL."""
+        return os.path.basename(file_path)
