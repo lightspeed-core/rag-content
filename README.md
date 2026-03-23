@@ -128,12 +128,14 @@ different:
 
     class CustomMetadataProcessor(MetadataProcessor):
 
-        def __init__(self, url):
+        def __init__(self, url, hermetic_build=False):
+            super().__init__(hermetic_build=hermetic_build)
             self.url = url
 
         def url_function(self, file_path: str) -> str:
             # Return a URL for the file, so it can be referenced when used
-            # in an answer
+            # in an answer. This is used as a fallback when the file does not
+            # contain a `url` field in its YAML frontmatter.
             return self.url
 
     if __name__ == "__main__":
@@ -160,6 +162,47 @@ different:
         # Save the new vector database to the output directory
         document_processor.save(args.index, args.output)
     ```
+
+### YAML Frontmatter Support
+
+Markdown files can include a YAML frontmatter block at the top to provide
+per-document metadata. The `MetadataProcessor` recognises two fields:
+
+| Field   | Description                                                      |
+|---------|------------------------------------------------------------------|
+| `title` | Document title. Overrides extraction from the first heading line. |
+| `url`   | Document URL. Takes priority over the value returned by `url_function`. |
+
+Example markdown file with frontmatter:
+
+```markdown
+---
+title: My Custom Page Title
+url: https://docs.example.com/my-page
+---
+
+# Ignored heading when frontmatter is present
+
+Content of the document...
+```
+
+When a file starts with `---`, the processor reads `title` and `url` directly
+from the frontmatter block. If neither field is present, the processor falls
+back to its default behaviour (first-line heading for the title, `url_function`
+for the URL).
+
+#### Hermetic Builds
+
+`MetadataProcessor` accepts a `hermetic_build` flag that disables URL
+reachability checks. This is useful for offline or CI environments where
+outbound network access is restricted:
+
+```python
+metadata_processor = CustomMetadataProcessor(hermetic_build=True)
+```
+
+When `hermetic_build=True`, `ping_url` is never called and `url_reachable` is
+always reported as `True` in the resulting metadata.
 
 ### Faiss Vector Store
 
