@@ -51,7 +51,7 @@ dependencies = [
     # User 0.4.4 instead of 0.4.3 to include CVE fix
     "llama-stack-api==0.4.4",
     "llama-stack-client==0.4.3",
-    "torch>=2.9.0,<2.10.0",
+    "torch>=2.11.0,<2.12.0",
     "torchvision>=0.24.0,<0.25.0",
     "aiosqlite>=0.21.0",
     "sqlite-vec>=0.1.6",
