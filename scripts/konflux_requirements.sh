@@ -82,8 +82,10 @@ echo "Packages from console.redhat.com written to: $WHEEL_FILE ($(wc -l < "$WHEE
 
 
 # Use stdout redirection instead of -o flag to work around uv bug where -o reuses stale hashes from existing output file
-uv pip compile "$WHEEL_FILE" --refresh --generate-hashes --index-url $RHOAI_INDEX_URL --python-version 3.12 --emit-index-url --no-deps --no-annotate --universal > "$WHEEL_HASH_FILE"
-uv pip compile "$WHEEL_FILE_PYPI" --refresh --generate-hashes --python-version 3.12 --emit-index-url --no-deps --no-annotate > "$WHEEL_HASH_FILE_PYPI"
+# RHOAI-only --generate-hashes can omit the hash for the Linux cp312 manylinux wheel pip actually installs.
+uv pip compile "$WHEEL_FILE" --refresh --generate-hashes --index-url $RHOAI_INDEX_URL --python-version 3.12 --python-platform x86_64-unknown-linux-gnu --emit-index-url --no-deps --no-annotate > "$WHEEL_HASH_FILE"
+uv run python scripts/augment_wheel_hashes.py "$WHEEL_HASH_FILE"
+uv pip compile "$WHEEL_FILE_PYPI" --refresh --generate-hashes --python-version 3.12 --python-platform x86_64-unknown-linux-gnu --emit-index-url --no-deps --no-annotate > "$WHEEL_HASH_FILE_PYPI"
 uv pip compile "$SOURCE_FILE" --refresh --generate-hashes --python-version 3.12 --emit-index-url --no-deps --no-annotate > "$SOURCE_HASH_FILE"
 uv run pybuild-deps compile --output-file="$BUILD_FILE" "$SOURCE_FILE"
 

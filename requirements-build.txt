@@ -9,12 +9,17 @@ calver==2025.10.20
 coherent-licensed==0.5.2
     # via importlib-metadata
 cython==3.2.4
-    # via sqlalchemy
+    # via
+    #   oracledb
+    #   sqlalchemy
+dunamai==1.26.0
+    # via uv-dynamic-versioning
 expandvars==1.1.2
     # via yarl
 flit-core==3.12.0
     # via
     #   coherent-licensed
+    #   jinja2
     #   marshmallow
     #   packaging
     #   pathspec
@@ -25,7 +30,6 @@ hatch-fancy-pypi-readme==25.1.0
     # via
     #   attrs
     #   jsonschema
-    #   llama-cloud
     #   llama-stack-client
     #   openai
 hatch-vcs==0.5.0
@@ -41,7 +45,6 @@ hatch-vcs==0.5.0
 hatchling==1.26.3
     # via
     #   hatch-fancy-pypi-readme
-    #   llama-cloud
     #   llama-stack-client
     #   openai
 hatchling==1.29.0
@@ -62,13 +65,12 @@ hatchling==1.29.0
     #   llama-index-core
     #   llama-index-embeddings-huggingface
     #   llama-index-embeddings-openai
-    #   llama-index-indices-managed-llama-cloud
     #   llama-index-instrumentation
     #   llama-index-llms-openai
     #   llama-index-readers-file
-    #   llama-index-readers-llama-parse
     #   llama-index-vector-stores-faiss
     #   llama-index-vector-stores-postgres
+    #   mcp
     #   opentelemetry-api
     #   opentelemetry-exporter-otlp-proto-common
     #   opentelemetry-exporter-otlp-proto-http
@@ -84,14 +86,20 @@ hatchling==1.29.0
     #   starlette
     #   termcolor
     #   urllib3
+    #   uv-dynamic-versioning
     #   uvicorn
     #   wcwidth
+jinja2==3.1.6
+    # via uv-dynamic-versioning
+markupsafe==3.0.3
+    # via jinja2
 maturin==1.10.2
     # via uv-build
 packaging==26.0
     # via
     #   hatchling
     #   setuptools-scm
+    #   vcs-versioning
     #   wheel
 pathspec==1.0.4
     # via hatchling
@@ -104,30 +112,42 @@ pluggy==1.6.0
     # via hatchling
 poetry-core==2.3.1
     # via
-    #   llama-parse
+    #   dunamai
     #   rich
     #   tomlkit
 semantic-version==2.10.0
     # via setuptools-rust
-setuptools-rust==1.12.0
+setuptools-rust==1.12.1
     # via maturin
-setuptools-scm==9.2.2
+setuptools-scm==10.0.5
     # via
     #   hatch-vcs
     #   importlib-metadata
+    #   llama-stack
     #   llama-stack-api
     #   pluggy
     #   setuptools-rust
     #   tabulate
     #   tenacity
     #   tqdm
+setuptools-scm==9.2.2
+    # via
+    #   hatch-vcs
     #   urllib3
+tomlkit==0.14.0
+    # via uv-dynamic-versioning
 trove-classifiers==2026.1.14.14
     # via hatchling
 uv-build==0.9.30
     # via llama-index-workflows
+uv-dynamic-versioning==0.14.0
+    # via mcp
+vcs-versioning==1.1.0
+    # via setuptools-scm
 wheel==0.46.3
     # via
+    #   oci
+    #   oracledb
     #   pycparser
     #   sentence-transformers
     #   tornado
@@ -149,9 +169,12 @@ setuptools==82.0.1
     #   importlib-metadata
     #   llama-stack
     #   llama-stack-api
+    #   markupsafe
     #   maturin
     #   multidict
     #   multiprocess
+    #   oci
+    #   oracledb
     #   pathspec
     #   pgvector
     #   pluggy
@@ -160,10 +183,12 @@ setuptools==82.0.1
     #   pyjwt
     #   python-dotenv
     #   regex
+    #   requests
     #   sentence-transformers
     #   setuptools-rust
     #   setuptools-scm
     #   sqlalchemy
+    #   sse-starlette
     #   tabulate
     #   tenacity
     #   tornado
@@ -173,5 +198,6 @@ setuptools==82.0.1
     #   tree-sitter-javascript
     #   tree-sitter-python
     #   trove-classifiers
+    #   vcs-versioning
     #   wrapt
     #   yarl
