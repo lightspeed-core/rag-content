@@ -303,7 +303,7 @@ registered_resources:
         together with the database for reference.
 
         Llama-stack is used as a library and this class supports 2 llama-stack
-        Vector IO providers: faiss and sqlite-vec.
+        Vector IO providers: faiss and pgvector.
 
         Faiss seems to create much larger database files, to the point of
         absurdity.
@@ -322,7 +322,6 @@ registered_resources:
         """
         assert config.vector_store_type in (  # noqa: S101
             "llamastack-faiss",
-            "llamastack-sqlite-vec",
             "llamastack-pgvector",
         )
 

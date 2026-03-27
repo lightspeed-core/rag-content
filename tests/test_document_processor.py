@@ -120,7 +120,7 @@ class TestDocumentProcessor:
         mock_processor["indexdb"].reset_mock()
 
     @pytest.mark.parametrize(
-        "vector_store_type", ["llamastack-faiss", "llamastack-sqlite-vec"]
+        "vector_store_type", ["llamastack-faiss"]
     )
     def test_init_llama_stack(self, vector_store_type, mock_processor):
         """Test DocumentProcessor initialization with LlamaStack-compatible vector store types."""
