@@ -142,7 +142,7 @@ uv-build==0.9.30
     # via llama-index-workflows
 uv-dynamic-versioning==0.14.0
     # via mcp
-vcs-versioning==1.1.0
+vcs-versioning==1.1.1
     # via setuptools-scm
 wheel==0.46.3
     # via
