@@ -288,7 +288,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--vector-store-type",
         default="auto",
-        choices=["auto", "faiss", "llamastack-faiss", "llamastack-sqlite-vec"],
+        choices=["auto", "faiss", "llamastack-faiss"],
         help="vector store type to be used.",
     )
     parser.add_argument(
@@ -319,8 +319,6 @@ if __name__ == "__main__":
             args.vector_store_type = "llamastack-pgvector"
         elif os.path.exists(os.path.join(args.db_path, "metadata.json")):
             args.vector_store_type = "faiss"
-        elif os.path.exists(os.path.join(args.db_path, "sqlite-vec_store.db")):
-            args.vector_store_type = "llamastack-sqlite-vec"
         elif os.path.exists(os.path.join(args.db_path, "faiss_store.db")):
             args.vector_store_type = "llamastack-faiss"
         else:
