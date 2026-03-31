@@ -337,7 +337,7 @@ registered_resources:
         model = SentenceTransformer(self.model_name_or_dir)
         self.config.embedding_dimension = model.get_sentence_embedding_dimension()
 
-        # faiss_store.db or sqlitevec_store.db
+        # faiss_store.db
         self.db_filename = config.vector_store_type[11:] + "_store.db"
 
         # We need to set env var before importing llama_stack
