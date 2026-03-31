@@ -153,8 +153,6 @@ pydantic-core==2.41.5 \
     --hash=sha256:c2486bffdf84e087e0632bc688c667c86405afaec618e4fe4ad7bde8c8cf8068 \
     --hash=sha256:c3f56276a4ea335637404bbd154eead369cf0c17f6182f6e40c176fdec5a4162 \
     --hash=sha256:f74563f5ed72064ac7bf45b3b2509f923cbe144207a537055c5c38fc9b556306
-pygments==2.19.2 \
-    --hash=sha256:3c7239b5a90a9339df2ddb3d4fd8fdaa79eb1cffa183937fe92ff1042f94f0d0
 pylatexenc==2.10 \
     --hash=sha256:e4811425ae786d0fca862b07e591668ffeea0111094f315ee457395e0d4673b4
 pypdfium2==4.30.0 \

@@ -80,6 +80,7 @@ hatchling==1.29.0
     #   platformdirs
     #   polyfactory
     #   pydantic-settings
+    #   pygments
     #   python-multipart
     #   semchunk
     #   soupsieve
@@ -110,7 +111,7 @@ pdm-backend==2.4.7
     #   typer
 pluggy==1.6.0
     # via hatchling
-poetry-core==2.3.1
+poetry-core==2.3.2
     # via
     #   dunamai
     #   rich
@@ -142,11 +143,10 @@ uv-build==0.9.30
     # via llama-index-workflows
 uv-dynamic-versioning==0.14.0
     # via mcp
-vcs-versioning==1.1.0
+vcs-versioning==1.1.1
     # via setuptools-scm
 wheel==0.46.3
     # via
-    #   oci
     #   oracledb
     #   pycparser
     #   sentence-transformers
@@ -173,7 +173,6 @@ setuptools==82.0.1
     #   maturin
     #   multidict
     #   multiprocess
-    #   oci
     #   oracledb
     #   pathspec
     #   pgvector
