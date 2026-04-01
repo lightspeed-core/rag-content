@@ -15,8 +15,10 @@ Usage::
 """
 
 import argparse
+import os
 
 from lightspeed_rag_content.document_processor import DocumentProcessor
+from lightspeed_rag_content.image_builder import DEFAULT_BASE_IMAGE, build_image_archive
 from lightspeed_rag_content.metadata_processor import DefaultMetadataProcessor
 
 DEFAULT_CHUNK_SIZE = 380
@@ -78,6 +80,36 @@ def _parse_args() -> argparse.Namespace:
         default=DEFAULT_DOC_TYPE,
         help=f"Document type (default: {DEFAULT_DOC_TYPE})",
     )
+    parser.add_argument(
+        "--output-image",
+        default=None,
+        help="Path for the output image archive (.tar). When set, the vector DB "
+        "(and optionally the embedding model) is packaged into a container image "
+        "that can be loaded with 'podman load' or 'docker load'.",
+    )
+    parser.add_argument(
+        "--image-name",
+        default="rag-content-output",
+        help="Repository name embedded in the image archive (default: rag-content-output)",
+    )
+    parser.add_argument(
+        "--image-tag",
+        default="latest",
+        help="Tag embedded in the image archive (default: latest)",
+    )
+    parser.add_argument(
+        "--exclude-model",
+        dest="include_model",
+        action="store_false",
+        default=True,
+        help="Exclude the embedding model from the output image (included by default)",
+    )
+    parser.add_argument(
+        "--base-image",
+        default=None,
+        help="Base container image for the output image archive "
+        "(default: UBI 9 full, ubi9/ubi)",
+    )
     return parser.parse_args()
 
 
@@ -98,6 +130,24 @@ def main() -> None:
 
     document_processor.process(args.folder, metadata=metadata_processor)
     document_processor.save(args.index, args.output)
+
+    if args.output_image:
+        extra_dirs = None
+        if args.include_model:
+            if not os.path.isdir(args.model_dir):
+                raise FileNotFoundError(
+                    f"Embedding model directory not found: {args.model_dir}. "
+                    "Use --exclude-model to build the image without it."
+                )
+            extra_dirs = {args.model_dir: "/rag/embeddings_model"}
+        build_image_archive(
+            vector_db_dir=args.output,
+            output_tar_path=args.output_image,
+            image_name=args.image_name,
+            image_tag=args.image_tag,
+            extra_dirs=extra_dirs,
+            base_image=args.base_image or DEFAULT_BASE_IMAGE,
+        )
 
 
 if __name__ == "__main__":

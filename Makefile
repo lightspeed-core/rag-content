@@ -8,6 +8,15 @@ POSTGRES_HOST ?= localhost
 POSTGRES_PORT ?= 15432
 POSTGRES_DATABASE ?= postgres
 
+# Container image build / output arguments
+TOOL_IMAGE ?= localhost/rag-content:latest
+DOCS_DIR ?= docs
+OUTPUT_DIR ?= output
+INDEX_NAME ?= my-index
+OUTPUT_IMAGE_NAME ?= rag-content-output
+OUTPUT_IMAGE_TAG ?= latest
+OUTPUT_IMAGE_FILE ?= $(OUTPUT_DIR)/$(OUTPUT_IMAGE_NAME)-$(OUTPUT_IMAGE_TAG).tar
+
 
 .PHONY: unit-test
 test-unit: ## Run the unit tests
@@ -100,6 +109,32 @@ start-postgres-debug: ## Start postgresql from the pgvector container image with
 	 -p $(POSTGRES_PORT):5432 \
 	 -v ./postgresql/data:/var/lib/postgresql/data:Z pgvector/pgvector:pg16 \
 	 postgres -c log_statement=all -c log_destination=stderr
+
+.PHONY: build-tool-image
+build-tool-image: ## Build the rag-content tool image (uses the existing Containerfile)
+	podman build -t $(TOOL_IMAGE) .
+
+.PHONY: generate-output-image
+# skopeo (needed to fetch the base image) is bundled in the tool container but
+# not required on the host, so the script is run inside the container.
+generate-output-image: build-tool-image ## Run the tool container and produce a vector-DB image archive
+	mkdir -p "$(OUTPUT_DIR)"
+	outfile="$$(basename "$(OUTPUT_IMAGE_FILE)")"; \
+	podman run --rm \
+	  -v "$(abspath $(DOCS_DIR)):/input:ro,Z" \
+	  -v "$(abspath $(OUTPUT_DIR)):/output:Z" \
+	  "$(TOOL_IMAGE)" \
+	  python /rag-content/scripts/generate_embeddings.py \
+	    -f /input \
+	    -o /output/vector_db \
+	    -i "$(INDEX_NAME)" \
+	    --output-image "/output/$$outfile" \
+	    --image-name "$(OUTPUT_IMAGE_NAME)" \
+	    --image-tag "$(OUTPUT_IMAGE_TAG)"
+	@echo ""
+	@echo "Image archive written to $(OUTPUT_IMAGE_FILE)"
+	@echo "Load with:  podman load < $(OUTPUT_IMAGE_FILE)"
+	@echo "Then push:  podman push $(OUTPUT_IMAGE_NAME):$(OUTPUT_IMAGE_TAG)"
 
 konflux-requirements:	## generate hermetic requirements.*.txt file and gemfile.lock for konflux build
 	./scripts/konflux_requirements.sh

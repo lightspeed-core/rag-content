@@ -710,7 +710,7 @@ registered_resources:
         output_dir: str,
         embedded_files: Optional[int] = None,  # pylint: disable=W0613
         exec_time: Optional[int] = None,  # pylint: disable=W0613
-    ) -> None:
+    ) -> str:
         """Save in the vector database all the documents we added."""
         os.makedirs(output_dir, exist_ok=True)
         db_file = os.path.realpath(os.path.join(output_dir, self.db_filename))
@@ -726,6 +726,7 @@ registered_resources:
         except Exception as exc:
             LOG.error("Failed to insert document: %s", exc)
             raise
+        return vector_store_id
 
 
 class DocumentProcessor:
