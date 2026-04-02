@@ -83,6 +83,52 @@ class TestGenerateEmbeddingsCLI:
         assert args.vector_store == "faiss"
         assert args.doc_type == "asciidoc"
 
+    def test_output_image_defaults(self):
+        """Test that --output-image flags default to None/off."""
+        args = self._parse(["-f", "/input", "-o", "/output", "-i", "my-index"])
+        assert args.output_image is None
+        assert args.image_name == "rag-content-output"
+        assert args.image_tag == "latest"
+        assert args.include_model is True
+
+    def test_output_image_flags_parsed(self):
+        """Test that all --output-image flags are parsed correctly."""
+        args = self._parse(
+            [
+                "-f",
+                "/input",
+                "-o",
+                "/output",
+                "-i",
+                "my-index",
+                "--output-image",
+                "/out/my.tar",
+                "--image-name",
+                "my-rag",
+                "--image-tag",
+                "v1",
+            ]
+        )
+        assert args.output_image == "/out/my.tar"
+        assert args.image_name == "my-rag"
+        assert args.image_tag == "v1"
+        assert args.include_model is True
+
+    def test_exclude_model_flag(self):
+        """Test that --exclude-model sets include_model to False."""
+        args = self._parse(
+            [
+                "-f",
+                "/input",
+                "-o",
+                "/output",
+                "-i",
+                "my-index",
+                "--exclude-model",
+            ]
+        )
+        assert args.include_model is False
+
     @pytest.mark.parametrize(
         "missing_flag,remaining",
         [
@@ -133,3 +179,129 @@ class TestGenerateEmbeddingsMain:
             "/in", metadata=mock_metadata
         )
         mock_doc_processor.save.assert_called_once_with("idx", "/out")
+
+    def test_main_does_not_build_image_when_flag_absent(self, mocker):
+        """main() must not call build_image_archive when --output-image is omitted."""
+        mocker.patch.object(
+            _generate_embeddings, "DocumentProcessor", return_value=MagicMock()
+        )
+        mocker.patch.object(
+            _generate_embeddings, "DefaultMetadataProcessor", return_value=MagicMock()
+        )
+        mock_build = mocker.patch.object(_generate_embeddings, "build_image_archive")
+
+        with patch(
+            "sys.argv",
+            ["generate_embeddings.py", "-f", "/in", "-o", "/out", "-i", "idx"],
+        ):
+            _generate_embeddings.main()
+
+        mock_build.assert_not_called()
+
+    def test_main_calls_build_image_archive_with_model(self, mocker, tmp_path):
+        """main() calls build_image_archive with extra_dirs when --output-image is set."""
+        model_dir = str(tmp_path / "model")
+        Path(model_dir).mkdir()
+        mock_doc_processor = MagicMock()
+        mocker.patch.object(
+            _generate_embeddings, "DocumentProcessor", return_value=mock_doc_processor
+        )
+        mocker.patch.object(
+            _generate_embeddings, "DefaultMetadataProcessor", return_value=MagicMock()
+        )
+        mock_build = mocker.patch.object(_generate_embeddings, "build_image_archive")
+
+        with patch(
+            "sys.argv",
+            [
+                "generate_embeddings.py",
+                "-f",
+                "/in",
+                "-o",
+                "/out",
+                "-i",
+                "idx",
+                "--output-image",
+                "/out/img.tar",
+                "--image-name",
+                "my-rag",
+                "--image-tag",
+                "v2",
+                "--model-dir",
+                model_dir,
+            ],
+        ):
+            _generate_embeddings.main()
+
+        mock_build.assert_called_once_with(
+            vector_db_dir="/out",
+            output_tar_path="/out/img.tar",
+            image_name="my-rag",
+            image_tag="v2",
+            extra_dirs={model_dir: "/rag/embeddings_model"},
+            base_image=_generate_embeddings.DEFAULT_BASE_IMAGE,
+        )
+
+    def test_main_calls_build_image_archive_without_model(self, mocker):
+        """main() passes extra_dirs=None when --exclude-model is set."""
+        mocker.patch.object(
+            _generate_embeddings, "DocumentProcessor", return_value=MagicMock()
+        )
+        mocker.patch.object(
+            _generate_embeddings, "DefaultMetadataProcessor", return_value=MagicMock()
+        )
+        mock_build = mocker.patch.object(_generate_embeddings, "build_image_archive")
+
+        with patch(
+            "sys.argv",
+            [
+                "generate_embeddings.py",
+                "-f",
+                "/in",
+                "-o",
+                "/out",
+                "-i",
+                "idx",
+                "--output-image",
+                "/out/img.tar",
+                "--exclude-model",
+            ],
+        ):
+            _generate_embeddings.main()
+
+        mock_build.assert_called_once_with(
+            vector_db_dir="/out",
+            output_tar_path="/out/img.tar",
+            image_name="rag-content-output",
+            image_tag="latest",
+            extra_dirs=None,
+            base_image=_generate_embeddings.DEFAULT_BASE_IMAGE,
+        )
+
+    def test_main_raises_if_model_dir_missing(self, mocker):
+        """main() raises FileNotFoundError when model dir does not exist."""
+        mocker.patch.object(
+            _generate_embeddings, "DocumentProcessor", return_value=MagicMock()
+        )
+        mocker.patch.object(
+            _generate_embeddings, "DefaultMetadataProcessor", return_value=MagicMock()
+        )
+
+        with patch(
+            "sys.argv",
+            [
+                "generate_embeddings.py",
+                "-f",
+                "/in",
+                "-o",
+                "/out",
+                "-i",
+                "idx",
+                "--output-image",
+                "/out/img.tar",
+                "--model-dir",
+                "/nonexistent/model",
+            ],
+        ):
+            with pytest.raises(FileNotFoundError, match="nonexistent/model"):
+                _generate_embeddings.main()

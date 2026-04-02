@@ -8,7 +8,8 @@ USER root
 # Install Python and Ruby
 RUN ${DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
     python3.12 python3.12-devel python3.12-pip git \
-    rubygems rubygem-bundler && \
+    rubygems rubygem-bundler \
+    skopeo && \
     ${DNF_COMMAND} clean all
 
 # Install uv package manager

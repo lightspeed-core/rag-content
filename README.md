@@ -390,6 +390,95 @@ commands:
     -k 5 \
     -q "how can I configure a cinder backend"
    ```
+## Packaging the Vector Database as a Container Image
+
+After generating the vector database, you can package it (and optionally the
+embedding model) into a container image archive using the `--output-image` flag
+of `generate_embeddings.py`. The resulting `.tar` file can be loaded directly
+with `podman load` or `docker load`.
+
+The image is built using `skopeo` (included in the RAG tool container image)
+to fetch the base image and pure Python to compose the final archive — no
+container daemon or elevated privileges required.
+
+The image layout is described by the static Containerfile bundled with the
+package (`src/lightspeed_rag_content/Containerfile.output-image`).
+
+The default base image is **full UBI 9**:
+
+```
+registry.access.redhat.com/ubi9/ubi:latest
+```
+
+### Basic usage
+
+```bash
+uv run python scripts/generate_embeddings.py \
+  -o ./vector_db/custom_docs/0.1 \
+  -f ./custom_docs/0.1/ \
+  -md embeddings_model/ \
+  -mn sentence-transformers/all-mpnet-base-v2 \
+  -i custom_docs-0_1 \
+  --output-image ./my-rag.tar
+```
+
+This produces `./my-rag.tar` containing:
+
+| Path inside the image | Content |
+|-----------------------|---------|
+| `/rag/vector_db/`     | Generated vector database files |
+| `/rag/embeddings_model/` | Embedding model (included by default) |
+
+### Loading the image
+
+```bash
+podman load < ./my-rag.tar
+# or
+docker load  < ./my-rag.tar
+```
+
+### Available flags
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--output-image PATH` | _(disabled)_ | Path for the output image archive (`.tar`). When set, the vector DB is packaged into a container image. |
+| `--image-name NAME` | `rag-content-output` | Repository name embedded in the image archive. |
+| `--image-tag TAG` | `latest` | Tag embedded in the image archive. |
+| `--exclude-model` | _(model included)_ | Exclude the embedding model from the output image. |
+| `--base-image IMAGE` | UBI 9 full (`ubi9/ubi`) | Parent image for the output image. Must be reachable by `skopeo`. |
+
+### Using a custom base image
+
+To override the default base image, pass `--base-image`:
+
+```bash
+uv run python scripts/generate_embeddings.py \
+  -o ./vector_db/custom_docs/0.1 \
+  -f ./custom_docs/0.1/ \
+  -md embeddings_model/ \
+  -mn sentence-transformers/all-mpnet-base-v2 \
+  -i custom_docs-0_1 \
+  --output-image ./my-rag.tar \
+  --base-image registry.access.redhat.com/ubi9/ubi:latest
+```
+
+### Excluding the embedding model
+
+If the model will be provided separately at runtime, pass `--exclude-model`:
+
+```bash
+uv run python scripts/generate_embeddings.py \
+  -o ./vector_db/custom_docs/0.1 \
+  -f ./custom_docs/0.1/ \
+  -md embeddings_model/ \
+  -mn sentence-transformers/all-mpnet-base-v2 \
+  -i custom_docs-0_1 \
+  --output-image ./my-rag.tar \
+  --image-name my-rag \
+  --image-tag v1.0 \
+  --exclude-model
+```
+
 ## Update lockfiles
 
 The lock file is used in this repository:

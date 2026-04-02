@@ -8,6 +8,7 @@ packages:
     python3.12-devel,
     python3.12-pip,
     git,
+    skopeo,
   ]
 contentOrigin:
   repofiles: ["./redhat.repo"]

@@ -1,0 +1,7 @@
+ARG BASE_IMAGE=registry.access.redhat.com/ubi9/ubi:latest
+FROM ${BASE_IMAGE}
+
+COPY --from=vector_db        --chown=65532:65532 . /rag/vector_db/
+COPY --from=embeddings_model --chown=65532:65532 . /rag/embeddings_model/
+
+USER 65532:65532
