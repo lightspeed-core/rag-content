@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = "==3.12.*"
 resolution-markers = [
     "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and sys_platform == 'linux') or (sys_platform != 'darwin' and sys_platform != 'linux')",
@@ -1123,7 +1123,7 @@ requires-dist = [
     { name = "llama-index-vector-stores-faiss", specifier = ">=0.3.0" },
     { name = "llama-index-vector-stores-postgres", specifier = ">=0.5.4" },
     { name = "llama-stack", specifier = "==0.5.0" },
-    { name = "llama-stack-api", specifier = "==0.5.0" },
+    { name = "llama-stack-api", specifier = "==0.7.1" },
     { name = "llama-stack-client", specifier = "==0.5.0" },
     { name = "python-frontmatter", specifier = ">=1.1.0" },
     { name = "pyyaml", specifier = ">=6.0.2" },
@@ -1437,7 +1437,7 @@ wheels = [
 
 [[package]]
 name = "llama-stack-api"
-version = "0.5.0"
+version = "0.7.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "fastapi" },
@@ -1447,9 +1447,9 @@ dependencies = [
     { name = "opentelemetry-sdk" },
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4d/44/3fa5f13b5da7eed8f790ae65784c6efbc325c142af5f6f80537717912af0/llama_stack_api-0.5.0.tar.gz", hash = "sha256:51074ec06ab87ece7e9461bf47d878b25eb232b2a009749314e2b8a5a5d83ca0", size = 126401, upload-time = "2026-02-05T17:23:55.323Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f3/d0/a320b11eec0db00c05ad22525f5ef8825b512215d7d138964caddb50dea2/llama_stack_api-0.7.1.tar.gz", hash = "sha256:441b0e1c29f7acc0a1d9b697d276f2c352387b719b67926af9983caec95f107e", size = 135479, upload-time = "2026-04-08T14:20:31.64Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1f/d7/4238a8f088d756ab756060d4daa05304dd72b209015adf31f6799099affd/llama_stack_api-0.5.0-py3-none-any.whl", hash = "sha256:dfd4ffff70207c49c8e734b503b42bc41860d271e7fe8745a26a41a4d4419ff8", size = 151595, upload-time = "2026-02-05T17:23:54.022Z" },
+    { url = "https://files.pythonhosted.org/packages/e7/0b/0ca3d5cc63bdd51327a051907e97916232dfa786d7758cec989277dbec19/llama_stack_api-0.7.1-py3-none-any.whl", hash = "sha256:13467639f83ffc87b950513afd2270e6ce0403852442d6214f3f08c087a2d5d5", size = 159662, upload-time = "2026-04-08T14:20:30.351Z" },
 ]
 
 [[package]]
@@ -3180,7 +3180,7 @@ dependencies = [
     { name = "typing-extensions", marker = "sys_platform == 'darwin'" },
 ]
 wheels = [
-    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1-cp312-none-macosx_11_0_arm64.whl", hash = "sha256:287242dd1f830846098b5eca847f817aa5c6015ea57ab4c1287809efea7b77eb" },
+    { url = "https://download-r2.pytorch.org/whl/cpu/torch-2.9.1-cp312-none-macosx_11_0_arm64.whl", hash = "sha256:287242dd1f830846098b5eca847f817aa5c6015ea57ab4c1287809efea7b77eb" },
 ]
 
 [[package]]
@@ -3202,10 +3202,10 @@ dependencies = [
     { name = "typing-extensions", marker = "sys_platform != 'darwin'" },
 ]
 wheels = [
-    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1%2Bcpu-cp312-cp312-manylinux_2_28_aarch64.whl", hash = "sha256:3bf9b442a51a2948e41216a76d7ab00f0694cfcaaa51b6f9bcab57b7f89843e6" },
-    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1%2Bcpu-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:7417d8c565f219d3455654cb431c6d892a3eb40246055e14d645422de13b9ea1" },
-    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1%2Bcpu-cp312-cp312-win_amd64.whl", hash = "sha256:a4e06b4f441675d26b462123c8a83e77c55f1ec8ebc081203be2db1ea8054add" },
-    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1%2Bcpu-cp312-cp312-win_arm64.whl", hash = "sha256:1abe31f14b560c1f062699e966cb08ef5b67518a1cfac2d8547a3dbcd8387b06" },
+    { url = "https://download-r2.pytorch.org/whl/cpu/torch-2.9.1%2Bcpu-cp312-cp312-manylinux_2_28_aarch64.whl", hash = "sha256:3bf9b442a51a2948e41216a76d7ab00f0694cfcaaa51b6f9bcab57b7f89843e6" },
+    { url = "https://download-r2.pytorch.org/whl/cpu/torch-2.9.1%2Bcpu-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:7417d8c565f219d3455654cb431c6d892a3eb40246055e14d645422de13b9ea1" },
+    { url = "https://download-r2.pytorch.org/whl/cpu/torch-2.9.1%2Bcpu-cp312-cp312-win_amd64.whl", hash = "sha256:a4e06b4f441675d26b462123c8a83e77c55f1ec8ebc081203be2db1ea8054add" },
+    { url = "https://download-r2.pytorch.org/whl/cpu/torch-2.9.1%2Bcpu-cp312-cp312-win_arm64.whl", hash = "sha256:1abe31f14b560c1f062699e966cb08ef5b67518a1cfac2d8547a3dbcd8387b06" },
 ]
 
 [[package]]
