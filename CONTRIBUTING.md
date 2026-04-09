@@ -189,6 +189,97 @@ by a code assistant with little to no creative input or modification by you
 but it is particularly appropriate to mark the contents of the file as
 recommended above.
 
+## Linters
+
+_Black_, _Ruff_, Pyright, _Pylint_, __Pydocstyle__, __Mypy__, and __Bandit__ tools are used as linters. There are a bunch of linter rules enabled for this repository. All of them are specified in `pyproject.toml`, such as in sections `[tool.ruff]` and `[tool.pylint."MESSAGES CONTROL"]`. Some specific rules can be disabled using `ignore` parameter (empty now).
+
+
+### Type hints checks
+
+It is possible to check if type hints added into the code are correct and whether assignments, function calls etc. use values of the right type. This check is invoked by following command:
+
+```
+make check-types
+```
+
+Please note that type hints check might be very slow on the first run.
+Subsequent runs are much faster thanks to the cache that Mypy uses. This check
+is part of a CI job that verifies sources.
+
+
+### Ruff
+
+List of all _Ruff_ rules recognized by Ruff can be retrieved by:
+
+
+```
+ruff linter
+```
+
+Description of all _Ruff_ rules are available on https://docs.astral.sh/ruff/rules/
+
+Ruff rules can be disabled in source code (for a given line or block) by using a special `noqa` comment line. For example:
+
+```python
+# noqa: E501
+```
+
+### Pylint
+
+List of all _Pylint_ rules can be retrieved by:
+
+```
+pylint --list-msgs
+```
+
+Description of all rules are available on https://pylint.readthedocs.io/en/latest/user_guide/checkers/features.html
+
+To disable _Pylint_ rule in source code, the comment line in following format can be used:
+
+```python
+# pylint: disable=C0415
+```
+
+
+
+### Security checks
+
+Static security check is performed by _Bandit_ tool. The check can be started by using:
+
+```
+make security-check
+```
+
+
+
+## Code style
+
+### Function Standards
+
+#### Documentation
+
+All functions require docstrings with brief descriptions
+
+#### Type annotations
+
+Use complete type annotations for parameters and return types
+
+- Use `typing_extensions.Self` for model validators
+- Union types: `str | int` (modern syntax)
+- Optional: `Optional[Type]`
+
+#### Naming conventions
+
+Use snake_case with descriptive, action-oriented names (get_, validate_, check_)
+
+#### Async functions
+
+Use `async def` for I/O operations and external API calls
+
+#### Error handling
+
+- Use FastAPI `HTTPException` with appropriate status codes for API endpoints
+- Handle `APIConnectionError` from Llama Stack where appropriate
 
 ### Formatting rules
 
