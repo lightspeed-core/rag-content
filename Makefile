@@ -68,13 +68,15 @@ check-format: ## Check that the code is properly formatted using Black and Ruff 
 .PHONY: check-coverage
 check-coverage: ## Check the coverage of unit tests.
 	@echo "Running $@ target ..."
-	uv run coverage run --source=src/lightspeed_rag_content -m unittest discover tests --verbose && uv run coverage report -m --fail-under 90
+	uv run coverage run --source=src/lightspeed_rag_content -m pytest tests --verbose && uv run coverage report -m --fail-under 90
 
 .PHONY: check-code-metrics
 check-code-metrics: ## Check the code using Radon.
 	@echo "Running $@ target ..."
-	@OUTPUT=$$(uv run radon cc -a A src/ | tee /dev/tty | tail -1) && \
-	GRADE=$$(echo $$OUTPUT | grep -oP " [A-F] " | tr -d '[:space:]') && \
+	@RADON_OUT=$$(uv run radon cc -a src/) && \
+	echo "$$RADON_OUT" && \
+	OUTPUT=$$(echo "$$RADON_OUT" | tail -1) && \
+	GRADE=$$(echo "$$OUTPUT" | awk '/Average complexity:/ { print $$3; exit }') && \
 	if [ "$$GRADE" = "A" ]; then exit 0; else exit 1; fi
 
 .PHONY: format
@@ -86,14 +88,16 @@ format: ## Format the code into unified format
 black:
 	uv tool run black --check .
 
-pylint:
+.PHONY: pylint
+pylint: ## Run pylint on application source.
+	@echo "Running $@ target ..."
 	uv run pylint src
 
 ruff:
 	uv run ruff check src
 
 .PHONY: verify
-verify: check-types check-format check-code-metrics check-coverage ## Verify the code using various linters
+verify: check-types check-format pylint check-code-metrics check-coverage ## Verify the code using various linters
 
 .PHONY: start-postgres
 start-postgres: ## Start postgresql from the pgvector container image

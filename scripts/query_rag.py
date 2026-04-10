@@ -52,9 +52,7 @@ def _llama_index_query(args: argparse.Namespace) -> None:  # noqa: C901
             else:
                 print(node)
         else:
-            logging.warning(
-                f"Node {args.node} is not a TextNode, type: {type(node).__name__}"
-            )
+            logging.warning(f"Node {args.node} is not a TextNode, type: {type(node).__name__}")
             if args.json:
                 result = {
                     "query": args.query,
@@ -154,9 +152,7 @@ def _get_chunk_text(chunk: Any) -> str:
         if isinstance(chunk.content, str):
             return chunk.content
         if isinstance(chunk.content, list):
-            return " ".join(
-                c.text if hasattr(c, "text") else str(c) for c in chunk.content
-            )
+            return " ".join(c.text if hasattr(c, "text") else str(c) for c in chunk.content)
     return str(chunk)
 
 
@@ -256,15 +252,11 @@ def _llama_stack_query(args: argparse.Namespace) -> None:  # noqa: C901
             for chunk, score in zip(res.chunks, res.scores):
                 print("=" * 80)
                 chunk_id = chunk.chunk_id if hasattr(chunk, "chunk_id") else ""
-                print(
-                    f"Chunk ID: {chunk_id}\nScore: {score}\nText:\n{_get_chunk_text(chunk)}"
-                )
+                print(f"Chunk ID: {chunk_id}\nScore: {score}\nText:\n{_get_chunk_text(chunk)}")
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Utility script for querying RAG database"
-    )
+    parser = argparse.ArgumentParser(description="Utility script for querying RAG database")
     parser.add_argument(
         "-p",
         "--db-path",
@@ -272,9 +264,7 @@ if __name__ == "__main__":
         help="path to the vector db",
     )
     parser.add_argument("-x", "--product-index", required=True, help="product index")
-    parser.add_argument(
-        "-m", "--model-path", required=True, help="path to the embedding model"
-    )
+    parser.add_argument("-m", "--model-path", required=True, help="path to the embedding model")
     parser.add_argument("-q", "--query", type=str, required=True, help="query to run")
     parser.add_argument("-k", "--top-k", type=int, default=1, help="similarity_top_k")
     parser.add_argument("-n", "--node", help="retrieve node")

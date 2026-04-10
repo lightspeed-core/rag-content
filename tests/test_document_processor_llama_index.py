@@ -28,9 +28,7 @@ from tests.conftest import RagMockEmbedding
 @pytest.fixture
 def doc_processor(mocker):
     """Fixture for DocumentProcessor tests using Llama Index."""
-    mocker.patch.object(
-        document_processor, "HuggingFaceEmbedding", new=RagMockEmbedding
-    )
+    mocker.patch.object(document_processor, "HuggingFaceEmbedding", new=RagMockEmbedding)
     mocker.patch.object(document_processor, "SentenceTransformer")
     mocker.patch("os.path.exists", return_value=True)
 
@@ -79,9 +77,7 @@ class TestDocumentProcessorLlamaIndex:
         fake_node_0.text = "Got whitespace"
         fake_node_1.text = "NoWhitespace"
 
-        result = doc_processor["processor"].db._filter_out_invalid_nodes(
-            [fake_node_0, fake_node_1]
-        )
+        result = doc_processor["processor"].db._filter_out_invalid_nodes([fake_node_0, fake_node_1])
         assert result == [fake_node_0]
 
     def test__save_index(self, mocker, doc_processor):
@@ -92,9 +88,7 @@ class TestDocumentProcessorLlamaIndex:
         doc_processor["processor"].db._save_index("fake-index", "/fake/path")
 
         fake_index.set_index_id.assert_called_once_with("fake-index")
-        fake_index.storage_context.persist.assert_called_once_with(
-            persist_dir="/fake/path"
-        )
+        fake_index.storage_context.persist.assert_called_once_with(persist_dir="/fake/path")
 
     def test__save_metadata(self, mocker, doc_processor):
         """Test that _save_metadata writes correct metadata to JSON file."""
@@ -108,9 +102,7 @@ class TestDocumentProcessorLlamaIndex:
             mock.sentinel.exec_time,
         )
 
-        mock_file.assert_called_once_with(
-            "/fake/path/metadata.json", "w", encoding="utf-8"
-        )
+        mock_file.assert_called_once_with("/fake/path/metadata.json", "w", encoding="utf-8")
         expected_dict = {
             "execution-time": mock.sentinel.exec_time,
             "llm": "None",
@@ -126,9 +118,7 @@ class TestDocumentProcessorLlamaIndex:
 
     def test_process(self, mocker, doc_processor):
         """Test that process method loads documents and filters nodes correctly."""
-        mock_dir_reader = mocker.patch.object(
-            document_processor, "SimpleDirectoryReader"
-        )
+        mock_dir_reader = mocker.patch.object(document_processor, "SimpleDirectoryReader")
         reader = mock_dir_reader.return_value
         reader.load_data.return_value = ["doc0", "doc1", "doc3"]
         fake_metadata = mocker.MagicMock()
@@ -147,17 +137,13 @@ class TestDocumentProcessorLlamaIndex:
         doc_processor["processor"].process(Path("/fake/path/docs"), fake_metadata)
 
         mock_filter.assert_called_once_with(mock_get_nodes.return_value)
-        reader.load_data.assert_called_once_with(
-            num_workers=doc_processor["num_workers"]
-        )
+        reader.load_data.assert_called_once_with(num_workers=doc_processor["num_workers"])
         assert doc_processor["processor"].db._good_nodes == fake_good_nodes
         assert doc_processor["processor"]._num_embedded_files == 3
 
     def test_process_drop_unreachable(self, mocker, doc_processor):
         """Test that process method drops unreachable documents when action is drop."""
-        mock_dir_reader = mocker.patch.object(
-            document_processor, "SimpleDirectoryReader"
-        )
+        mock_dir_reader = mocker.patch.object(document_processor, "SimpleDirectoryReader")
         reader = mock_dir_reader.return_value
         reader.load_data.return_value = [
             Document(text="doc0", metadata={"url_reachable": False}),
@@ -180,13 +166,9 @@ class TestDocumentProcessorLlamaIndex:
 
     def test_process_fail_unreachable(self, mocker, doc_processor):
         """Test that process raises RuntimeError for unreachable documents when action is fail."""
-        mock_dir_reader = mocker.patch.object(
-            document_processor, "SimpleDirectoryReader"
-        )
+        mock_dir_reader = mocker.patch.object(document_processor, "SimpleDirectoryReader")
         reader = mock_dir_reader.return_value
-        reader.load_data.return_value = [
-            Document(text="doc0", metadata={"url_reachable": False})
-        ]
+        reader.load_data.return_value = [Document(text="doc0", metadata={"url_reachable": False})]
         fake_metadata = mocker.MagicMock()
         fake_good_nodes = [mocker.Mock(), mocker.Mock()]
 

@@ -42,9 +42,7 @@ class TestConfig:
 @pytest.fixture
 def mock_processor(mocker):
     """Fixture to mock dependencies for DocumentProcessor tests."""
-    mocker.patch.object(
-        document_processor, "HuggingFaceEmbedding", new=RagMockEmbedding
-    )
+    mocker.patch.object(document_processor, "HuggingFaceEmbedding", new=RagMockEmbedding)
     log = mocker.patch.object(document_processor, "LOG")
     indexdb = mocker.patch.object(document_processor, "_LlamaIndexDB")
     llamadb = mocker.patch.object(document_processor, "_LlamaStackDB")

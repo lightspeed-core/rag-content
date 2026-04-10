@@ -104,15 +104,13 @@ class MetadataProcessor:
         url_reachable = True
         if not self.hermetic_build and not self.ping_url(docs_url):
             LOG.warning(
-                'URL not reachable: %(url)s (Title: "%(title)s", '
-                "File path: %(file_path)s)",
+                'URL not reachable: %(url)s (Title: "%(title)s", File path: %(file_path)s)',
                 document,
             )
             url_reachable = False
 
         LOG.debug(
-            'Metadata populated for: "%(title)s" (URL: %(url)s, File '
-            "path: %(file_path)s)",
+            'Metadata populated for: "%(title)s" (URL: %(url)s, File path: %(file_path)s)',
             document,
         )
 

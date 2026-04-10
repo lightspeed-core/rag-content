@@ -83,9 +83,7 @@ def add_input_file_argument(
 def get_common_arg_parser() -> argparse.ArgumentParser:
     """Provide common CLI arguments to document processing scripts."""
     parser = argparse.ArgumentParser(description="Embedding CLI for task execution")
-    parser.add_argument(
-        "-f", "--folder", help="Directory containing the plain text documentation"
-    )
+    parser.add_argument("-f", "--folder", help="Directory containing the plain text documentation")
     parser.add_argument(
         "-md",
         "--model-dir",
@@ -93,12 +91,8 @@ def get_common_arg_parser() -> argparse.ArgumentParser:
         help="Directory containing the embedding model.",
     )
     parser.add_argument("-mn", "--model-name", help="HF repo id of the embedding model")
-    parser.add_argument(
-        "-c", "--chunk", type=int, default=380, help="Chunk size for embedding"
-    )
-    parser.add_argument(
-        "-l", "--overlap", type=int, default=0, help="Chunk overlap for embedding"
-    )
+    parser.add_argument("-c", "--chunk", type=int, default=380, help="Chunk size for embedding")
+    parser.add_argument("-l", "--overlap", type=int, default=0, help="Chunk overlap for embedding")
     parser.add_argument(
         "-em",
         "--exclude-metadata",

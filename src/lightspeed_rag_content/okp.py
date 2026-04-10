@@ -61,10 +61,7 @@ def metadata_has_url_and_title(metadata: dict[str, Any]) -> bool:
     Returns:
         bool: True if both URL and title are present, False otherwise.
     """
-    return (
-        "reference_url" in metadata.get("extra", {})
-        and metadata.get("title", "").strip()
-    )
+    return "reference_url" in metadata.get("extra", {}) and bool(metadata.get("title", "").strip())
 
 
 def yield_files_related_to_projects(
@@ -144,9 +141,9 @@ class OKPMetadataProcessor(MetadataProcessor):
     def url_function(self, file_path: str) -> str:
         """Return the URL for the OKP file."""
         md = parse_metadata(file_path)
-        return md["extra"]["reference_url"]
+        return str(md["extra"]["reference_url"])
 
     def get_file_title(self, file_path: str) -> str:
         """Return the title of the OKP file."""
         md = parse_metadata(file_path)
-        return md["title"]
+        return str(md["title"])

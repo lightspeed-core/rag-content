@@ -22,7 +22,7 @@ import tempfile
 import time
 from io import BytesIO
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional, Union
+from typing import TYPE_CHECKING, Any, Optional, Union, cast
 
 import faiss
 from llama_index.core import Settings, SimpleDirectoryReader, VectorStoreIndex
@@ -153,9 +153,7 @@ class _LlamaIndexDB(_BaseDB):
         valid_nodes = self._split_and_filter(docs)
         self._good_nodes.extend(valid_nodes)
 
-    def save(
-        self, index: str, output_dir: str, embedded_files: int, exec_time: int
-    ) -> None:
+    def save(self, index: str, output_dir: str, embedded_files: int, exec_time: int) -> None:
         """Save vector store index and metadata."""
         self._save_index(index, output_dir)
         self._save_metadata(index, output_dir, embedded_files, exec_time)
@@ -175,9 +173,7 @@ class _LlamaIndexDB(_BaseDB):
     ) -> None:
         """Create and save the metadata."""
         vector_db = (
-            "faiss.IndexFlatIP"
-            if self.config.vector_store_type == "faiss"
-            else "PGVectorStore"
+            "faiss.IndexFlatIP" if self.config.vector_store_type == "faiss" else "PGVectorStore"
         )
         metadata: dict[str, Union[str, int, float]] = {
             "execution-time": exec_time,
@@ -190,9 +186,7 @@ class _LlamaIndexDB(_BaseDB):
             "overlap": self.config.chunk_overlap,
             "total-embedded-files": embedded_files,
         }
-        with open(
-            os.path.join(persist_folder, "metadata.json"), "w", encoding="utf-8"
-        ) as file:
+        with open(os.path.join(persist_folder, "metadata.json"), "w", encoding="utf-8") as file:
             file.write(json.dumps(metadata))
 
 
@@ -342,9 +336,7 @@ registered_resources:
 
         # We need to set env var before importing llama_stack
         # Create temp directory for the llama-stack configuration file and the DB
-        self.tmp_dir = tempfile.TemporaryDirectory(  # pylint: disable=R1732
-            prefix="ls-rag-"
-        )
+        self.tmp_dir = tempfile.TemporaryDirectory(prefix="ls-rag-")  # pylint: disable=R1732
         # Force a default directory to prevent llama-stack from using hosts's
         # ~/.llama content
         os.environ["LLAMA_STACK_CONFIG_DIR"] = self.tmp_dir.name
@@ -380,9 +372,7 @@ registered_resources:
             ]
             missing = [v for v in required_vars if not os.getenv(v)]
             if missing:
-                raise ValueError(
-                    f"Missing required environment variables: {', '.join(missing)}"
-                )
+                raise ValueError(f"Missing required environment variables: {', '.join(missing)}")
             vector_io_cfg = self.VECTOR_IO_CONFIG_TEMPLATE_FOR_PGVECTOR.format(
                 provider_type=self.provider_type,
             )
@@ -518,9 +508,7 @@ registered_resources:
                 doc_groups[doc_id] = []
             doc_groups[doc_id].append(idx)
 
-        upload_tasks = [
-            upload_file(chunk_indices) for chunk_indices in doc_groups.values()
-        ]
+        upload_tasks = [upload_file(chunk_indices) for chunk_indices in doc_groups.values()]
         results = await asyncio.gather(*upload_tasks, return_exceptions=True)
         for result in results:
             if isinstance(result, Exception):
@@ -554,9 +542,7 @@ registered_resources:
                 chunks_to_insert.append(doc)
 
         LOG.info("Inserting %d chunks into vector store...", len(chunks_to_insert))
-        await client.vector_io.insert(
-            vector_store_id=vector_store.id, chunks=chunks_to_insert
-        )
+        await client.vector_io.insert(vector_store_id=vector_store.id, chunks=chunks_to_insert)
         return str(vector_store.id)
 
     async def _upload_and_process_files(  # noqa: C901  # pylint: disable=R0912,R0914
@@ -595,13 +581,18 @@ registered_resources:
         LOG.info("Processing %d files...", total_docs)
 
         for idx, rag_doc in enumerate(self.documents):
-            doc_uuid = rag_doc.document_id  # type: ignore[union-attr]
+            # Manual chunking uses dict chunks; auto chunking uses RAGDocument (or compatible).
+            if isinstance(rag_doc, dict):
+                raise TypeError(
+                    "Auto-chunking mode requires RAGDocument instances, not chunk dicts"
+                )
+            doc_uuid = rag_doc.document_id
             max_retries = 3
 
             for attempt in range(max_retries):
                 try:
                     # Upload file (rag_doc is RAGDocument in auto chunking mode)
-                    file_obj = BytesIO(rag_doc.content.encode("utf-8"))  # type: ignore[union-attr]
+                    file_obj = BytesIO(cast("str", rag_doc.content).encode("utf-8"))
                     file_obj.name = f"{doc_uuid}.txt"
 
                     uploaded_file = await client.files.create(
@@ -611,7 +602,7 @@ registered_resources:
 
                     # Attach file to vector store and wait for processing
                     attributes = {
-                        **rag_doc.metadata,  # type: ignore[union-attr]
+                        **rag_doc.metadata,
                         "document_id": doc_uuid,
                         "source": index,
                     }
@@ -678,16 +669,12 @@ registered_resources:
         if failed_docs:
             for doc_uuid, error in failed_docs[:10]:  # Show first 10
                 LOG.error("Failed document %s: %s", doc_uuid, error)
-            raise RuntimeError(
-                f"Failed to process {len(failed_docs)}/{total_docs} files"
-            )
+            raise RuntimeError(f"Failed to process {len(failed_docs)}/{total_docs} files")
 
         LOG.info("All files processed successfully")
         return str(vector_store.id)
 
-    def _update_yaml_config(
-        self, cfg_file: str, index: str, vector_store_id: str
-    ) -> None:
+    def _update_yaml_config(self, cfg_file: str, index: str, vector_store_id: str) -> None:
         """Update the config file with the created vector_store_id."""
         vector_stores_section = self.VECTOR_STORES_TEMPLATE.format(
             dimension=self.config.embedding_dimension,
@@ -697,9 +684,7 @@ registered_resources:
         )
         with open(cfg_file, "r", encoding="utf-8") as f:
             config_content = f.read()
-        config_content = config_content.replace(
-            "vector_stores: []", vector_stores_section
-        )
+        config_content = config_content.replace("vector_stores: []", vector_stores_section)
         with open(cfg_file, "w", encoding="utf-8") as f:
             f.write(config_content)
 
@@ -713,9 +698,7 @@ registered_resources:
         """Save in the vector database all the documents we added."""
         os.makedirs(output_dir, exist_ok=True)
         db_file = os.path.realpath(os.path.join(output_dir, self.db_filename))
-        files_metadata_db_file = os.path.realpath(
-            os.path.join(output_dir, "files_metadata.db")
-        )
+        files_metadata_db_file = os.path.realpath(os.path.join(output_dir, "files_metadata.db"))
         cfg_file = os.path.join(output_dir, self.CFG_FILENAME)
         # There's no need to register the DB because the YAML includes it
         self.write_yaml_config(index, cfg_file, db_file, files_metadata_db_file)
@@ -790,9 +773,7 @@ class DocumentProcessor:
         if self.config.vector_store_type.startswith("llamastack"):
             return _LlamaStackDB(self.config)
 
-        raise RuntimeError(
-            f"Unknown vector store type: {self.config.vector_store_type}"
-        )
+        raise RuntimeError(f"Unknown vector store type: {self.config.vector_store_type}")
 
     def process(
         self,
@@ -842,9 +823,7 @@ class DocumentProcessor:
                 ignored_docs = []
 
             # Find reachable docs among those we're checking
-            reachable_docs = [
-                doc for doc in docs_to_check if doc.metadata["url_reachable"] is True
-            ]
+            reachable_docs = [doc for doc in docs_to_check if doc.metadata["url_reachable"] is True]
 
             if len(docs_to_check) != len(reachable_docs):
                 # Optionally fail on unreachable URLs

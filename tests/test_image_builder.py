@@ -56,9 +56,7 @@ def _make_fake_base_archive(path: str) -> dict:
     config_bytes = json.dumps(config, sort_keys=True).encode()
     config_sha = hashlib.sha256(config_bytes).hexdigest()
     config_entry = f"{config_sha}.json"
-    manifest = [
-        {"Config": config_entry, "RepoTags": ["base:latest"], "Layers": [layer_name]}
-    ]
+    manifest = [{"Config": config_entry, "RepoTags": ["base:latest"], "Layers": [layer_name]}]
     manifest_bytes = json.dumps(manifest, indent=2).encode()
 
     def _add(t, name, data):
@@ -198,9 +196,7 @@ class TestMakeLayerTar:
         layer_file = str(tmp_path / "layer.tar")
         _make_layer_tar(vdb, None, layer_file)
         with tarfile.open(layer_file) as layer:
-            gz_member = next(
-                m for m in layer.getmembers() if m.name.endswith("faiss_store.db.gz")
-            )
+            gz_member = next(m for m in layer.getmembers() if m.name.endswith("faiss_store.db.gz"))
             gz_data = layer.extractfile(gz_member).read()
         assert gzip.decompress(gz_data) == original
 
@@ -221,27 +217,21 @@ class TestMakeLayerTar:
 class TestFetchBaseArchive:
     def test_calls_skopeo_copy(self, tmp_path):
         out = str(tmp_path / "base.tar")
-        with mock.patch(
-            "lightspeed_rag_content.image_builder.subprocess.run"
-        ) as mock_run:
+        with mock.patch("lightspeed_rag_content.image_builder.subprocess.run") as mock_run:
             _fetch_base_archive("registry.example.com/img:tag", out)
         cmd = mock_run.call_args[0][0]
         assert cmd[0] == "/usr/bin/skopeo" and cmd[1] == "copy"
 
     def test_uses_docker_transport_prefix(self, tmp_path):
         out = str(tmp_path / "base.tar")
-        with mock.patch(
-            "lightspeed_rag_content.image_builder.subprocess.run"
-        ) as mock_run:
+        with mock.patch("lightspeed_rag_content.image_builder.subprocess.run") as mock_run:
             _fetch_base_archive("myregistry/myimage:v1", out)
         cmd = mock_run.call_args[0][0]
         assert "docker://myregistry/myimage:v1" in cmd
 
     def test_uses_docker_archive_destination(self, tmp_path):
         out = str(tmp_path / "base.tar")
-        with mock.patch(
-            "lightspeed_rag_content.image_builder.subprocess.run"
-        ) as mock_run:
+        with mock.patch("lightspeed_rag_content.image_builder.subprocess.run") as mock_run:
             _fetch_base_archive("myregistry/myimage:v1", out)
         cmd = mock_run.call_args[0][0]
         assert any(arg.startswith("docker-archive:") for arg in cmd)
@@ -314,9 +304,7 @@ class TestBuildImageArchive:
         assert config["config"]["User"] == "65532:65532"
 
     def test_custom_layer_contains_vector_db_files(self, tmp_path):
-        vdb = _make_dir(
-            str(tmp_path / "vdb"), {"store.json": "{}", "sub/idx.faiss": "data"}
-        )
+        vdb = _make_dir(str(tmp_path / "vdb"), {"store.json": "{}", "sub/idx.faiss": "data"})
         out = str(tmp_path / "out.tar")
 
         def fake_fetch(base_image, dest_tar):

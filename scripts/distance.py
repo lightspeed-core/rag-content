@@ -42,9 +42,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Utility script for calculating distance between two embeddings"
     )
-    parser.add_argument(
-        "-m", "--model-path", required=True, help="path to the embedding model"
-    )
+    parser.add_argument("-m", "--model-path", required=True, help="path to the embedding model")
     parser.add_argument("-q1", "--query1", required=True, help="Query 1")
     parser.add_argument("-q2", "--query2", required=True, help="Query 2")
     args = parser.parse_args()

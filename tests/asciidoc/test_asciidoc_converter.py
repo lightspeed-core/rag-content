@@ -59,9 +59,7 @@ class TestAsciidoctorConverter:
         adoc_text_converter = AsciidoctorConverter(
             attributes_file=converter_data["attributes_file"]
         )
-        adoc_text_converter.convert(
-            converter_data["input_file"], converter_data["output_file"]
-        )
+        adoc_text_converter.convert(converter_data["input_file"], converter_data["output_file"])
 
         mock_run.assert_called_with(
             [
@@ -92,9 +90,7 @@ class TestAsciidoctorConverter:
         mock_which.return_value = converter_data["asciidoctor_cmd"]
         custom_converter = Path("custom_converter")
         adoc_text_converter = AsciidoctorConverter(converter_file=custom_converter)
-        adoc_text_converter.convert(
-            converter_data["input_file"], converter_data["output_file"]
-        )
+        adoc_text_converter.convert(converter_data["input_file"], converter_data["output_file"])
 
         mock_run.assert_called_with(
             [
@@ -117,9 +113,7 @@ class TestAsciidoctorConverter:
         mock_which = mocker.patch(
             "lightspeed_rag_content.asciidoc.asciidoctor_converter.shutil.which"
         )
-        mocker.patch(
-            "lightspeed_rag_content.asciidoc.asciidoctor_converter.subprocess.run"
-        )
+        mocker.patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.subprocess.run")
         mock_which.return_value = converter_data["asciidoctor_cmd"]
         adoc_text_converter = AsciidoctorConverter()
 
@@ -134,9 +128,7 @@ class TestAsciidoctorConverter:
         mock_which = mocker.patch(
             "lightspeed_rag_content.asciidoc.asciidoctor_converter.shutil.which"
         )
-        mocker.patch(
-            "lightspeed_rag_content.asciidoc.asciidoctor_converter.subprocess.run"
-        )
+        mocker.patch("lightspeed_rag_content.asciidoc.asciidoctor_converter.subprocess.run")
         mock_which.return_value = converter_data["asciidoctor_cmd"]
         adoc_text_converter = AsciidoctorConverter()
 
@@ -149,9 +141,7 @@ class TestAsciidoctorConverter:
 
     def test__get_converter_file(self):
         converter_file = AsciidoctorConverter._get_converter_file("text")
-        assert converter_file == RUBY_ASCIIDOC_DIR.joinpath(
-            "asciidoc_text_converter.rb"
-        )
+        assert converter_file == RUBY_ASCIIDOC_DIR.joinpath("asciidoc_text_converter.rb")
 
     def test__get_converter_file_asciidoctor_built_in_format(self):
         converter_file = AsciidoctorConverter._get_converter_file("html5")

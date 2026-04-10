@@ -175,16 +175,12 @@ class TestGenerateEmbeddingsMain:
             vector_store_type=_generate_embeddings.DEFAULT_VECTOR_STORE,
             doc_type=_generate_embeddings.DEFAULT_DOC_TYPE,
         )
-        mock_doc_processor.process.assert_called_once_with(
-            "/in", metadata=mock_metadata
-        )
+        mock_doc_processor.process.assert_called_once_with("/in", metadata=mock_metadata)
         mock_doc_processor.save.assert_called_once_with("idx", "/out")
 
     def test_main_does_not_build_image_when_flag_absent(self, mocker):
         """main() must not call build_image_archive when --output-image is omitted."""
-        mocker.patch.object(
-            _generate_embeddings, "DocumentProcessor", return_value=MagicMock()
-        )
+        mocker.patch.object(_generate_embeddings, "DocumentProcessor", return_value=MagicMock())
         mocker.patch.object(
             _generate_embeddings, "DefaultMetadataProcessor", return_value=MagicMock()
         )
@@ -244,9 +240,7 @@ class TestGenerateEmbeddingsMain:
 
     def test_main_calls_build_image_archive_without_model(self, mocker):
         """main() passes extra_dirs=None when --exclude-model is set."""
-        mocker.patch.object(
-            _generate_embeddings, "DocumentProcessor", return_value=MagicMock()
-        )
+        mocker.patch.object(_generate_embeddings, "DocumentProcessor", return_value=MagicMock())
         mocker.patch.object(
             _generate_embeddings, "DefaultMetadataProcessor", return_value=MagicMock()
         )
@@ -280,9 +274,7 @@ class TestGenerateEmbeddingsMain:
 
     def test_main_raises_if_model_dir_missing(self, mocker):
         """main() raises FileNotFoundError when model dir does not exist."""
-        mocker.patch.object(
-            _generate_embeddings, "DocumentProcessor", return_value=MagicMock()
-        )
+        mocker.patch.object(_generate_embeddings, "DocumentProcessor", return_value=MagicMock())
         mocker.patch.object(
             _generate_embeddings, "DefaultMetadataProcessor", return_value=MagicMock()
         )

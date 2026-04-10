@@ -21,6 +21,7 @@ force-exclude = true
 "src/lightspeed_rag_content/image_builder.py" = ["S603", "S607"]
 
 [tool.black]
+line-length = 100
 force-exclude = "embeddings_model"
 
 [tool.pydocstyle]
