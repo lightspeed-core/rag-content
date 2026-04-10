@@ -82,12 +82,8 @@ class TestHtmlMainConvert:
 
     def test_main_convert_file_not_found(self, mock_html_reader, tmp_path):
         """Test conversion with non-existent file."""
-        mock_html_reader["reader"].load_data.side_effect = FileNotFoundError(
-            "File not found"
-        )
-        args = argparse.Namespace(
-            input_file=tmp_path / "nonexistent.html", output_file=None
-        )
+        mock_html_reader["reader"].load_data.side_effect = FileNotFoundError("File not found")
+        args = argparse.Namespace(input_file=tmp_path / "nonexistent.html", output_file=None)
 
         with pytest.raises(SystemExit) as exc_info:
             main_convert(args)
@@ -96,12 +92,8 @@ class TestHtmlMainConvert:
 
     def test_main_convert_runtime_error(self, mock_html_reader, html_file, tmp_path):
         """Test conversion with runtime error."""
-        mock_html_reader["reader"].load_data.side_effect = RuntimeError(
-            "Conversion failed"
-        )
-        args = argparse.Namespace(
-            input_file=html_file, output_file=tmp_path / "output.md"
-        )
+        mock_html_reader["reader"].load_data.side_effect = RuntimeError("Conversion failed")
+        args = argparse.Namespace(input_file=html_file, output_file=tmp_path / "output.md")
 
         with pytest.raises(SystemExit) as exc_info:
             main_convert(args)

@@ -93,9 +93,7 @@ def main_batch(args: argparse.Namespace) -> None:
             LOG.error("Failed to convert %s: %s", html_file, e)
             error_count += 1
 
-    LOG.info(
-        "Batch conversion complete: %d succeeded, %d failed", success_count, error_count
-    )
+    LOG.info("Batch conversion complete: %d succeeded, %d failed", success_count, error_count)
 
     if error_count > 0:
         sys.exit(1)

@@ -67,9 +67,7 @@ def generate_requirements_file(work_directory: str) -> None:
     shell("pip-compile -vv pyproject.toml --generate-hashes", work_directory)
 
 
-def remove_package(
-    directory: str, source: str, target: str, package_prefix: str
-) -> None:
+def remove_package(directory: str, source: str, target: str, package_prefix: str) -> None:
     """Remove package or packages with specified prefix from the requirements file."""
     package_block = False
 

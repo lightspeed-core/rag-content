@@ -102,9 +102,7 @@ registered_resources:
 @pytest.fixture
 def llama_stack_processor(mocker):
     """Fixture for _LlamaStackDB tests."""
-    mocker.patch.object(
-        document_processor, "HuggingFaceEmbedding", new=RagMockEmbedding
-    )
+    mocker.patch.object(document_processor, "HuggingFaceEmbedding", new=RagMockEmbedding)
     st = mocker.patch.object(document_processor, "SentenceTransformer")
     st.return_value.get_sentence_embedding_dimension.return_value = 768
     # Mock os.path.exists to return False only for the embeddings_model_dir check
@@ -142,9 +140,7 @@ class TestDocumentProcessorLlamaStack:
 
     def test_init(self, mocker, llama_stack_processor):
         """Test basic initialization of _LlamaStackDB with default settings."""
-        temp_dir = mocker.patch.object(
-            document_processor.tempfile, "TemporaryDirectory"
-        )
+        temp_dir = mocker.patch.object(document_processor.tempfile, "TemporaryDirectory")
         temp_dir.return_value.name = "temp_dir"
         doc = document_processor._LlamaStackDB(llama_stack_processor["config"])
 
@@ -161,9 +157,7 @@ class TestDocumentProcessorLlamaStack:
 
     def test_init_model_path(self, mocker, llama_stack_processor):
         """Test initialization when embeddings_model_dir exists as a local path."""
-        temp_dir = mocker.patch.object(
-            document_processor.tempfile, "TemporaryDirectory"
-        )
+        temp_dir = mocker.patch.object(document_processor.tempfile, "TemporaryDirectory")
         temp_dir.return_value.name = "temp_dir"
         exists_mock = mocker.patch("os.path.exists", return_value=True)
         realpath_mock = mocker.patch("os.path.realpath")
@@ -211,9 +205,7 @@ class TestDocumentProcessorLlamaStack:
         """Test running with llama-stack client lifecycle management."""
         import asyncio
 
-        temp_dir = mocker.patch.object(
-            document_processor.tempfile, "TemporaryDirectory"
-        )
+        temp_dir = mocker.patch.object(document_processor.tempfile, "TemporaryDirectory")
         temp_dir.return_value.name = "tempdir"
         doc = document_processor._LlamaStackDB(llama_stack_processor["config"])
         yaml_file = "yaml_file"
@@ -297,9 +289,7 @@ class TestDocumentProcessorLlamaStack:
         doc = document_processor._LlamaStackDB(config)
 
         fake_out_docs = [mocker.Mock(), mocker.Mock()]
-        doc_class = mocker.patch.object(
-            doc, "document_class", side_effect=fake_out_docs
-        )
+        doc_class = mocker.patch.object(doc, "document_class", side_effect=fake_out_docs)
         mock_filter = mocker.patch.object(doc, "_split_and_filter")
 
         in_docs = [
@@ -386,9 +376,7 @@ class TestDocumentProcessorLlamaStack:
         # Mock client_class to support async context manager
         client_instance = mocker.Mock()
         client_class_mock = mocker.patch.object(doc, "client_class")
-        client_class_mock.return_value.__aenter__ = AsyncMock(
-            return_value=client_instance
-        )
+        client_class_mock.return_value.__aenter__ = AsyncMock(return_value=client_instance)
         client_class_mock.return_value.__aexit__ = AsyncMock(return_value=None)
 
         makedirs = mocker.patch("os.makedirs")
@@ -404,33 +392,23 @@ class TestDocumentProcessorLlamaStack:
         vector_store_mock = mocker.Mock()
         vector_store_mock.id = "vs_123"
         client_instance.vector_stores.create = AsyncMock(return_value=vector_store_mock)
-        client_instance.files.create = AsyncMock(
-            return_value=mocker.Mock(id="file_123")
-        )
+        client_instance.files.create = AsyncMock(return_value=mocker.Mock(id="file_123"))
         client_instance.vector_io.insert = AsyncMock()
 
         # Mock embeddings.create for manual chunking
         embedding_response_mock = mocker.Mock()
         embedding_response_mock.data = [mocker.Mock(embedding=[0.1] * 768)]
-        client_instance.embeddings.create = AsyncMock(
-            return_value=embedding_response_mock
-        )
+        client_instance.embeddings.create = AsyncMock(return_value=embedding_response_mock)
 
         batch_mock = mocker.Mock()
         batch_mock.status = "completed"
-        client_instance.vector_stores.file_batches.create = AsyncMock(
-            return_value=batch_mock
-        )
+        client_instance.vector_stores.file_batches.create = AsyncMock(return_value=batch_mock)
 
         # Mock vector_stores.files methods for auto chunking
         vs_file_mock = mocker.Mock()
         vs_file_mock.status = "completed"
-        client_instance.vector_stores.files.create = AsyncMock(
-            return_value=vs_file_mock
-        )
-        client_instance.vector_stores.files.retrieve = AsyncMock(
-            return_value=vs_file_mock
-        )
+        client_instance.vector_stores.files.create = AsyncMock(return_value=vs_file_mock)
+        client_instance.vector_stores.files.retrieve = AsyncMock(return_value=vs_file_mock)
 
         doc.save(mock.sentinel.index, "out_dir")
 

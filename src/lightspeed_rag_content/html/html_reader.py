@@ -98,9 +98,7 @@ class HTMLReader(BaseReader):
             markdown_content = result.document.export_to_markdown()
         except Exception as exc:
             LOG.error("Failed to convert HTML file %s: %s", file_path, exc)
-            raise RuntimeError(
-                f"Failed to convert HTML file '{file_path}': {exc}"
-            ) from exc
+            raise RuntimeError(f"Failed to convert HTML file '{file_path}': {exc}") from exc
 
         LOG.debug("Successfully converted %s to Markdown", file_path)
 
@@ -131,9 +129,7 @@ def convert_html_file_to_markdown(file_path: str | Path) -> str:
     return documents[0].text
 
 
-def convert_html_string_to_markdown(
-    html_content: str, document_name: str | None = None
-) -> str:
+def convert_html_string_to_markdown(html_content: str, document_name: str | None = None) -> str:
     """Convert an HTML string to Markdown format.
 
     Args:

@@ -64,9 +64,7 @@ def _make_layer_tar(
     the file back in chunks so the full layer need not be held in memory.
     """
     with tarfile.open(dest_file, "w") as layer:
-        _add_dir_to_tar(
-            layer, vector_db_dir, "/rag/vector_db", compress_extensions={".db"}
-        )
+        _add_dir_to_tar(layer, vector_db_dir, "/rag/vector_db", compress_extensions={".db"})
         if extra_dirs:
             for src, dest in extra_dirs.items():
                 if os.path.isdir(src):
@@ -179,9 +177,7 @@ def _read_docker_archive(
     return entry["Layers"], config
 
 
-def _build_image_config(
-    base_config: dict[str, Any], layer_sha: str
-) -> tuple[bytes, str]:
+def _build_image_config(base_config: dict[str, Any], layer_sha: str) -> tuple[bytes, str]:
     """Return ``(config_bytes, config_entry)`` for the new image config."""
     now = datetime.now(tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     new_config = copy.deepcopy(base_config)

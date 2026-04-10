@@ -36,9 +36,7 @@ def main_data():
         "input_file": Path("input.adoc"),
         "output_file": Path("output.adoc"),
         "text_converter_file": RUBY_ASCIIDOC_DIR.joinpath("asciidoc_text_converter.rb"),
-        "structure_dumper_file": RUBY_ASCIIDOC_DIR.joinpath(
-            "asciidoc_structure_dumper.rb"
-        ),
+        "structure_dumper_file": RUBY_ASCIIDOC_DIR.joinpath("asciidoc_structure_dumper.rb"),
     }
 
 
@@ -111,12 +109,8 @@ class Test__main__:
         assert e.value.code != 0
 
     def test_main_get_structure(self, mocker, main_data):
-        mock_which = mocker.patch(
-            "lightspeed_rag_content.asciidoc.__main__.shutil.which"
-        )
-        mock_run = mocker.patch(
-            "lightspeed_rag_content.asciidoc.__main__.subprocess.run"
-        )
+        mock_which = mocker.patch("lightspeed_rag_content.asciidoc.__main__.shutil.which")
+        mock_run = mocker.patch("lightspeed_rag_content.asciidoc.__main__.subprocess.run")
         mock_which.return_value = "/usr/bin/ruby"
         mock_args = Mock()
         mock_args.input_file = main_data["input_file"]
@@ -132,13 +126,9 @@ class Test__main__:
         )
 
     def test_main_incorrect_asciidoctor_cmd(self, mocker, main_data):
-        mock_which = mocker.patch(
-            "lightspeed_rag_content.asciidoc.__main__.shutil.which"
-        )
+        mock_which = mocker.patch("lightspeed_rag_content.asciidoc.__main__.shutil.which")
         mock_which.return_value = "/usr/bin/ruby"
-        mock_run = mocker.patch(
-            "lightspeed_rag_content.asciidoc.__main__.subprocess.run"
-        )
+        mock_run = mocker.patch("lightspeed_rag_content.asciidoc.__main__.subprocess.run")
         mock_run.side_effect = subprocess.CalledProcessError(
             cmd=main_data["asciidoctor_cmd"], returncode=1
         )
@@ -150,9 +140,7 @@ class Test__main__:
         assert e.value.code != 0
 
     def test_main_missing_asciidoctor_cmd(self, mocker, main_data, caplog):
-        mock_which = mocker.patch(
-            "lightspeed_rag_content.asciidoc.__main__.shutil.which"
-        )
+        mock_which = mocker.patch("lightspeed_rag_content.asciidoc.__main__.shutil.which")
         mock_which.return_value = ""
         mock_args = Mock()
         mock_args.input_file = main_data["input_file"]

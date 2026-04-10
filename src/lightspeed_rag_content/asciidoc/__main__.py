@@ -60,9 +60,7 @@ def main_get_structure(args: argparse.Namespace) -> None:
         sys.exit(1)
 
     try:
-        dumper_script_path: Path = RUBY_ASCIIDOC_DIR.joinpath(
-            "asciidoc_structure_dumper.rb"
-        )
+        dumper_script_path: Path = RUBY_ASCIIDOC_DIR.joinpath("asciidoc_structure_dumper.rb")
         subprocess.run(  # noqa: S603
             [
                 ruby_cmd,
