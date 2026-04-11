@@ -6,62 +6,29 @@
 #
 calver==2025.10.20
     # via trove-classifiers
-coherent-licensed==0.5.2
-    # via importlib-metadata
 cython==3.2.4
-    # via
-    #   oracledb
-    #   sqlalchemy
-dunamai==1.26.0
-    # via uv-dynamic-versioning
-expandvars==1.1.2
-    # via yarl
+    # via oracledb
 flit-core==3.12.0
     # via
-    #   coherent-licensed
-    #   jinja2
-    #   marshmallow
     #   packaging
     #   pathspec
-    #   pypdf
     #   tinytag
     #   wheel
 hatch-fancy-pypi-readme==25.1.0
-    # via
-    #   attrs
-    #   jsonschema
-    #   llama-stack-client
-    #   openai
+    # via llama-stack-client
 hatch-vcs==0.5.0
-    # via
-    #   attrs
-    #   chardet
-    #   filelock
-    #   fsspec
-    #   jsonschema
-    #   platformdirs
-    #   termcolor
-    #   urllib3
+    # via chardet
 hatchling==1.26.3
     # via
     #   hatch-fancy-pypi-readme
     #   llama-stack-client
-    #   openai
 hatchling==1.29.0
     # via
-    #   attrs
     #   banks
     #   chardet
-    #   einops
-    #   expandvars
-    #   filelock
-    #   fsspec
     #   hatch-fancy-pypi-readme
     #   hatch-vcs
-    #   jsonschema
-    #   latex2mathml
     #   llama-index
-    #   llama-index-cli
     #   llama-index-core
     #   llama-index-embeddings-huggingface
     #   llama-index-embeddings-openai
@@ -70,30 +37,6 @@ hatchling==1.29.0
     #   llama-index-readers-file
     #   llama-index-vector-stores-faiss
     #   llama-index-vector-stores-postgres
-    #   mcp
-    #   opentelemetry-api
-    #   opentelemetry-exporter-otlp-proto-common
-    #   opentelemetry-exporter-otlp-proto-http
-    #   opentelemetry-proto
-    #   opentelemetry-sdk
-    #   opentelemetry-semantic-conventions
-    #   platformdirs
-    #   polyfactory
-    #   pydantic-settings
-    #   pygments
-    #   python-multipart
-    #   semchunk
-    #   soupsieve
-    #   starlette
-    #   termcolor
-    #   urllib3
-    #   uv-dynamic-versioning
-    #   uvicorn
-    #   wcwidth
-jinja2==3.1.6
-    # via uv-dynamic-versioning
-markupsafe==3.0.3
-    # via jinja2
 maturin==1.10.2
     # via uv-build
 packaging==26.0
@@ -104,18 +47,8 @@ packaging==26.0
     #   wheel
 pathspec==1.0.4
     # via hatchling
-pdm-backend==2.4.7
-    # via
-    #   fastapi
-    #   marko
-    #   typer
 pluggy==1.6.0
     # via hatchling
-poetry-core==2.3.2
-    # via
-    #   dunamai
-    #   rich
-    #   tomlkit
 semantic-version==2.10.0
     # via setuptools-rust
 setuptools-rust==1.12.1
@@ -123,80 +56,34 @@ setuptools-rust==1.12.1
 setuptools-scm==10.0.5
     # via
     #   hatch-vcs
-    #   importlib-metadata
     #   llama-stack
     #   llama-stack-api
     #   pluggy
     #   setuptools-rust
-    #   tabulate
-    #   tenacity
-    #   tqdm
-setuptools-scm==9.2.2
-    # via
-    #   hatch-vcs
-    #   urllib3
-tomlkit==0.14.0
-    # via uv-dynamic-versioning
 trove-classifiers==2026.1.14.14
     # via hatchling
 uv-build==0.9.30
     # via llama-index-workflows
-uv-dynamic-versioning==0.14.0
-    # via mcp
 vcs-versioning==1.1.1
     # via setuptools-scm
 wheel==0.46.3
-    # via
-    #   oracledb
-    #   pycparser
-    #   sentence-transformers
-    #   tornado
-    #   tree-sitter-c
-    #   tree-sitter-javascript
-    #   tree-sitter-python
-    #   wrapt
+    # via oracledb
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==82.0.0
-    # via charset-normalizer
 setuptools==82.0.1
     # via
     #   calver
-    #   certifi
-    #   colorlog
-    #   dill
-    #   googleapis-common-protos
-    #   importlib-metadata
     #   llama-stack
     #   llama-stack-api
-    #   markupsafe
     #   maturin
-    #   multidict
-    #   multiprocess
     #   oracledb
     #   pathspec
     #   pgvector
     #   pluggy
-    #   psutil
-    #   pycparser
-    #   pyjwt
-    #   python-dotenv
-    #   regex
-    #   requests
-    #   sentence-transformers
     #   setuptools-rust
     #   setuptools-scm
-    #   sqlalchemy
-    #   sse-starlette
-    #   tabulate
-    #   tenacity
-    #   tornado
-    #   tqdm
-    #   tree-sitter
-    #   tree-sitter-c
-    #   tree-sitter-javascript
-    #   tree-sitter-python
     #   trove-classifiers
     #   vcs-versioning
-    #   wrapt
-    #   yarl
+# --- PEP 517 [build-system] (from pyproject.toml; merged by konflux_requirements.sh) ---
+pdm-backend==2.4.8
+# --- end PEP 517 [build-system] ---
