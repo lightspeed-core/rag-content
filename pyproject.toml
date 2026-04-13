@@ -65,7 +65,7 @@ dependencies = [
     "torchvision>=0.24.0,<0.25.0",
     "aiosqlite>=0.21.0",
     "tomlkit",
-    "chardet==7.2.0",
+    "chardet==7.4.2",
     "hf-xet>=1.2.0",
     "einops>=0.8.1",
     # For HTML to Markdown conversion in BYOK workflows
