@@ -1,0 +1,17 @@
+[external-nvidia-cuda-for-rhel-${releasever_major}-x86_64-rpms]
+name = NVIDIA CUDA for RHEL ${releasever_major} x86_64 (RPMs)
+# internal: baseurl = https://private.console.redhat.com/api/pulp-content/rhel-ai/cuda-rhel-${releasever_major}-x86_64/
+baseurl = https://developer.download.nvidia.com/compute/cuda/repos/rhel${releasever_major}/x86_64
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-NVIDIA-CUDA-${releasever_major}
+repo_gpgcheck = 0
+
+[external-nvidia-cuda-for-rhel-${releasever_major}-sbsa-rpms]
+name = NVIDIA CUDA for RHEL ${releasever_major} SBSA (aarch64) (RPMs)
+# internal: baseurl = https://private.console.redhat.com/api/pulp-content/rhel-ai/cuda-rhel-${releasever_major}-sbsa/
+baseurl = https://developer.download.nvidia.com/compute/cuda/repos/rhel${releasever_major}/sbsa
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-NVIDIA-CUDA-${releasever_major}
+repo_gpgcheck = 0

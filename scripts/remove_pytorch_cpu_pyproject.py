@@ -1,7 +1,7 @@
 """Removes the pytorch-cpu dependency from the pyproject.toml file.
 
 This script removes the pytorch-cpu dependency from the pyproject.toml file.
-It is used to create a container image with GPU CUDA backend.
+It is used to create a container image with CUDA backend.
 
 Usage:
     python remove_pytorch_cpu_pyproject.py
@@ -44,7 +44,9 @@ def remove_sections(file_path: str, sections_to_remove: list[str]) -> None:
 
 
 if __name__ == "__main__":
-    file_path = "pyproject.toml"
+    import sys
+
+    file_path = sys.argv[1] if len(sys.argv) > 1 else "pyproject.toml"
     print(f"pyproject file path: {file_path}")
     sections = ["tool.uv.index", "tool.uv.sources"]
     remove_sections(file_path, sections)

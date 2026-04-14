@@ -4,6 +4,20 @@ lockfileVendor: redhat
 arches:
 - arch: aarch64
   packages:
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/a/autoconf-2.69-39.el9.noarch.rpm
+    repoid: rhel-9-for-aarch64-appstream-eus-rpms
+    size: 701111
+    checksum: sha256:84fd90d834ac3f1f4e0d18bf45b92836970cea247c69fabaa69e01cba5e34c3e
+    name: autoconf
+    evr: 2.69-39.el9
+    sourcerpm: autoconf-2.69-39.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/a/automake-1.16.2-8.el9.noarch.rpm
+    repoid: rhel-9-for-aarch64-appstream-eus-rpms
+    size: 709275
+    checksum: sha256:905e10fa951af9e7b29d724bdd9ec42a42d25bf53f620d53a52203ac2e2c4f95
+    name: automake
+    evr: 1.16.2-8.el9
+    sourcerpm: automake-1.16.2-8.el9.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/c/cargo-1.84.1-1.el9.aarch64.rpm
     repoid: rhel-9-for-aarch64-appstream-eus-rpms
     size: 7744425
@@ -109,6 +123,20 @@ arches:
     name: libslirp
     evr: 4.4.0-8.el9
     sourcerpm: libslirp-4.4.0-8.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libpq-devel-13.23-1.el9_6.aarch64.rpm
+    repoid: rhel-9-for-aarch64-appstream-eus-rpms
+    size: 99035
+    checksum: sha256:00a7c684ffa582e4e55543f011dad15a9644d1294e298b3087749afda1b15e6f
+    name: libpq-devel
+    evr: 13.23-1.el9_6
+    sourcerpm: libpq-13.23-1.el9_6.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libtool-2.4.6-46.el9.aarch64.rpm
+    repoid: rhel-9-for-aarch64-appstream-eus-rpms
+    size: 598835
+    checksum: sha256:8920fa4680e70bd8ab820ac3cc24285f38cdc377d5b5622eab2f805b3e08a224
+    name: libtool
+    evr: 2.4.6-46.el9
+    sourcerpm: libtool-2.4.6-46.el9.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libuv-1.42.0-2.el9_4.aarch64.rpm
     repoid: rhel-9-for-aarch64-appstream-eus-rpms
     size: 150129
@@ -116,6 +144,13 @@ arches:
     name: libuv
     evr: 1:1.42.0-2.el9_4
     sourcerpm: libuv-1.42.0-2.el9_4.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/m/m4-1.4.19-1.el9.aarch64.rpm
+    repoid: rhel-9-for-aarch64-appstream-eus-rpms
+    size: 308647
+    checksum: sha256:7f30b1b9fa76f9f55b04d83f14a76fe1f64c88d842ef1a53a8e1b87276aacc1a
+    name: m4
+    evr: 1.4.19-1.el9
+    sourcerpm: m4-1.4.19-1.el9.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/p/perl-AutoLoader-5.74-481.1.el9_6.noarch.rpm
     repoid: rhel-9-for-aarch64-appstream-eus-rpms
     size: 21344
@@ -213,6 +248,20 @@ arches:
     checksum: sha256:e39dcc13a24d3b5a7ba11288e63b22a055a8e1061743b8a409858d98ebd794e4
     name: perl-File-Basename
     evr: 2.85-481.1.el9_6
+    sourcerpm: perl-5.32.1-481.1.el9_6.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/p/perl-File-Compare-1.100.600-481.1.el9_6.noarch.rpm
+    repoid: rhel-9-for-aarch64-appstream-eus-rpms
+    size: 13166
+    checksum: sha256:0dd800746b848a84fce73dcef035c4241e6aa90262c821a0ad295a7756ca1a4c
+    name: perl-File-Compare
+    evr: 1.100.600-481.1.el9_6
+    sourcerpm: perl-5.32.1-481.1.el9_6.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/p/perl-File-Copy-2.34-481.1.el9_6.noarch.rpm
+    repoid: rhel-9-for-aarch64-appstream-eus-rpms
+    size: 20143
+    checksum: sha256:165816db79e88e63c96bdafaf0c3bfee95b6feedb78e40da3a6dcc196a15a186
+    name: perl-File-Copy
+    evr: 2.34-481.1.el9_6
     sourcerpm: perl-5.32.1-481.1.el9_6.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/p/perl-File-Find-1.37-481.1.el9_6.noarch.rpm
     repoid: rhel-9-for-aarch64-appstream-eus-rpms
@@ -445,6 +494,13 @@ arches:
     name: perl-Text-Tabs+Wrap
     evr: 2013.0523-460.el9
     sourcerpm: perl-Text-Tabs+Wrap-2013.0523-460.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/p/perl-Thread-Queue-3.14-460.el9.noarch.rpm
+    repoid: rhel-9-for-aarch64-appstream-eus-rpms
+    size: 24804
+    checksum: sha256:88d838d681ad683970eb8566e8936faabffc3495dd1b555f083a1cd00538291a
+    name: perl-Thread-Queue
+    evr: 3.14-460.el9
+    sourcerpm: perl-Thread-Queue-3.14-460.el9.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/p/perl-Time-Local-1.300-7.el9.noarch.rpm
     repoid: rhel-9-for-aarch64-appstream-eus-rpms
     size: 37469
@@ -550,6 +606,20 @@ arches:
     name: perl-subs
     evr: 1.03-481.1.el9_6
     sourcerpm: perl-5.32.1-481.1.el9_6.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/p/perl-threads-2.25-460.el9.aarch64.rpm
+    repoid: rhel-9-for-aarch64-appstream-eus-rpms
+    size: 61254
+    checksum: sha256:787a2ff27e96046c3b38e44a760e52660f6b63875661ef64addde79b63363eb1
+    name: perl-threads
+    evr: 1:2.25-460.el9
+    sourcerpm: perl-threads-2.25-460.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/p/perl-threads-shared-1.61-460.el9.aarch64.rpm
+    repoid: rhel-9-for-aarch64-appstream-eus-rpms
+    size: 47910
+    checksum: sha256:073ef01a23d905b89b5688645c85fa654567876c19043378b9fd15e44229c558
+    name: perl-threads-shared
+    evr: 1.61-460.el9
+    sourcerpm: perl-threads-shared-1.61-460.el9.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/p/perl-vars-1.05-481.1.el9_6.noarch.rpm
     repoid: rhel-9-for-aarch64-appstream-eus-rpms
     size: 12885
@@ -711,10 +781,31 @@ arches:
     name: shadow-utils-subid
     evr: 2:4.9-12.el9
     sourcerpm: shadow-utils-4.9-12.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/codeready-builder/os/Packages/s/swig-4.0.2-8.el9.aarch64.rpm
+    repoid: codeready-builder-for-rhel-9-aarch64-eus-rpms
+    size: 1636339
+    checksum: sha256:5b44767ff7c65f96c97c32c1245170a0699c64d34e59225082b593c5c19ee282
+    name: swig
+    evr: 4.0.2-8.el9
+    sourcerpm: swig-4.0.2-8.el9.src.rpm
   source: []
   module_metadata: []
 - arch: x86_64
   packages:
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/a/autoconf-2.69-39.el9.noarch.rpm
+    repoid: rhel-9-for-x86_64-appstream-eus-rpms
+    size: 701111
+    checksum: sha256:84fd90d834ac3f1f4e0d18bf45b92836970cea247c69fabaa69e01cba5e34c3e
+    name: autoconf
+    evr: 2.69-39.el9
+    sourcerpm: autoconf-2.69-39.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/a/automake-1.16.2-8.el9.noarch.rpm
+    repoid: rhel-9-for-x86_64-appstream-eus-rpms
+    size: 709275
+    checksum: sha256:905e10fa951af9e7b29d724bdd9ec42a42d25bf53f620d53a52203ac2e2c4f95
+    name: automake
+    evr: 1.16.2-8.el9
+    sourcerpm: automake-1.16.2-8.el9.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/c/cargo-1.84.1-1.el9.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-eus-rpms
     size: 8292467
@@ -820,6 +911,20 @@ arches:
     name: libslirp
     evr: 4.4.0-8.el9
     sourcerpm: libslirp-4.4.0-8.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libpq-devel-13.23-1.el9_6.x86_64.rpm
+    repoid: rhel-9-for-x86_64-appstream-eus-rpms
+    size: 100133
+    checksum: sha256:001ce9ad00b1f1056e11226d56f1586660c7fbda0260f78b0ca9807699ce57f8
+    name: libpq-devel
+    evr: 13.23-1.el9_6
+    sourcerpm: libpq-13.23-1.el9_6.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libtool-2.4.6-46.el9.x86_64.rpm
+    repoid: rhel-9-for-x86_64-appstream-eus-rpms
+    size: 598907
+    checksum: sha256:29e3e75c1037c5335fd6f9f4029e2dcdcd27d8870fd72b18bd7c16bf51a0db8c
+    name: libtool
+    evr: 2.4.6-46.el9
+    sourcerpm: libtool-2.4.6-46.el9.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libuv-1.42.0-2.el9_4.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-eus-rpms
     size: 154427
@@ -827,6 +932,13 @@ arches:
     name: libuv
     evr: 1:1.42.0-2.el9_4
     sourcerpm: libuv-1.42.0-2.el9_4.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/m/m4-1.4.19-1.el9.x86_64.rpm
+    repoid: rhel-9-for-x86_64-appstream-eus-rpms
+    size: 311655
+    checksum: sha256:1e2e39a86cdd100379df1e555608c64f3de3439fef8a746208509375c787c27c
+    name: m4
+    evr: 1.4.19-1.el9
+    sourcerpm: m4-1.4.19-1.el9.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/p/perl-AutoLoader-5.74-481.1.el9_6.noarch.rpm
     repoid: rhel-9-for-x86_64-appstream-eus-rpms
     size: 21344
@@ -924,6 +1036,20 @@ arches:
     checksum: sha256:e39dcc13a24d3b5a7ba11288e63b22a055a8e1061743b8a409858d98ebd794e4
     name: perl-File-Basename
     evr: 2.85-481.1.el9_6
+    sourcerpm: perl-5.32.1-481.1.el9_6.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/p/perl-File-Compare-1.100.600-481.1.el9_6.noarch.rpm
+    repoid: rhel-9-for-x86_64-appstream-eus-rpms
+    size: 13166
+    checksum: sha256:0dd800746b848a84fce73dcef035c4241e6aa90262c821a0ad295a7756ca1a4c
+    name: perl-File-Compare
+    evr: 1.100.600-481.1.el9_6
+    sourcerpm: perl-5.32.1-481.1.el9_6.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/p/perl-File-Copy-2.34-481.1.el9_6.noarch.rpm
+    repoid: rhel-9-for-x86_64-appstream-eus-rpms
+    size: 20143
+    checksum: sha256:165816db79e88e63c96bdafaf0c3bfee95b6feedb78e40da3a6dcc196a15a186
+    name: perl-File-Copy
+    evr: 2.34-481.1.el9_6
     sourcerpm: perl-5.32.1-481.1.el9_6.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/p/perl-File-Find-1.37-481.1.el9_6.noarch.rpm
     repoid: rhel-9-for-x86_64-appstream-eus-rpms
@@ -1156,6 +1282,13 @@ arches:
     name: perl-Text-Tabs+Wrap
     evr: 2013.0523-460.el9
     sourcerpm: perl-Text-Tabs+Wrap-2013.0523-460.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/p/perl-Thread-Queue-3.14-460.el9.noarch.rpm
+    repoid: rhel-9-for-x86_64-appstream-eus-rpms
+    size: 24804
+    checksum: sha256:88d838d681ad683970eb8566e8936faabffc3495dd1b555f083a1cd00538291a
+    name: perl-Thread-Queue
+    evr: 3.14-460.el9
+    sourcerpm: perl-Thread-Queue-3.14-460.el9.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/p/perl-Time-Local-1.300-7.el9.noarch.rpm
     repoid: rhel-9-for-x86_64-appstream-eus-rpms
     size: 37469
@@ -1261,6 +1394,20 @@ arches:
     name: perl-subs
     evr: 1.03-481.1.el9_6
     sourcerpm: perl-5.32.1-481.1.el9_6.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/p/perl-threads-2.25-460.el9.x86_64.rpm
+    repoid: rhel-9-for-x86_64-appstream-eus-rpms
+    size: 62702
+    checksum: sha256:22546db61ccd2c69020c7ec3b04449b3589e1220dd3a02ad38e6d6c773ae126f
+    name: perl-threads
+    evr: 1:2.25-460.el9
+    sourcerpm: perl-threads-2.25-460.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/p/perl-threads-shared-1.61-460.el9.x86_64.rpm
+    repoid: rhel-9-for-x86_64-appstream-eus-rpms
+    size: 48850
+    checksum: sha256:3ee2cd37764da3452fbaa301f9bdf3ae1a2dba47b77cafb0ae5d31a10196b971
+    name: perl-threads-shared
+    evr: 1.61-460.el9
+    sourcerpm: perl-threads-shared-1.61-460.el9.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/p/perl-vars-1.05-481.1.el9_6.noarch.rpm
     repoid: rhel-9-for-x86_64-appstream-eus-rpms
     size: 12885
@@ -1422,5 +1569,12 @@ arches:
     name: shadow-utils-subid
     evr: 2:4.9-12.el9
     sourcerpm: shadow-utils-4.9-12.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/codeready-builder/os/Packages/s/swig-4.0.2-8.el9.x86_64.rpm
+    repoid: codeready-builder-for-rhel-9-x86_64-eus-rpms
+    size: 1697818
+    checksum: sha256:068fc85180ef47f1a33a48caf7c148d059e258c9bedc5ce9c27d83bcaa81c2aa
+    name: swig
+    evr: 4.0.2-8.el9
+    sourcerpm: swig-4.0.2-8.el9.src.rpm
   source: []
   module_metadata: []

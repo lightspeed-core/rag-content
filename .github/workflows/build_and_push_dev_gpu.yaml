@@ -9,7 +9,7 @@ env:
   IMAGE_NAMESPACE: lightspeed-core
   IMAGE_REGISTRY: quay.io
   LATEST_TAG: latest
-  CONTAINER_FILE: Containerfile-gpu
+  CONTAINER_FILE: Containerfile-cuda
 
 jobs:
   build-and-push-dev-gpu:

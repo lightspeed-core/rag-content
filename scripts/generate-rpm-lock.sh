@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Default values for command-line arguments
-BASE_IMAGE="registry.redhat.io/rhai/base-image-cpu-rhel9:3.2"
 INPUT_FILE="rpms.in.yaml"
 OUTPUT_FILE="rpms.lock.yaml"
 
@@ -16,7 +15,6 @@ usage() {
     exit 1
 }
 
-
 while getopts "i:f:o:h" opt; do
     case $opt in
         i) BASE_IMAGE="$OPTARG" ;;
@@ -26,6 +24,11 @@ while getopts "i:f:o:h" opt; do
         *) usage ;;
     esac
 done
+
+if [ -z "$BASE_IMAGE" ]; then
+    echo "BASE_IMAGE is not set"
+    exit 1
+fi
 
 echo "Using BASE_IMAGE: $BASE_IMAGE"
 echo "Using INPUT_FILE: $INPUT_FILE"

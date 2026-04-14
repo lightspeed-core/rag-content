@@ -35,6 +35,9 @@ namespace_packages = true
 explicit_package_bases = true
 exclude = ["^embeddings_model/"]
 
+[tool.pyright]
+exclude = ["embeddings_model"]
+
 [tool.pdm]
 distribution = true
 
@@ -76,8 +79,8 @@ dependencies = [
 requires-python = "==3.12.*"
 dynamic = ["license", "readme"]
 
-# PyTorch has multiple wheel variants for different backends - cpu, gpu, etc.
-# By default on pypi.org is the gpu variant. Forces uv to use the cpu variant.
+# PyTorch has multiple wheel variants for different backends - cpu, cuda, etc.
+# By default on pypi.org is the cuda variant. Forces uv to use the cpu variant.
 [[tool.uv.index]]
 name = "pytorch-cpu"
 url = "https://download.pytorch.org/whl/cpu"

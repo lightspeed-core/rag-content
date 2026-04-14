@@ -83,7 +83,7 @@ check-code-metrics: ## Check the code using Radon.
 format: ## Format the code into unified format
 	uv run black scripts src tests
 	uv run ruff check scripts src --fix
-	uv run pre-commit run
+	uv run pre-commit run --all-files
 
 black:
 	uv tool run black --check .
@@ -144,8 +144,12 @@ konflux-requirements:	## generate hermetic requirements.*.txt file and gemfile.l
 	./scripts/konflux_requirements.sh
 	bundle _2.2.33_ lock --add-platform aarch64-linux
 
+konflux-requirements-cuda:	## generate hermetic requirements.*.cuda.txt for CUDA konflux build
+	./scripts/konflux_requirements_cuda.sh
+
+BASE_IMAGE := $(shell grep '^BASE_IMAGE=' build-args-konflux.conf | cut -d= -f2-)
 konflux-rpm-lock:	## generate rpm.lock.yaml file for konflux build
-	./scripts/generate-rpm-lock.sh
+	./scripts/generate-rpm-lock.sh -i $(BASE_IMAGE)
 
 ruby-bundler: # Install bundler 2.2.33, this is the version used by the container image.
 	gem install bundler -v 2.2.33

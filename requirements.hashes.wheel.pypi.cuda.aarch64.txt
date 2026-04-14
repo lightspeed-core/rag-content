@@ -1,0 +1,11 @@
+faiss-cpu @ https://files.pythonhosted.org/packages/19/89/a4ba4d285ea4f9b0824bf31ebded3171da08bfcf5376f4771cc5481f72cd/faiss_cpu-1.12.0-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl \
+    --hash=sha256:016e391f49933875b8d60d47f282f2e93d8ea9f9ffbda82467aa771b11a237db
+
+# aarch64 CUDA: torch and torchvision from RHOAI (PyPI only has CPU on aarch64)
+torch @ https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.3/cuda12.9-ubi9/torch-2.9.0-13-cp312-cp312-linux_aarch64.whl \
+    --hash=sha256:5059b9516b74ad4a7a5d37a9243d749d957ee002378960ce5c67f7bb23fc8154
+torchvision @ https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.3/cuda12.9-ubi9/torchvision-0.24.0-9-cp312-cp312-linux_aarch64.whl \
+    --hash=sha256:569d6ab37fb575f514d04c04706a65fc599f24c7b6264b44e54b9b9c017e353a
+# triton from RHOAI cpu-ubi9 (declared by RHOAI torch METADATA)
+triton @ https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.3/cpu-ubi9/triton-3.5.0-3-cp312-cp312-linux_aarch64.whl \
+    --hash=sha256:a46eaadd18e726ff38f9cfb53c4e641dfe937741394cdf45e2981858200fae1d
