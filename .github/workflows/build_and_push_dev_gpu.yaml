@@ -1,18 +1,18 @@
-name: Build CUDA image, main branch push quay.io
+name: Build GPU image, main branch push quay.io
 
 on:
   push:
-    branches: [ syedriko-lcore-1440-cuda ]
+    branches: [ main ]
 
 env:
-  IMAGE_NAME: rag-content-cuda
+  IMAGE_NAME: rag-content-gpu
   IMAGE_NAMESPACE: lightspeed-core
   IMAGE_REGISTRY: quay.io
   LATEST_TAG: latest
   CONTAINER_FILE: Containerfile-cuda
 
 jobs:
-  build-and-push-dev-cuda:
+  build-and-push-dev-gpu:
     runs-on: ubuntu-latest
     permissions:
       contents: read
