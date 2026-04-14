@@ -1,0 +1,33 @@
+[
+  {
+    "type": "generic",
+    "path": ".",
+    "lockfile": "artifacts.lock.yaml"
+  },
+  {
+    "type": "rpm",
+    "path": "cuda"
+  },
+  {
+    "type": "pip",
+    "path": ".",
+    "requirements_files": [
+      "requirements.hashes.wheel.cuda.txt",
+      "requirements.hashes.wheel.pypi.cuda.base.txt",
+      "requirements.hashes.wheel.pypi.cuda.x86_64.txt",
+      "requirements.hashes.wheel.pypi.cuda.aarch64.txt",
+      "requirements.hashes.source.cuda.txt",
+      "requirements.hermetic.txt"
+    ],
+    "requirements_build_files": ["requirements-build.cuda.txt"],
+    "binary": {
+      "packages": "triton,pylatexenc,uv-build,uv,pip,maturin,cmake,opencv-python,omegaconf,rapidocr,sqlite-vec,griffe,griffecli,griffelib,pyclipper,tree-sitter-typescript,hf-xet,docling-parse,torch,torchvision,psycopg2-binary,faiss-cpu,llama-index-vector-stores-faiss,pypdf,pypdfium2,jiter,aiohappyeyeballs,aiohttp,aiosignal,beautifulsoup4,click,defusedxml,distro,filetype,frozenlist,h11,httpx,idna,jinja2,jsonschema,lxml,marko,networkx,numpy,openpyxl,pandas,pillow,pluggy,prompt-toolkit,propcache,pydantic,python-docx,python-pptx,pyyaml,requests,rtree,scipy,setuptools,sniffio,sympy,termcolor,tiktoken,tomlkit,typing-extensions,urllib3",
+      "os": "linux",
+      "arch": "x86_64,aarch64",
+      "py_version": 312
+    }
+  },
+  {
+    "type": "bundler"
+  }
+]

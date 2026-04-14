@@ -144,6 +144,20 @@ konflux-requirements:	## generate hermetic requirements.*.txt file and gemfile.l
 	./scripts/konflux_requirements.sh
 	bundle _2.2.33_ lock --add-platform aarch64-linux
 
+HERMETO_MODE ?= pip-cpu
+hermeto-fetch-deps:	## run Hermeto prefetch (HERMETO_MODE=pip-cpu|pip-cuda|full-cpu|full-cuda); podman/docker + network
+	@./scripts/run_hermeto_fetch_deps.sh "$(HERMETO_MODE)"
+
+# Pip-slice checks against committed lockfiles (mirrors Konflux prefetch-dependencies for Python).
+# CPU success does not imply CUDA: different requirements.*.cuda.txt, overrides.cuda.txt, and wheel/source splits
+# (e.g. Hermeto runs cargo vendor --locked on some sdists only seen in one pipeline).
+.PHONY: hermeto-verify-pip-cpu hermeto-verify-pip-cuda hermeto-verify-pip
+hermeto-verify-pip-cpu: ## Hermeto strict fetch-deps pip-cpu → .hermeto-output-verify-cpu
+	HERMETO_OUT="$(CURDIR)/.hermeto-output-verify-cpu" ./scripts/run_hermeto_fetch_deps.sh pip-cpu
+hermeto-verify-pip-cuda: ## Hermeto strict fetch-deps pip-cuda → .hermeto-output-verify-cuda
+	HERMETO_OUT="$(CURDIR)/.hermeto-output-verify-cuda" ./scripts/run_hermeto_fetch_deps.sh pip-cuda
+hermeto-verify-pip: hermeto-verify-pip-cpu hermeto-verify-pip-cuda ## both pip slices (run before pushing Konflux prefetch changes)
+
 konflux-rpm-lock:	## generate rpm.lock.yaml file for konflux build
 	./scripts/generate-rpm-lock.sh
 
