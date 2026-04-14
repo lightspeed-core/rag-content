@@ -19,6 +19,9 @@ force-exclude = true
 "tests/*" = ["S101", "D104", "D100"]
 "scripts/*" = ["S101"]
 "src/lightspeed_rag_content/image_builder.py" = ["S603", "S607"]
+# Konflux/uv helper scripts: HTTPS to known indexes, subprocess to uv, and high cyclomatic complexity.
+"scripts/generate_requirements_overrides.py" = ["C901", "D101", "D102", "D103", "D107", "S310", "S603"]
+"scripts/merge_pep517_build_requires.py" = ["S310", "D103"]
 
 [tool.black]
 line-length = 100

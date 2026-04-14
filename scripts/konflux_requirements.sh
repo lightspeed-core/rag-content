@@ -7,6 +7,9 @@
 # stop on error and print commands
 set -ex
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR/.."
+
 RAW_REQ_FILE="requirements.no_hashes.txt"
 SOURCE_FILE="requirements.source.txt"
 WHEEL_FILE="requirements.wheel.txt"
@@ -15,20 +18,32 @@ SOURCE_HASH_FILE="requirements.hashes.source.txt"
 WHEEL_HASH_FILE="requirements.hashes.wheel.txt"
 WHEEL_HASH_FILE_PYPI="requirements.hashes.wheel.pypi.txt"
 BUILD_FILE="requirements-build.txt"
-RHOAI_INDEX_URL="https://console.redhat.com/api/pypi/public-rhai/rhoai/3.2/cpu-ubi9/simple/"
+RHOAI_INDEX_URL="https://console.redhat.com/api/pypi/public-rhai/rhoai/3.3/cpu-ubi9/simple/"
+PYTHON_VERSION="${PYTHON_VERSION:-3.12}"
 
 # extra wheels to be included in the wheel list, often come from build-time dependencies
 EXTRA_WHEELS="uv-build,uv,pip,maturin"
+# PyPI-sourced deps with no usable sdist: route to hashed PyPI wheels, not source / pybuild-deps.
 PYPI_WHEELS="opencv-python,omegaconf,rapidocr,griffe,griffecli,griffelib,pyclipper,tree-sitter-typescript"
 
-# Generate requirements list from pyproject.toml from both indexes
+# Regenerates requirements.overrides.txt (do not hand-edit; commit script output). Needs RHOAI.
+uv run --script scripts/generate_requirements_overrides.py \
+	--rhoai-index "$RHOAI_INDEX_URL" \
+	--python-version "$PYTHON_VERSION" \
+	-o requirements.overrides.txt
+
+# Generate requirements list from pyproject.toml from both indexes.
+# --index-strategy unsafe-first-match: uv exhausts candidates from --index (RHOAI) before
+# --default-index (PyPI). That is not "pick the newest version across both" (that is
+# unsafe-best-match). If a package still annotates as PyPI while RHOAI has a compatible wheel,
+# regenerate requirements.overrides.txt with generate_requirements_overrides.py.
 uv pip compile pyproject.toml -o "$RAW_REQ_FILE" \
-		--python-platform x86_64-unknown-linux-gnu \
-		--python-version 3.12 \
+		--universal \
+		--python-version "$PYTHON_VERSION" \
 		--refresh \
 		--index $RHOAI_INDEX_URL \
 		--default-index https://pypi.org/simple/ \
-		--index-strategy unsafe-best-match \
+		--index-strategy unsafe-first-match \
 		--emit-index-annotation \
 		--no-sources \
 		--override requirements.overrides.txt
@@ -58,6 +73,10 @@ while IFS= read -r line || [[ -n "$line" ]]; do
                 package_name=$(echo "$current_package" | sed 's/[=<>!].*//')
                 if echo ",${PYPI_WHEELS}," | grep -qF ",${package_name},"; then
                     echo "$current_package" >> "$WHEEL_FILE_PYPI"
+                elif grep -qE "^${package_name}==" requirements.overrides.txt; then
+                    # Pinned in requirements.overrides.txt for RHOAI-first. uv may still emit
+                    # `# from pypi.org` when both indexes ship the same version — fetch as RHOAI wheel.
+                    echo "$current_package" >> "$WHEEL_FILE"
                 else
                     echo "$current_package" >> "$SOURCE_FILE"
                 fi
@@ -83,14 +102,18 @@ echo "Packages from console.redhat.com written to: $WHEEL_FILE ($(wc -l < "$WHEE
 
 # Use stdout redirection instead of -o flag to work around uv bug where -o reuses stale hashes from existing output file
 # RHOAI-only --generate-hashes can omit the hash for the Linux cp312 manylinux wheel pip actually installs.
-uv pip compile "$WHEEL_FILE" --refresh --generate-hashes --index-url $RHOAI_INDEX_URL --python-version 3.12 --python-platform x86_64-unknown-linux-gnu --emit-index-url --no-deps --no-annotate > "$WHEEL_HASH_FILE"
+uv pip compile "$WHEEL_FILE" --refresh --generate-hashes --index-url $RHOAI_INDEX_URL --python-version "$PYTHON_VERSION" --universal --emit-index-url --no-deps --no-annotate > "$WHEEL_HASH_FILE"
 uv run python scripts/augment_wheel_hashes.py "$WHEEL_HASH_FILE"
-uv pip compile "$WHEEL_FILE_PYPI" --refresh --generate-hashes --python-version 3.12 --python-platform x86_64-unknown-linux-gnu --emit-index-url --no-deps --no-annotate > "$WHEEL_HASH_FILE_PYPI"
-uv pip compile "$SOURCE_FILE" --refresh --generate-hashes --python-version 3.12 --emit-index-url --no-deps --no-annotate > "$SOURCE_HASH_FILE"
+uv pip compile "$WHEEL_FILE_PYPI" --refresh --generate-hashes --python-version "$PYTHON_VERSION" --universal --emit-index-url --no-deps --no-annotate > "$WHEEL_HASH_FILE_PYPI"
+uv pip compile "$SOURCE_FILE" --refresh --generate-hashes --python-version "$PYTHON_VERSION" --universal --emit-index-url --no-deps --no-annotate > "$SOURCE_HASH_FILE"
 uv run pybuild-deps compile --output-file="$BUILD_FILE" "$SOURCE_FILE"
 
 # pin maturin to the version available in the Red Hat registry
 sed -i 's/maturin==[0-9.]*/maturin==1.10.2/' "$BUILD_FILE"
+
+# PEP 517 [build-system] from pyproject.toml (root package). pybuild-deps only infers build tools for
+# third-party sdists in requirements.source.txt — not this repo — so merge those requires here for Cachi2.
+uv run --script scripts/merge_pep517_build_requires.py "$BUILD_FILE"
 
 # remove intermediate files
 rm "$RAW_REQ_FILE" "$WHEEL_FILE" "$WHEEL_FILE_PYPI" "$SOURCE_FILE"
