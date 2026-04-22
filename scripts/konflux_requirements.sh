@@ -18,11 +18,9 @@ WHEEL_FILE="requirements.wheel.txt"
 WHEEL_FILE_PYPI="requirements.wheel.pypi.txt"
 SOURCE_HASH_FILE="requirements.hashes.source.txt"
 WHEEL_HASH_FILE="requirements.hashes.wheel.txt"
-WHEEL_HASH_CPU_X86="requirements.hashes.wheel.cpu.x86_64.txt"
-WHEEL_HASH_CPU_AARCH="requirements.hashes.wheel.cpu.aarch64.txt"
 WHEEL_HASH_FILE_PYPI="requirements.hashes.wheel.pypi.txt"
 BUILD_FILE="requirements-build.txt"
-RHOAI_INDEX_URL="https://packages.redhat.com/api/pypi/public-rhai/rhoai/3.3/cpu-ubi9/simple/"
+RHOAI_INDEX_URL="https://packages.redhat.com/api/pypi/public-rhai/rhoai/3.4/cpu-ubi9/simple/"
 
 # Prefetch as wheels for image pip/bootstrap (not project deps).
 EXTRA_WHEELS="uv-build,uv,pip,maturin"
@@ -92,9 +90,7 @@ wheel_packages="$wheel_packages,$EXTRA_WHEELS,$pypi_wheel_packages"
 wheel_packages=$(printf '%s' "$wheel_packages" | tr ',' '\n' | awk 'NF && !seen[$0]++' | paste -sd, -)
 for _tekton_prefetch in \
 	.tekton/rag-tool-pull-request.yaml \
-	.tekton/rag-tool-push.yaml \
-	.tekton/lightspeed-core-rag-content-cpu-f176b-pull-request.yaml \
-	.tekton/lightspeed-core-rag-content-cpu-f176b-push.yaml; do
+	.tekton/rag-tool-push.yaml ; do
 	sed -i 's/"packages": "[^"]*"/"packages": "'"$wheel_packages"'"/' "$_tekton_prefetch"
 done
 
@@ -117,122 +113,10 @@ else
 	printf '%s\n' "--index-url $RHOAI_INDEX_URL" >> "$WHEEL_HASH_FILE"
 fi
 sed -i '/^--extra-index-url/d' "$WHEEL_HASH_FILE"
-# Hermeto intersects torch==… + RHOAI index pins with PyPI wheel metadata; RHOAI rebuild filenames never
-# match → "No wheels found". Strip torch/vision/triton from the RHOAI hash file and emit arch fragments
-# with direct pulp / PyPI URLs (prefetch lists both; Containerfile picks one by TARGETARCH).
-if grep -qE '^(torch|torchvision|triton)==' "$WHEEL_HASH_FILE"; then
-	awk '
-/^torch==|^torchvision==|^triton==/ { skip=1; next }
-skip && /^[ \t]/ { next }
-skip && /^[a-zA-Z0-9]/ { skip=0 }
-{ print }
-' "$WHEEL_HASH_FILE" > "${WHEEL_HASH_FILE}.strip" && mv "${WHEEL_HASH_FILE}.strip" "$WHEEL_HASH_FILE"
-fi
-# aiohappyeyeballs: RHOAI *-2-py3-none-any.whl ≠ PyPI bytes; Hermeto prefetches RHOAI → uv+PyPI hashes all rejected.
-AIOHAPPYEYEBALLS_CPU_PULP_URL="https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.2/cpu-ubi9/aiohappyeyeballs-2.6.1-2-py3-none-any.whl"
-AIOHAPPYEYEBALLS_CPU_PULP_SHA256="e63730c7e8303fe9b9b25dfdf72f49ed74380176609a5d11cf7b634058e986d9"
-if grep -q '^aiohappyeyeballs==' "$WHEEL_HASH_FILE"; then
-	awk -v url="$AIOHAPPYEYEBALLS_CPU_PULP_URL" -v wh="$AIOHAPPYEYEBALLS_CPU_PULP_SHA256" '
-/^aiohappyeyeballs==/ {
-  print "aiohappyeyeballs @ " url " \\"
-  print "    --hash=sha256:" wh
-  skip=1
-  next
-}
-skip && /^[ \t]+--hash=/ { next }
-skip && /^[[:space:]]*$/ { next }
-skip && /^[a-zA-Z0-9]/ { skip=0 }
-{ print }
-' "$WHEEL_HASH_FILE" > "${WHEEL_HASH_FILE}.aioh" && mv "${WHEEL_HASH_FILE}.aioh" "$WHEEL_HASH_FILE"
-fi
-# aiohttp: RHOAI publishes separate linux_x86_64 / linux_aarch64 wheels. If both appear in the universal
-# wheel file, pip installs every line and fails on the wrong arch ("not a supported wheel on this platform").
-# Strip aiohttp from the main file and pin each arch in requirements.hashes.wheel.cpu.{x86_64,aarch64}.txt (like torch).
-AIOHTTP_CPU_PULP_BASE="https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.2/cpu-ubi9"
-AIOHTTP_CPU_X86_WHEEL="aiohttp-3.13.3-2-cp312-cp312-linux_x86_64.whl"
-AIOHTTP_CPU_X86_SHA256="19f57e62cb4ee5baf6463ea09a386f91fd82d18bbb6f01fd69462ebb7493f1c6"
-AIOHTTP_CPU_AARCH_WHEEL="aiohttp-3.13.3-2-cp312-cp312-linux_aarch64.whl"
-AIOHTTP_CPU_AARCH_SHA256="3ad7241c57279824a2811527054c8c9ee7ed9d4c6d5fbdaba0e3a8ea95d294a4"
-if grep -qE '^aiohttp(==| @)' "$WHEEL_HASH_FILE"; then
-	awk '
-/^aiohttp==|^aiohttp @/ { skip=1; next }
-skip && /^[ \t]/ { next }
-skip && /^[a-zA-Z0-9]/ { skip=0 }
-{ print }
-' "$WHEEL_HASH_FILE" > "${WHEEL_HASH_FILE}.stripaio" && mv "${WHEEL_HASH_FILE}.stripaio" "$WHEEL_HASH_FILE"
-fi
-# markupsafe: RHOAI *-2-cp312-*linux_*.whl bytes ≠ PyPI hashes in uv lock; Hermeto prefetches RHOAI. Split per
-# arch (same pip issue as aiohttp if both arches appear in the universal wheel file).
-MARKUPSAFE_CPU_PULP_BASE="https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.2/cpu-ubi9"
-MARKUPSAFE_CPU_X86_WHEEL="markupsafe-3.0.3-2-cp312-cp312-linux_x86_64.whl"
-MARKUPSAFE_CPU_X86_SHA256="0af6343bc5950d7402fac77cd858153863f2c6ea8fec825bf42b4a779617b228"
-MARKUPSAFE_CPU_AARCH_WHEEL="markupsafe-3.0.3-2-cp312-cp312-linux_aarch64.whl"
-MARKUPSAFE_CPU_AARCH_SHA256="fb13d952fc3e75323d200fedee7bd5c14341500afc2c5d7e0793ae369f933d1c"
-if grep -qE '^markupsafe(==| @)' "$WHEEL_HASH_FILE"; then
-	awk '
-/^markupsafe==|^markupsafe @/ { skip=1; next }
-skip && /^[ \t]/ { next }
-skip && /^[a-zA-Z0-9]/ { skip=0 }
-{ print }
-' "$WHEEL_HASH_FILE" > "${WHEEL_HASH_FILE}.stripms" && mv "${WHEEL_HASH_FILE}.stripms" "$WHEEL_HASH_FILE"
-fi
-CPU_PULP_32="https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.2/cpu-ubi9"
-TV_X86_URL="https://files.pythonhosted.org/packages/7e/e6/7324ead6793075a8c75c56abeed1236d1750de16a5613cfe2ddad164a92a/torchvision-0.24.0-cp312-cp312-manylinux_2_28_x86_64.whl"
-TV_X86_SHA="26b9dd9c083f8e5f7ac827de6d5b88c615d9c582dc87666770fbdf16887e4c25"
-TV_AARCH_URL="https://files.pythonhosted.org/packages/00/7b/e3809b3302caea9a12c13f3adebe4fef127188438e719fd6c8dc93db1da6/torchvision-0.24.0-cp312-cp312-manylinux_2_28_aarch64.whl"
-TV_AARCH_SHA="b0531d1483fc322d7da0d83be52f0df860a75114ab87dbeeb9de765feaeda843"
-{
-	printf '%s\n' "# Autogenerated by konflux_requirements.sh — linux/x86_64 arch-specific wheels (Hermeto)."
-	printf '%s\n' "torch @ ${CPU_PULP_32}/torch-2.9.0-7-cp312-cp312-linux_x86_64.whl \\"
-	printf '%s\n' "    --hash=sha256:b6fa21f12a26a38f530f5afd691eaf7f632770034d80a1c66e4d9d52616cff07"
-	printf '%s\n' "torchvision @ ${TV_X86_URL} \\"
-	printf '%s\n' "    --hash=sha256:${TV_X86_SHA}"
-	printf '%s\n' "triton @ ${CPU_PULP_32}/triton-3.5.0-3-cp312-cp312-linux_x86_64.whl \\"
-	printf '%s\n' "    --hash=sha256:6f420ea77a5b22e4dffe502638da2e773a4dd8fbb016f1be140c9cfa81d313d9"
-} > "$WHEEL_HASH_CPU_X86"
-{
-	printf '%s\n' "# Autogenerated by konflux_requirements.sh — linux/aarch64 arch-specific wheels (Hermeto)."
-	printf '%s\n' "torch @ ${CPU_PULP_32}/torch-2.9.0-7-cp312-cp312-linux_aarch64.whl \\"
-	printf '%s\n' "    --hash=sha256:dbef52f7f4824242a9cd9aff2ebd7e6c87744b5a40048cbb2e3854361ec727fd"
-	printf '%s\n' "torchvision @ ${TV_AARCH_URL} \\"
-	printf '%s\n' "    --hash=sha256:${TV_AARCH_SHA}"
-	printf '%s\n' "triton @ ${CPU_PULP_32}/triton-3.5.0-3-cp312-cp312-linux_aarch64.whl \\"
-	printf '%s\n' "    --hash=sha256:8325dca63029c7fedd3e70c11ba9abc472e94f54eaddfbe872a7d823d167e595"
-} > "$WHEEL_HASH_CPU_AARCH"
-if grep -qE '^aiohttp==' "$WHEEL_FILE"; then
-	printf '%s\n' "aiohttp @ ${AIOHTTP_CPU_PULP_BASE}/${AIOHTTP_CPU_X86_WHEEL} \\" >> "$WHEEL_HASH_CPU_X86"
-	printf '%s\n' "    --hash=sha256:${AIOHTTP_CPU_X86_SHA256}" >> "$WHEEL_HASH_CPU_X86"
-	printf '%s\n' "aiohttp @ ${AIOHTTP_CPU_PULP_BASE}/${AIOHTTP_CPU_AARCH_WHEEL} \\" >> "$WHEEL_HASH_CPU_AARCH"
-	printf '%s\n' "    --hash=sha256:${AIOHTTP_CPU_AARCH_SHA256}" >> "$WHEEL_HASH_CPU_AARCH"
-fi
-if grep -qE '^markupsafe==' "$WHEEL_FILE"; then
-	printf '%s\n' "markupsafe @ ${MARKUPSAFE_CPU_PULP_BASE}/${MARKUPSAFE_CPU_X86_WHEEL} \\" >> "$WHEEL_HASH_CPU_X86"
-	printf '%s\n' "    --hash=sha256:${MARKUPSAFE_CPU_X86_SHA256}" >> "$WHEEL_HASH_CPU_X86"
-	printf '%s\n' "markupsafe @ ${MARKUPSAFE_CPU_PULP_BASE}/${MARKUPSAFE_CPU_AARCH_WHEEL} \\" >> "$WHEEL_HASH_CPU_AARCH"
-	printf '%s\n' "    --hash=sha256:${MARKUPSAFE_CPU_AARCH_SHA256}" >> "$WHEEL_HASH_CPU_AARCH"
-fi
 if grep -qE '^[a-zA-Z0-9][a-zA-Z0-9_.-]*==' "$WHEEL_FILE_PYPI"; then
 	uv pip compile "$WHEEL_FILE_PYPI" --refresh --generate-hashes --python-version 3.12 --emit-index-url --no-deps --no-annotate > "$WHEEL_HASH_FILE_PYPI"
 else
 	printf '%s\n' "# No PyPI wheel-only (last-resort) pins." > "$WHEEL_HASH_FILE_PYPI"
-fi
-# pylatexenc: Hermeto intersects binary wheel hashes with PyPI; RHOAI rebuild *-8-py3-none-any.whl does not match.
-# Pin the pulp wheel (py3-none-any; same artifact is published on cuda12.9-ubi9 — not on 3.2/cpu-ubi9 pulp).
-PYLATEXENC_CPU_PULP_URL="https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.3/cuda12.9-ubi9/pylatexenc-2.10-8-py3-none-any.whl"
-PYLATEXENC_CPU_PULP_SHA256="df56e08b8c5aeea5d791c2e73cf91eaa746e8c52c0f1a51b249dcf033b6e10e6"
-if grep -q '^pylatexenc==' "$WHEEL_HASH_FILE_PYPI"; then
-	awk -v url="$PYLATEXENC_CPU_PULP_URL" -v wh="$PYLATEXENC_CPU_PULP_SHA256" '
-/^pylatexenc==/ {
-  print "pylatexenc @ " url " \\"
-  print "    --hash=sha256:" wh
-  skip=1
-  next
-}
-skip && /^[ \t]+--hash=/ { next }
-skip && /^[[:space:]]*$/ { next }
-skip && /^[a-zA-Z0-9]/ { skip=0 }
-{ print }
-' "$WHEEL_HASH_FILE_PYPI" > "${WHEEL_HASH_FILE_PYPI}.plx" && mv "${WHEEL_HASH_FILE_PYPI}.plx" "$WHEEL_HASH_FILE_PYPI"
 fi
 # Hermeto fetches wheels per file index: RHOAI for .wheel.txt, PyPI for .pypi.txt. If a package
 # appears in both, pip must see PyPI hashes (prefetched wheel). Drop the RHOAI copy (same as CUDA script).
@@ -262,4 +146,4 @@ echo "Packages from pypi.org written to: $SOURCE_HASH_FILE ($( grep -Eo '==[0-9.
 echo "Packages from packages.redhat.com written to: $WHEEL_HASH_FILE ($(grep -Eo '==[0-9.]+' "$WHEEL_HASH_FILE" | wc -l) packages)"
 echo "Packages from pypi.org (wheels) written to: $WHEEL_HASH_FILE_PYPI ($(grep -Eo '==[0-9.]+' "$WHEEL_HASH_FILE_PYPI" | wc -l) packages)"
 echo "Build dependencies written to: $BUILD_FILE ($(grep -Eo '==[0-9.]+' "$BUILD_FILE" | wc -l) packages)"
-echo "Remember to commit $SOURCE_HASH_FILE, $WHEEL_HASH_FILE, $WHEEL_HASH_CPU_X86, $WHEEL_HASH_CPU_AARCH, $WHEEL_HASH_FILE_PYPI, $BUILD_FILE, Containerfile, pipeline configurations and push the changes"
+echo "Remember to commit $SOURCE_HASH_FILE, $WHEEL_HASH_FILE, $WHEEL_HASH_FILE_PYPI, $BUILD_FILE, Containerfile, pipeline configurations and push the changes"
