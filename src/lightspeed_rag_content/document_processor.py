@@ -95,22 +95,91 @@ class _BaseDB:
                 return True
         return False
 
-    @classmethod
-    def _filter_out_invalid_nodes(cls, nodes: list[Any]) -> list[TextNode]:
+    @staticmethod
+    def _got_content(text: str) -> bool:
+        """Check if text has content.
+
+        The following will not be considered content (returns False):
+        - Empty lines
+        - Empty code blocks
+        - Horizontal rules
+        - ATX header lines
+        - Setext header lines
+        """
+
+        def is_eq_dash(line: str) -> bool:
+            line = line.strip()
+            return bool(line) and all(char in ("=", "-") for char in line)
+
+        code_block = None
+
+        split_text = text.splitlines()
+
+        i = 0
+        while i < len(split_text):
+            raw_line = split_text[i]
+            line = raw_line.strip()
+
+            # Ignore empty lines
+            if not line:
+                i += 1
+                continue
+
+            # Code block indentation with content
+            if raw_line.startswith("    "):
+                return True
+
+            # Fenced code block start or end
+            if line.startswith("```"):
+                # Change to none in case all our content is a fenced empty code block
+                code_block = "fenced" if code_block != "fenced" else None
+                i += 1
+                continue
+
+            # Content inside a fenced code block
+            if code_block:
+                return True
+
+            # Ignore ATX header lines
+            if line.startswith("#"):
+                i += 1
+                continue
+
+            # Ignore horizontal rules
+            if is_eq_dash(line):
+                i += 1
+                continue
+
+            # Ignore if the next line declares this one as a setext header lines
+            if i + 1 < len(split_text) and is_eq_dash(split_text[i + 1]):
+                i += 2
+                continue
+
+            # Real content found
+            return True
+
+        return False
+
+    def _valid_text_node(self, text: str) -> bool:
+        """Check if text node is valid: has whitespace and has content."""
+        if self.config.doc_type in ("markdown", "html") and not self._got_content(text):
+            return False
+        return self._got_whitespace(text)
+
+    def _filter_out_invalid_nodes(self, nodes: list[Any]) -> list[TextNode]:
         """Filter out invalid nodes."""
         good_nodes = []
         for node in nodes:
-            if isinstance(node, TextNode) and cls._got_whitespace(node.text):
+            if isinstance(node, TextNode) and self._valid_text_node(node.text):
                 # Exclude given metadata during embedding
                 good_nodes.append(node)
             else:
-                LOG.debug("Skipping node without whitespace: %s", repr(node))
+                LOG.debug("Skipping invalid node: %s", repr(node))
         return good_nodes
 
-    @classmethod
-    def _split_and_filter(cls, docs: list[Document]) -> list[TextNode]:
+    def _split_and_filter(self, docs: list[Document]) -> list[TextNode]:
         nodes = Settings.text_splitter.get_nodes_from_documents(docs)
-        valid_nodes = cls._filter_out_invalid_nodes(nodes)
+        valid_nodes = self._filter_out_invalid_nodes(nodes)
         return valid_nodes
 
 
