@@ -1,0 +1,120 @@
+# Shared Buildah build + push for dev tags (CPU or GPU). Called by build_and_push_dev*.yaml.
+on:
+  workflow_call:
+    inputs:
+      image_name:
+        description: 'Local image name (e.g. rag-content-cpu)'
+        required: true
+        type: string
+      container_file:
+        description: 'Containerfile path relative to repo root'
+        required: true
+        type: string
+    secrets:
+      # Optional so forked PRs can call this workflow without registry secrets (build-only).
+      QUAY_REGISTRY_USERNAME:
+        required: false
+      QUAY_REGISTRY_PASSWORD:
+        required: false
+
+env:
+  IMAGE_NAMESPACE: lightspeed-core
+  IMAGE_REGISTRY: quay.io
+  LATEST_TAG: latest
+
+jobs:
+  build-and-push:
+    # Standard ubuntu-latest has limited disk; container images can be large.
+    # When the runner has a separate disk at /mnt, we redirect Buildah scratch there; otherwise defaults.
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: ${{ inputs.image_name }}
+      CONTAINER_FILE: ${{ inputs.container_file }}
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: validate-quay-creds
+        if: github.event_name != 'pull_request'
+        env:
+          QUAY_REGISTRY_USERNAME: ${{ secrets.QUAY_REGISTRY_USERNAME }}
+          QUAY_REGISTRY_PASSWORD: ${{ secrets.QUAY_REGISTRY_PASSWORD }}
+        run: |
+          if [ -z "${QUAY_REGISTRY_USERNAME:-}" ] || [ -z "${QUAY_REGISTRY_PASSWORD:-}" ]; then
+            echo "::error::QUAY_REGISTRY_USERNAME and QUAY_REGISTRY_PASSWORD must be set for non-PR events (pushes and other workflows that publish to Quay)."
+            exit 1
+          fi
+
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@v1.3.1
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
+      - name: Install buildah
+        run: |
+          sudo apt update
+          sudo apt install -y buildah qemu-user-static
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure Buildah scratch paths on /mnt when present
+        run: |
+          set -eux
+          ROOT_SRC=$(findmnt -n -o SOURCE / 2>/dev/null || true)
+          MNT_SRC=$(findmnt -n -o SOURCE /mnt 2>/dev/null || true)
+          if [ -z "${ROOT_SRC:-}" ] || [ -z "${MNT_SRC:-}" ] || [ "$ROOT_SRC" = "$MNT_SRC" ]; then
+            echo "::notice title=Buildah::No separate /mnt filesystem (root=${ROOT_SRC:-?}, /mnt=${MNT_SRC:-none}); using Buildah/container defaults."
+            exit 0
+          fi
+          BASE=/mnt/buildah-scratch
+          sudo mkdir -p "${BASE}/tmp" "${BASE}/containers-graph" "${BASE}/containers-run"
+          sudo chown -R "$USER:$USER" "${BASE}/tmp" "${BASE}/containers-graph" "${BASE}/containers-run"
+          chmod 1777 "${BASE}/tmp"
+          mkdir -p ~/.config/containers
+          printf '%s\n' '[storage]' 'driver = "overlay"' \
+            "graphroot = \"${BASE}/containers-graph\"" \
+            "runroot = \"${BASE}/containers-run\"" \
+            > ~/.config/containers/storage.conf
+          echo "TMPDIR=${BASE}/tmp" >> "$GITHUB_ENV"
+          echo "::notice title=Buildah::Scratch on /mnt ($MNT_SRC) vs root ($ROOT_SRC)."
+
+      - name: Create dev image tag
+        run: |
+          echo "DEV_TAG=dev-$(date +%Y%m%d)-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "dev image tag: ${{ env.DEV_TAG }}"
+      - name: Build image with Buildah
+        id: build_image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: ${{ env.IMAGE_NAME }}
+          tags: |
+            ${{ env.DEV_TAG }}
+            ${{ env.LATEST_TAG }}
+          containerfiles: |
+            ${{ env.CONTAINER_FILE }}
+          archs: amd64, arm64
+          oci: true
+      - name: Check images
+        run: |
+          buildah images | grep '${{ env.IMAGE_NAME }}'
+          echo '${{ steps.build_image.outputs.image }}'
+          echo '${{ steps.build_image.outputs.tags }}'
+      - name: Check manifest
+        run: |
+          set -x
+          buildah manifest inspect ${{ steps.build_image.outputs.image }}:${{ env.LATEST_TAG }}
+
+      - name: Push image to Quay.io
+        uses: redhat-actions/push-to-registry@v2
+        if: ${{ github.event_name != 'pull_request' }}
+        with:
+          image: ${{ steps.build_image.outputs.image }}
+          tags: ${{ steps.build_image.outputs.tags }}
+          registry: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAMESPACE }}
+          username: ${{ secrets.QUAY_REGISTRY_USERNAME }}
+          password: ${{ secrets.QUAY_REGISTRY_PASSWORD }}
