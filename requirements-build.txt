@@ -6,8 +6,11 @@
 #
 calver==2025.10.20
     # via trove-classifiers
+coherent-licensed==0.5.2
+    # via zipp
 cython==3.2.4
     # via
+    #   lxml
     #   oracledb
     #   pyclipper
     #   sqlalchemy
@@ -19,6 +22,8 @@ flit-core==3.12.0
     # via
     #   aiosqlite
     #   click
+    #   coherent-licensed
+    #   idna
     #   jinja2
     #   packaging
     #   pathspec
@@ -30,6 +35,7 @@ hatch-fancy-pypi-readme==25.1.0
     #   attrs
     #   llama-stack-client
     #   openai
+    #   pydantic
 hatch-vcs==0.5.0
     # via
     #   attrs
@@ -37,6 +43,7 @@ hatch-vcs==0.5.0
     #   filelock
     #   fsspec
     #   platformdirs
+    #   scikit-build-core
 hatchling==1.26.3
     # via
     #   hatch-fancy-pypi-readme
@@ -55,7 +62,6 @@ hatchling==1.29.0
     #   griffelib
     #   hatch-fancy-pypi-readme
     #   hatch-vcs
-    #   latex2mathml
     #   llama-index
     #   llama-index-core
     #   llama-index-embeddings-huggingface
@@ -74,9 +80,11 @@ hatchling==1.29.0
     #   opentelemetry-semantic-conventions
     #   platformdirs
     #   polyfactory
+    #   pydantic
     #   pydantic-settings
     #   pygments
     #   python-multipart
+    #   scikit-build-core
     #   semchunk
     #   soupsieve
     #   starlette
@@ -88,15 +96,20 @@ jinja2==3.1.6
 markupsafe==3.0.3
     # via jinja2
 maturin==1.10.2
-    # via uv-build
-packaging==26.0
+    # via
+    #   pydantic-core
+    #   uv-build
+packaging==26.2
     # via
     #   hatchling
+    #   scikit-build-core
     #   setuptools-scm
     #   vcs-versioning
     #   wheel
-pathspec==1.0.4
-    # via hatchling
+pathspec==1.1.1
+    # via
+    #   hatchling
+    #   scikit-build-core
 pdm-backend==2.4.8
     # via
     #   fastapi
@@ -106,11 +119,15 @@ pdm-backend==2.4.8
     #   typer
 pluggy==1.6.0
     # via hatchling
-poetry-core==2.3.2
+poetry-core==2.4.0
     # via
     #   dunamai
     #   rich
     #   tomlkit
+pybind11==3.0.4
+    # via pillow
+scikit-build-core==0.12.2
+    # via pybind11
 semantic-version==2.10.0
     # via setuptools-rust
 setuptools-rust==1.12.1
@@ -126,10 +143,13 @@ setuptools-scm==10.0.5
     #   setuptools-rust
     #   tabulate
     #   tenacity
+    #   zipp
 tomlkit==0.14.0
     # via uv-dynamic-versioning
-trove-classifiers==2026.1.14.14
+trove-classifiers==2026.4.28.13
     # via hatchling
+uv-build==0.10.12
+    # via latex2mathml
 uv-build==0.9.30
     # via llama-index-workflows
 uv-dynamic-versioning==0.14.0
@@ -140,16 +160,20 @@ uv-dynamic-versioning==0.14.0
     #   mcp
 vcs-versioning==1.1.1
     # via setuptools-scm
-wheel==0.46.3
+wheel==0.47.0
     # via
+    #   oci
     #   oracledb
     #   pyclipper
     #   sentence-transformers
     #   tornado
+    #   tree-sitter-c
     #   tzdata
     #   wrapt
 
 # The following packages are considered to be unsafe in a requirements file:
+setuptools==78.1.1
+    # via oci
 setuptools==82.0.1
     # via
     #   anyio
@@ -160,17 +184,18 @@ setuptools==82.0.1
     #   googleapis-common-protos
     #   llama-stack
     #   llama-stack-api
+    #   lxml
     #   markupsafe
     #   maturin
     #   multiprocess
     #   oracledb
     #   pathspec
     #   pgvector
+    #   pillow
     #   pluggy
     #   psutil
     #   pyclipper
     #   pyjwt
-    #   python-dotenv
     #   regex
     #   requests
     #   sentence-transformers
@@ -181,8 +206,10 @@ setuptools==82.0.1
     #   tabulate
     #   tenacity
     #   tornado
+    #   tree-sitter-c
     #   trove-classifiers
     #   tzdata
     #   vcs-versioning
     #   wrapt
     #   yarl
+    #   zipp

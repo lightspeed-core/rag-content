@@ -72,7 +72,7 @@ dependencies = [
     "hf-xet>=1.2.0",
     "einops>=0.8.1",
     # For HTML to Markdown conversion in BYOK workflows
-    "docling>=2.68.0,<2.73.0",
+    "docling>=2.68.0,<2.74.0",
     "python-frontmatter>=1.1.0",
     "certifi>=2025.10.5",
 ]

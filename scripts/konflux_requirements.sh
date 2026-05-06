@@ -34,7 +34,7 @@ PYPI_WHEEL_LAST_RESORT="hf-xet,psycopg2-binary,jiter,docling-parse,tokenizers,to
 
 # Generate requirements list from pyproject.toml from both indexes
 uv pip compile pyproject.toml -o "$RAW_REQ_FILE" \
-		--python-platform x86_64-unknown-linux-gnu \
+		--python-platform x86_64-manylinux_2_28 \
 		--python-version 3.12 \
 		--refresh \
 		--index $RHOAI_INDEX_URL \
@@ -92,9 +92,7 @@ wheel_packages="$wheel_packages,$EXTRA_WHEELS,$pypi_wheel_packages"
 wheel_packages=$(printf '%s' "$wheel_packages" | tr ',' '\n' | awk 'NF && !seen[$0]++' | paste -sd, -)
 for _tekton_prefetch in \
 	.tekton/rag-tool-pull-request.yaml \
-	.tekton/rag-tool-push.yaml \
-	.tekton/lightspeed-core-rag-content-cpu-f176b-pull-request.yaml \
-	.tekton/lightspeed-core-rag-content-cpu-f176b-push.yaml; do
+	.tekton/rag-tool-push.yaml; do
 	sed -i 's/"packages": "[^"]*"/"packages": "'"$wheel_packages"'"/' "$_tekton_prefetch"
 done
 

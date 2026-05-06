@@ -13,7 +13,9 @@ packages:
     swig,
     autoconf,
     automake,
-    libtool
+    libtool,
+    libxml2-devel,
+    libxslt-devel,
   ]
 contentOrigin:
   repofiles: ["./redhat.repo"]
