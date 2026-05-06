@@ -20,9 +20,6 @@ importlib-metadata==8.7.1 \
     --hash=sha256:8209be00f7e319e6061880bccc9dc0744b55a73697834dad4eb1dc99b82fb6a5
 jsonlines==4.0.0 \
     --hash=sha256:1e7b463ff451783f6c1c0735d54eaacaa576c081e7036f97a4f8641f949c902e
-lxml==6.0.2 \
-    --hash=sha256:24f98facd549f7ef3c72323a747eeac31a67bc0c561d29f3328ab43a5dfbd7d2 \
-    --hash=sha256:72c9aa5835202a4341906c84f8d9971596a36237e1e3d688632906cd2f1c4b9d
 marko==2.2.2 \
     --hash=sha256:6507f902e516694f3aaefb0b1601d3f278bfe68b92e77d74c57ca7db54f237a9
 mpire==2.10.2 \
@@ -70,9 +67,6 @@ transformers==4.57.3 \
 tree-sitter==0.25.2 \
     --hash=sha256:d184a4c53597bd26336df9d3f1e976e1c64dac38a00bca7e10204a2c040d9550 \
     --hash=sha256:d93a3a41534649f06f468484fd5e431a453da5b69cd61537aa896feb175853e3
-tree-sitter-c==0.24.1 \
-    --hash=sha256:4bf962796f4b3efea6ffb3f44c2edbf001136cdb79d1b6950a6b221891b316ad \
-    --hash=sha256:86e53f3949cf272eff6067c649ef83a6947e5f89e9bc54f9360d034ff7cf1c46
 tree-sitter-javascript==0.25.0 \
     --hash=sha256:383776d7f9c3d5ab867c540a2ebd75d4f2cb3bf92fc748f292a8db78d548284c \
     --hash=sha256:7cb8b78dfb908e21244e436fc16a3c204720a56ada95e4600b937ee660791927
@@ -89,5 +83,3 @@ wrapt==1.17.3 \
     --hash=sha256:4d67a66255fbde88ea056abb714514ab6cf7dfe08e411b2b5d2a1a25d53abf5f
 xlsxwriter==3.2.9 \
     --hash=sha256:80e882be04cccad46889d9982f23f28b00a9f79f73baabb02ff7d81804e317fd
-zipp==3.23.0 \
-    --hash=sha256:e1488ddde6d6ac5464c38673e40eb8eb8ae53105a5cc6ff65181e30b17121206
