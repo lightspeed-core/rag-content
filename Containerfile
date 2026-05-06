@@ -16,7 +16,7 @@ RUN ${DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nod
 # Hermetic: some sdists (e.g. Python patchelf for docling-parse/cibuildwheel) need autotools + a compiler.
 RUN if [ -f /cachi2/cachi2.env ]; then \
     ${DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
-    gcc cmake git libpq-devel swig autoconf automake libtool && \
+    gcc cmake git libpq-devel swig autoconf automake libtool libxml2-devel libxslt-devel && \
     ${DNF_COMMAND} clean all; \
     fi
 
