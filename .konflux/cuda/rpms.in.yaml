@@ -13,6 +13,8 @@ packages:
     autoconf,
     automake,
     libtool,
+    libxml2-devel,
+    libxslt-devel,    
     skopeo,
     libcudnn9,
     libnccl,
