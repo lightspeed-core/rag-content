@@ -51,15 +51,13 @@ spec:
            "path": ".",
            "requirements_files": [
             "requirements.hashes.wheel.cuda.txt",
-            "requirements.hashes.wheel.pypi.cuda.base.txt",
-            "requirements.hashes.wheel.pypi.cuda.x86_64.txt",
-            "requirements.hashes.wheel.pypi.cuda.aarch64.txt",
+            "requirements.hashes.wheel.pypi.cuda.txt",
             "requirements.hashes.source.cuda.txt",
-             "requirements.hermetic.txt"
+            "requirements.hermetic.txt"
            ],
            "requirements_build_files": ["requirements-build.cuda.txt"],
            "binary": {
-             "packages": "aiohappyeyeballs,aiohttp,aiosignal,annotated-doc,annotated-types,antlr4-python3-runtime,beautifulsoup4,cffi,colorama,cryptography,dataclasses-json,defusedxml,distro,et-xmlfile,filetype,frozenlist,greenlet,h11,hf-xet,httpcore,httpx,httpx-sse,idna,importlib-metadata,jinja2,joblib,jsonlines,jsonref,jsonschema,jsonschema-specifications,lxml,markdown-it-py,marko,markupsafe,marshmallow,mdurl,mpire,mpmath,mypy-extensions,nest-asyncio,networkx,numpy,omegaconf,openpyxl,pandas,pillow,pluggy,prompt-toolkit,propcache,pydantic,pydantic-core,pylatexenc,pypdfium2,python-dateutil,python-docx,python-pptx,pyyaml,referencing,rpds-py,rtree,safetensors,scikit-learn,scipy,setuptools,shapely,shellingham,six,sniffio,sympy,termcolor,threadpoolctl,tiktoken,tomlkit,transformers,tree-sitter,tree-sitter-c,tree-sitter-javascript,tree-sitter-python,tree-sitter-typescript,triton,typing-extensions,typing-inspect,typing-inspection,urllib3,wrapt,xlsxwriter,zipp,uv-build,uv,pip,maturin,cmake,docling-parse,faiss-cpu,jiter,llama-index-vector-stores-faiss,opencv-python,psycopg2-binary,rapidocr,tokenizers",
+             "packages": "accelerate,aiohappyeyeballs,aiohttp,aiosignal,aiosqlite,annotated-doc,annotated-types,anyio,asyncpg,attrs,beautifulsoup4,cffi,chardet,charset-normalizer,colorama,cryptography,dataclasses-json,defusedxml,deprecated,dirtyjson,distro,docling,docling-core,docling-ibm-models,docling-parse,einops,et-xmlfile,faiss-cpu,filetype,fire,frozenlist,googleapis-common-protos,greenlet,griffe,griffecli,griffelib,h11,hf-xet,httpcore,httpx,httpx-sse,importlib-metadata,jinja2,jiter,joblib,jsonlines,jsonref,jsonschema,jsonschema-specifications,latex2mathml,llama-index-embeddings-openai,llama-index-instrumentation,marko,markupsafe,marshmallow,mcp,mdurl,mpmath,multidict,mypy-extensions,nest-asyncio,networkx,nltk,numpy,openpyxl,pandas,pgvector,pillow,platformdirs,pluggy,polyfactory,prompt-toolkit,propcache,protobuf,psutil,pyaml,pycparser,pydantic,pydantic-core,pydantic-settings,pygments,pyjwt,pylatexenc,pypdf,pypdfium2,python-dateutil,python-docx,python-dotenv,python-pptx,pyyaml,referencing,regex,requests,rich,rpds-py,rtree,safetensors,scikit-learn,scipy,setuptools,shellingham,six,sniffio,soupsieve,sqlalchemy,starlette,striprtf,sympy,tabulate,tenacity,termcolor,threadpoolctl,tiktoken,tinytag,tokenizers,tomlkit,torch,torchvision,tornado,tqdm,transformers,triton,typer,typing-extensions,typing-inspect,typing-inspection,urllib3,websockets,wrapt,xlsxwriter,yarl,zipp,uv-build,uv,pip,maturin,psycopg2-binary",
              "os": "linux",
              "arch": "x86_64,aarch64",
              "py_version": 312
