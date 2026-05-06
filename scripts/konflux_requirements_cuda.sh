@@ -75,6 +75,7 @@ mv pyproject.cuda.toml pyproject.toml
 # Generate requirements from CUDA pyproject (torch from PyPI = CUDA on Linux).
 # Use CPU RHOAI as extra index so faiss-cpu (and similar) resolve from RHOAI and prefetch can fetch wheels.
 uv pip compile pyproject.toml -o "$RAW_REQ_FILE" \
+	--python-platform x86_64-manylinux_2_28 \
 	--python-version 3.12 \
 	--refresh \
 	--index "$RHOAI_INDEX_URL" \
