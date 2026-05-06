@@ -10,50 +10,43 @@ cython==3.2.4
     # via
     #   lxml
     #   oracledb
+dunamai==1.26.1
+    # via uv-dynamic-versioning
+expandvars==1.1.2
+    # via propcache
 flit-core==3.12.0
     # via
-    #   click
-    #   idna
+    #   jinja2
+    #   markdown-it-py
     #   packaging
     #   pathspec
+    #   pypdf
     #   wheel
 hatch-fancy-pypi-readme==25.1.0
     # via openai
 hatch-vcs==0.5.0
-    # via
-    #   filelock
-    #   fsspec
+    # via urllib3
 hatchling==1.26.3
     # via
     #   hatch-fancy-pypi-readme
     #   openai
 hatchling==1.29.0
     # via
-    #   banks
-    #   filelock
-    #   fsspec
+    #   expandvars
     #   hatch-fancy-pypi-readme
     #   hatch-vcs
-    #   llama-index
-    #   llama-index-core
     #   llama-index-embeddings-huggingface
     #   llama-index-llms-openai
     #   llama-index-readers-file
     #   llama-index-vector-stores-faiss
     #   llama-index-vector-stores-postgres
-    #   opentelemetry-api
-    #   opentelemetry-exporter-otlp-proto-common
-    #   opentelemetry-exporter-otlp-proto-http
-    #   opentelemetry-proto
-    #   opentelemetry-sdk
-    #   opentelemetry-semantic-conventions
-    #   python-multipart
-    #   uvicorn
-    #   wcwidth
-maturin==1.10.2
-    # via
-    #   cryptography
-    #   uv-build
+    #   mcp
+    #   urllib3
+    #   uv-dynamic-versioning
+jinja2==3.1.6
+    # via uv-dynamic-versioning
+markupsafe==3.0.3
+    # via jinja2
 packaging==26.2
     # via
     #   hatchling
@@ -62,24 +55,23 @@ packaging==26.2
     #   wheel
 pathspec==1.1.1
     # via hatchling
-pdm-backend==2.4.8
-    # via fastapi
 pluggy==1.6.0
     # via hatchling
-semantic-version==2.10.0
-    # via setuptools-rust
-setuptools-rust==1.12.1
-    # via maturin
+poetry-core==2.4.0
+    # via
+    #   dunamai
+    #   tomlkit
 setuptools-scm==10.0.5
     # via
-    #   hatch-vcs
     #   llama-stack-api
     #   pluggy
-    #   setuptools-rust
-trove-classifiers==2026.4.28.13
+    #   urllib3
+tomlkit==0.14.0
+    # via uv-dynamic-versioning
+trove-classifiers==2026.5.7.17
     # via hatchling
-uv-build==0.9.30
-    # via llama-index-workflows
+uv-dynamic-versioning==0.14.0
+    # via mcp
 vcs-versioning==1.1.1
     # via setuptools-scm
 wheel==0.47.0
@@ -87,7 +79,6 @@ wheel==0.47.0
     #   oci
     #   oracledb
     #   sentence-transformers
-    #   tzdata
 
 # The following packages are considered to be unsafe in a requirements file:
 setuptools==78.1.1
@@ -95,17 +86,17 @@ setuptools==78.1.1
 setuptools==82.0.1
     # via
     #   calver
-    #   certifi
+    #   googleapis-common-protos
     #   llama-stack-api
     #   lxml
-    #   maturin
+    #   markupsafe
     #   oracledb
     #   pathspec
     #   pluggy
+    #   propcache
+    #   regex
     #   sentence-transformers
-    #   setuptools-rust
     #   setuptools-scm
     #   sse-starlette
     #   trove-classifiers
-    #   tzdata
     #   vcs-versioning
