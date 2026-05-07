@@ -16,7 +16,7 @@ RUN ${DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nod
 # Hermetic: some sdists (e.g. Python patchelf for docling-parse/cibuildwheel) need autotools + a compiler.
 RUN if [ -f /cachi2/cachi2.env ]; then \
     ${DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
-    gcc cmake git libpq-devel swig autoconf automake libtool && \
+    gcc cmake git libpq-devel swig autoconf automake libtool libxml2-devel libxslt-devel && \
     ${DNF_COMMAND} clean all; \
     fi
 
@@ -25,7 +25,7 @@ RUN pip3.12 install uv>=0.7.20
 
 WORKDIR /rag-content
 
-COPY Makefile pyproject.toml uv.lock README.md Gemfile Gemfile.lock requirements.hashes.wheel.txt requirements.hashes.wheel.cpu.x86_64.txt requirements.hashes.wheel.cpu.aarch64.txt requirements.hashes.wheel.pypi.txt requirements.hashes.source.txt requirements-build.txt ./
+COPY Makefile pyproject.toml uv.lock README.md Gemfile Gemfile.lock requirements.hashes.wheel.txt requirements.hashes.wheel.pypi.txt requirements.hashes.source.txt requirements-build.txt ./
 COPY src ./src
 COPY tests ./tests
 COPY scripts ./scripts
@@ -51,7 +51,6 @@ RUN if [ -f /cachi2/cachi2.env ]; then \
     case "${TARGETARCH:-amd64}" in amd64) CPU_WHEEL_ARCH=x86_64 ;; arm64) CPU_WHEEL_ARCH=aarch64 ;; *) CPU_WHEEL_ARCH=x86_64 ;; esac && \
     pip install --no-cache-dir --ignore-installed --no-index --find-links ${PIP_FIND_LINKS} --no-deps \
       -r requirements.hashes.wheel.txt \
-      -r requirements.hashes.wheel.cpu.${CPU_WHEEL_ARCH}.txt \
       -r requirements.hashes.wheel.pypi.txt \
       -r requirements.hashes.source.txt && \
     pip install --no-cache-dir --no-deps . && \
