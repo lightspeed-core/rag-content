@@ -7,7 +7,7 @@ This directory contains a small **two-node GPU lab** on EC2:
 | x86_64     | `x86_64`       | `g6.2xlarge` (NVIDIA L4 class)  | Subnet A   |
 | aarch64    | `arm64`        | `g5g.4xlarge` (NVIDIA T4G)     | Subnet B   |
 
-Both run **RHEL 9.4** (Hourly2-GP3 marketplace-style AMIs defined in `cuda_cloud_formation.yaml`). The stack creates a VPC, public subnets in **two** availability zones, security groups, and the two instances.
+Both run RHEL 9.4 (Hourly2-GP3 marketplace-style AMIs defined in `cuda_cloud_formation.yaml`). The stack creates a VPC, two public subnets (often one availability zone so both GPUs are valid and capacity is sane), security groups, and the two instances.
 
 **End-to-end automation** (stack + copy installer + unattended driver/container toolkit install + wait): `provision_cuda_lab.sh`.
 
@@ -74,13 +74,13 @@ The script creates the CloudFormation stack, waits for it, copies `install_cuda_
 
 ## CloudFormation template (`cuda_cloud_formation.yaml`)
 
-You can deploy manually; the template expects **parameters**:
+You can deploy manually; the template expects parameters:
 
 - **`username`** — name prefix.
-- **`PublicSubnetAAvailabilityZone`** / **`PublicSubnetBAvailabilityZone`** — AZs for the two public subnets (x86 and aarch64 instances). **`provision_cuda_lab.sh`** sets these from EC2 **instance-type offerings**.
-- **`AllowedIngressCidr`** — must be a valid IPv4 CIDR and **cannot** be `0.0.0.0/0`.
+- **`PublicSubnetAAvailabilityZone`** / **`PublicSubnetBAvailabilityZone`** — AZs for subnets A/B. `provision_cuda_lab.sh` sets both via `describe-instance-type-offerings`, randomly choosing among AZs where both GPU types are offered when possible (often the same AZ for both subnets).
+- **`AllowedIngressCidr`** — must be a valid IPv4 CIDR and cannot be `0.0.0.0/0`.
 
-Comments at the top of the YAML file show an example **`aws cloudformation create-stack`** invocation.
+Comments at the top of the YAML file show an example `aws cloudformation create-stack` invocation.
 
 Validate locally:
 
