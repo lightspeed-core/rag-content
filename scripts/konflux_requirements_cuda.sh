@@ -22,14 +22,15 @@
 
 set -ex
 
+KONFLUX_DIR=".konflux"
 RAW_REQ_FILE="requirements.no_hashes.cuda.txt"
 SOURCE_FILE="requirements.source.cuda.txt"
 WHEEL_FILE="requirements.wheel.cuda.txt"
 WHEEL_FILE_PYPI="requirements.wheel.pypi.cuda.txt"
-SOURCE_HASH_FILE="requirements.hashes.source.cuda.txt"
-WHEEL_HASH_FILE="requirements.hashes.wheel.cuda.txt"
-WHEEL_HASH_FILE_PYPI="requirements.hashes.wheel.pypi.cuda.txt"
-BUILD_FILE="requirements-build.cuda.txt"
+SOURCE_HASH_FILE="${KONFLUX_DIR}/requirements.hashes.source.cuda.txt"
+WHEEL_HASH_FILE="${KONFLUX_DIR}/requirements.hashes.wheel.cuda.txt"
+WHEEL_HASH_FILE_PYPI="${KONFLUX_DIR}/requirements.hashes.wheel.pypi.cuda.txt"
+BUILD_FILE="${KONFLUX_DIR}/requirements-build.cuda.txt"
 RHOAI_INDEX_URL="https://packages.redhat.com/api/pypi/public-rhai/rhoai/3.3/cuda12.9-ubi9/simple/"
 # CPU RHOAI index (same version as CUDA): faiss-cpu resolves from here so prefetch can fetch wheels.
 RHOAI_INDEX_URL_CPU="${RHOAI_INDEX_URL/cuda12.9-ubi9/cpu-ubi9}"
