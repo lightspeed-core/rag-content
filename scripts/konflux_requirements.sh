@@ -12,16 +12,17 @@
 # stop on error and print commands
 set -ex
 
+KONFLUX_DIR=".konflux"
 RAW_REQ_FILE="requirements.no_hashes.txt"
 SOURCE_FILE="requirements.source.txt"
 WHEEL_FILE="requirements.wheel.txt"
 WHEEL_FILE_PYPI="requirements.wheel.pypi.txt"
-SOURCE_HASH_FILE="requirements.hashes.source.txt"
-WHEEL_HASH_FILE="requirements.hashes.wheel.txt"
-WHEEL_HASH_CPU_X86="requirements.hashes.wheel.cpu.x86_64.txt"
-WHEEL_HASH_CPU_AARCH="requirements.hashes.wheel.cpu.aarch64.txt"
-WHEEL_HASH_FILE_PYPI="requirements.hashes.wheel.pypi.txt"
-BUILD_FILE="requirements-build.txt"
+SOURCE_HASH_FILE="${KONFLUX_DIR}/requirements.hashes.source.txt"
+WHEEL_HASH_FILE="${KONFLUX_DIR}/requirements.hashes.wheel.txt"
+WHEEL_HASH_CPU_X86="${KONFLUX_DIR}/requirements.hashes.wheel.cpu.x86_64.txt"
+WHEEL_HASH_CPU_AARCH="${KONFLUX_DIR}/requirements.hashes.wheel.cpu.aarch64.txt"
+WHEEL_HASH_FILE_PYPI="${KONFLUX_DIR}/requirements.hashes.wheel.pypi.txt"
+BUILD_FILE="${KONFLUX_DIR}/requirements-build.txt"
 RHOAI_INDEX_URL="https://packages.redhat.com/api/pypi/public-rhai/rhoai/3.3/cpu-ubi9/simple/"
 
 # Prefetch as wheels for image pip/bootstrap (not project deps).

@@ -41,16 +41,16 @@ spec:
       [
          {
            "type": "generic",
-           "path": ".",
+           "path": ".konflux",
            "lockfile": "artifacts.lock.yaml"
          },
          {
            "type": "rpm",
-           "path": "."
+           "path": ".konflux"
          },
          {
            "type": "pip",
-           "path": ".",
+           "path": ".konflux",
            "requirements_files": [
              "requirements.hashes.wheel.txt",
              "requirements.hashes.wheel.cpu.x86_64.txt",
@@ -74,7 +74,7 @@ spec:
   - name: hermetic
     value: 'true'
   - name: build-args-file
-    value: build-args-konflux.conf
+    value: .konflux/build-args-konflux.conf
   pipelineSpec:
     description: |
       This pipeline is ideal for building multi-arch container images from a Containerfile while maintaining trust after pipeline customization.

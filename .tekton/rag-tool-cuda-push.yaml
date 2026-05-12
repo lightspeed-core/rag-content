@@ -39,16 +39,16 @@ spec:
       [
          {
            "type": "generic",
-           "path": ".",
+           "path": ".konflux",
            "lockfile": "artifacts.lock.yaml"
          },
          {
            "type": "rpm",
-           "path": "cuda"
+           "path": ".konflux/cuda"
          },
          {
            "type": "pip",
-           "path": ".",
+           "path": ".konflux",
            "requirements_files": [
             "requirements.hashes.wheel.cuda.txt",
             "requirements.hashes.wheel.pypi.cuda.base.txt",
@@ -72,7 +72,7 @@ spec:
   - name: hermetic
     value: 'true'
   - name: build-args-file
-    value: build-args-konflux-cuda.conf
+    value: .konflux/build-args-konflux-cuda.conf
   pipelineSpec:
     description: |
       This pipeline is ideal for building multi-arch container images from a Containerfile while maintaining trust after pipeline customization.
