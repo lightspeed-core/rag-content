@@ -85,7 +85,7 @@ uv pip compile pyproject.toml -o "$RAW_REQ_FILE" \
 	--index-strategy unsafe-best-match \
 	--emit-index-annotation \
 	--no-sources \
-	--override requirements.overrides.cuda.txt
+	--override ${KONFLUX_DIR}/requirements.overrides.cuda.txt
 
 # Restore original pyproject.toml and uv.lock (trap will also run on exit and clean up)
 mv pyproject.toml pyproject.cuda.toml

@@ -23,6 +23,9 @@ docling-ibm-models==3.12.0
 triton==3.5.0
 greenlet==3.3.0
 pypdfium2==4.30.0
+pydantic-core==2.46.1
+pydantic==2.13.1
+pydantic-settings==2.13.1
 deprecated==1.2.18
 wrapt==1.17.3
 # hf-xet: pin wheel-only 1.2.0 (same as CPU). Newer releases (e.g. 1.4.x) use Rust edition 2024; image Cargo

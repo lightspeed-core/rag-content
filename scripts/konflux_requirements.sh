@@ -43,7 +43,7 @@ uv pip compile pyproject.toml -o "$RAW_REQ_FILE" \
 		--index-strategy unsafe-best-match \
 		--emit-index-annotation \
 		--no-sources \
-		--override requirements.overrides.txt
+		--override ${KONFLUX_DIR}/requirements.overrides.txt
 
 # Initialize output files
 echo "# Packages from pypi.org" > "$SOURCE_FILE"

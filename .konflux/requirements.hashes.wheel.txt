@@ -90,8 +90,6 @@ jsonschema==4.26.0 \
     --hash=sha256:2601ba467f84ff6ee9c057cbe6a9d7aebefa76cfa747327b37f81d4581f6748f
 jsonschema-specifications==2025.9.1 \
     --hash=sha256:065ec57323001f79634013c12250a476952e6ce834a17cfd5227343cec3c4aee
-markdown-it-py==4.0.0 \
-    --hash=sha256:4ca21586bdc83c96a1318ffc854698e1fdcad60a3e8051d249f10ef210c945c0
 marko==2.2.2 \
     --hash=sha256:5dc6e6fdb83f2cfdb0c687bfbc17883d739797929cf8feb57c045a7f360a4365
 marshmallow==3.26.2 \
@@ -129,11 +127,6 @@ pluggy==1.6.0 \
     --hash=sha256:b438478d30f9d6ee193d83daf54b6ee1ab4500f54dcef77b3e315aa4b9aef107
 prompt-toolkit==3.0.52 \
     --hash=sha256:c329e921742d68b12ff8543ca7004be7b4ccd8a69317bea8d9a6e524dd48cdbe
-propcache==0.4.1 \
-    --hash=sha256:10f7bf66817595de6682fd428cf2aa7892c0b0b45475585e8029655ab50c0510 \
-    --hash=sha256:3ccf1a18d315e7e234aee592a5dddd10951fa41f8a8658021dbe7ac413cca797 \
-    --hash=sha256:3f5189a8cf5fd36f414b4d9bf244e61a1eca49ac57942c7e930250df94b2340a \
-    --hash=sha256:42ecf4d140bbc503d90097af47bfc9c7e2a88faaad70694ea2bf50ad3da35c41
 pycparser==3.0 \
     --hash=sha256:86072d0cf4bf7e125171d79036c2126a2fa377687520e834987c2de4b4e5a9e9
 pylatexenc==2.10 \
@@ -200,8 +193,6 @@ tiktoken==0.12.0 \
     --hash=sha256:019dfefcb4f2899eb8c7fd4d170c3ed335113579de129f55526fcdc3b43ef5ba \
     --hash=sha256:9d341a1e06d325151f05991a0a1616c12918132fda42b7601d25c9d02726e5b3 \
     --hash=sha256:aee67dcabd42538b82abaf27a1d5b74da0eb2da37fa9c9c117ca99d9146e2937
-tomlkit==0.14.0 \
-    --hash=sha256:96890a2259a290d46848528559815b808c7817f09bff1323a122131853a50b65
 tqdm==4.67.3 \
     --hash=sha256:d798b33fcc041b9a42c57f462b9c068a5a15c2dbcef1c87695d80c7074770a4d
 transformers==4.57.3 \
@@ -231,7 +222,5 @@ typing-inspect==0.9.0 \
     --hash=sha256:369f80dd867ce208d61bc645e236c5049273c6e0f46c090fb9c7a9655fc8320b
 typing-inspection==0.4.2 \
     --hash=sha256:4baec0c9a4ad5cc8a85c71c387e98ff9ecc7b85b6e538e204343940090be3b63
-urllib3==2.6.3 \
-    --hash=sha256:a5bd1dd5b4c7b1da77f93abcd09f8619209b2f11fe699382f6cb79b34dc89437
 xlsxwriter==3.2.9 \
     --hash=sha256:35358bbc5bb4085bc6c1bc97622791ad5d9c4c19e3ccc1f8708d8b4e6a7a84de
