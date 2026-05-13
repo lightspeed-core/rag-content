@@ -60,8 +60,6 @@ termcolor==3.3.0 \
     --hash=sha256:902151eddd445ac7d4d1489bf0c85d1dd743ab42523ba6ec7763816aca701b7b
 threadpoolctl==3.6.0 \
     --hash=sha256:7f43d114c8e9adec8e8f6932a9f58744515c417475637471a2c32f3279965664
-tomlkit==0.14.0 \
-    --hash=sha256:9c0f412bfcb3b52746f92f129c110add0095bc010b0c1c03252b82e70b0deb6c
 transformers==4.57.3 \
     --hash=sha256:53798f5fa438cf5a947ad0a0fddbf1e405a31c55b1b8018c9bb68adc8d6d00f2
 tree-sitter==0.25.2 \
