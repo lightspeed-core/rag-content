@@ -46,6 +46,7 @@ hatch-vcs==0.5.0
     #   filelock
     #   fsspec
     #   platformdirs
+    #   scikit-build-core
     #   urllib3
 hatchling==1.26.3
     # via
@@ -85,6 +86,7 @@ hatchling==1.29.0
     #   polyfactory
     #   pygments
     #   python-multipart
+    #   scikit-build-core
     #   soupsieve
     #   starlette
     #   urllib3
@@ -100,11 +102,14 @@ maturin==1.10.2
 packaging==26.2
     # via
     #   hatchling
+    #   scikit-build-core
     #   setuptools-scm
     #   vcs-versioning
     #   wheel
 pathspec==1.1.1
-    # via hatchling
+    # via
+    #   hatchling
+    #   scikit-build-core
 pdm-backend==2.4.8
     # via
     #   fastapi
@@ -119,6 +124,10 @@ poetry-core==2.4.0
     #   dunamai
     #   rich
     #   tomlkit
+pybind11==3.0.4
+    # via pillow
+scikit-build-core==0.12.2
+    # via pybind11
 semantic-version==2.10.0
     # via setuptools-rust
 setuptools-rust==1.12.1
@@ -186,6 +195,7 @@ setuptools==82.0.1
     #   oracledb
     #   pathspec
     #   pgvector
+    #   pillow
     #   pluggy
     #   propcache
     #   psutil

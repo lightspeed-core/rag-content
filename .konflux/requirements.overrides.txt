@@ -25,7 +25,6 @@ pypdfium2==4.30.0
 pydantic-core==2.41.5
 pydantic==2.12.5
 pydantic-settings==2.12.0
-pillow==12.1.1
 docling-core==2.74.0
 # Pin to 1.2.0; we fetch as wheel only (PYPI_WHEELS) — sdists need Rust 1.85+.
 hf-xet==1.2.0

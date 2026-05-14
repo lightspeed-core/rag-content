@@ -16,6 +16,11 @@ packages:
     libtool,
     libxml2-devel,
     libxslt-devel,
+    libjpeg-turbo-devel,
+    zlib-devel,
+    libtiff-devel,
+    freetype-devel,
+    libwebp-devel,
   ]
 contentOrigin:
   repofiles: ["./redhat.repo"]
