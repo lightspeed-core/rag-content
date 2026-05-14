@@ -14,17 +14,18 @@
 # stop on error and print commands
 set -ex
 
+KONFLUX_DIR=".konflux"
 PROFILE="${1:-cpu}"
 case "$PROFILE" in
 cpu)
 	RHOAI_INDEX_URL="https://packages.redhat.com/api/pypi/public-rhai/rhoai/3.4/cpu-ubi9/simple/"
-	REQUIREMENTS_OVERRIDE="requirements.overrides.txt"
-	WHEEL_FILE="requirements.wheel.txt"
-	WHEEL_FILE_PYPI="requirements.wheel.pypi.txt"
-	SOURCE_HASH_FILE="requirements.hashes.source.txt"
-	WHEEL_HASH_FILE="requirements.hashes.wheel.txt"
-	WHEEL_HASH_FILE_PYPI="requirements.hashes.wheel.pypi.txt"
-	BUILD_FILE="requirements-build.txt"
+	REQUIREMENTS_OVERRIDE="${KONFLUX_DIR}/requirements.overrides.txt"
+	WHEEL_FILE="${KONFLUX_DIR}/requirements.wheel.txt"
+	WHEEL_FILE_PYPI="${KONFLUX_DIR}/requirements.wheel.pypi.txt"
+	SOURCE_HASH_FILE="${KONFLUX_DIR}/requirements.hashes.source.txt"
+	WHEEL_HASH_FILE="${KONFLUX_DIR}/requirements.hashes.wheel.txt"
+	WHEEL_HASH_FILE_PYPI="${KONFLUX_DIR}/requirements.hashes.wheel.pypi.txt"
+	BUILD_FILE="${KONFLUX_DIR}/requirements-build.txt"
 	TEKTON_PREFETCH_FILES=(
 		.tekton/rag-tool-pull-request.yaml
 		.tekton/rag-tool-push.yaml
@@ -32,13 +33,13 @@ cpu)
 	;;
 cuda)
 	RHOAI_INDEX_URL="https://packages.redhat.com/api/pypi/public-rhai/rhoai/3.4/cuda12.9-ubi9/simple/"
-	REQUIREMENTS_OVERRIDE="requirements.overrides.cuda.txt"
-	WHEEL_FILE="requirements.wheel.cuda.txt"
-	WHEEL_FILE_PYPI="requirements.wheel.pypi.cuda.txt"
-	SOURCE_HASH_FILE="requirements.hashes.source.cuda.txt"
-	WHEEL_HASH_FILE="requirements.hashes.wheel.cuda.txt"
-	WHEEL_HASH_FILE_PYPI="requirements.hashes.wheel.pypi.cuda.txt"
-	BUILD_FILE="requirements-build.cuda.txt"
+	REQUIREMENTS_OVERRIDE="${KONFLUX_DIR}/requirements.overrides.cuda.txt"
+	WHEEL_FILE="${KONFLUX_DIR}/requirements.wheel.cuda.txt"
+	WHEEL_FILE_PYPI="${KONFLUX_DIR}/requirements.wheel.pypi.cuda.txt"
+	SOURCE_HASH_FILE="${KONFLUX_DIR}/requirements.hashes.source.cuda.txt"
+	WHEEL_HASH_FILE="${KONFLUX_DIR}/requirements.hashes.wheel.cuda.txt"
+	WHEEL_HASH_FILE_PYPI="${KONFLUX_DIR}/requirements.hashes.wheel.pypi.cuda.txt"
+	BUILD_FILE="${KONFLUX_DIR}/requirements-build.cuda.txt"
 	TEKTON_PREFETCH_FILES=(
 		.tekton/rag-tool-cuda-pull-request.yaml
 		.tekton/rag-tool-cuda-push.yaml
@@ -115,17 +116,8 @@ wheel_packages=$(grep -vE '^#|^--' "$WHEEL_FILE" | sed '/^$/d' | sed 's/==.*//' 
 pypi_wheel_packages=$(grep -vE '^#|^--' "$WHEEL_FILE_PYPI" | sed '/^$/d' | sed 's/==.*//' | tr '\n' ',' | sed 's/,$//')
 wheel_packages="$wheel_packages,$EXTRA_WHEELS,$pypi_wheel_packages"
 wheel_packages=$(printf '%s' "$wheel_packages" | tr ',' '\n' | awk 'NF && !seen[$0]++' | paste -sd, -)
-<<<<<<< HEAD
-for _tekton_prefetch in \
-	.tekton/rag-tool-pull-request.yaml \
-<<<<<<< HEAD
-	.tekton/rag-tool-push.yaml; do
-=======
-	.tekton/rag-tool-push.yaml ; do
->>>>>>> 959d70a (Update Python dependencies to RHOAI index 3.4)
-=======
+
 for _tekton_prefetch in "${TEKTON_PREFETCH_FILES[@]}"; do
->>>>>>> 8660365 (cuda)
 	sed -i 's/"packages": "[^"]*"/"packages": "'"$wheel_packages"'"/' "$_tekton_prefetch"
 done
 

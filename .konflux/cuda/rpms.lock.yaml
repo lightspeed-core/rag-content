@@ -221,13 +221,6 @@ arches:
     name: libxml2-devel
     evr: 2.9.13-12.el9_6.1
     sourcerpm: libxml2-2.9.13-12.el9_6.1.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libxslt-1.1.34-13.el9_6.1.aarch64.rpm
-    repoid: rhel-9-for-aarch64-appstream-eus-rpms
-    size: 244463
-    checksum: sha256:5c2b240916b054dd00e8add4fe43479816f2b214ea8be3461de6a710bc5e39d1
-    name: libxslt
-    evr: 1.1.34-13.el9_6.1
-    sourcerpm: libxslt-1.1.34-13.el9_6.1.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libxslt-devel-1.1.34-13.el9_6.1.aarch64.rpm
     repoid: rhel-9-for-aarch64-appstream-eus-rpms
     size: 326591
@@ -757,13 +750,6 @@ arches:
     name: libxml2-devel
     evr: 2.9.13-12.el9_6.1
     sourcerpm: libxml2-2.9.13-12.el9_6.1.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libxslt-1.1.34-13.el9_6.1.x86_64.rpm
-    repoid: rhel-9-for-x86_64-appstream-eus-rpms
-    size: 247056
-    checksum: sha256:89efaa836dd7787e19f09426a306bcbbbe37cf061fd9c9406e43a9a420a3ab1e
-    name: libxslt
-    evr: 1.1.34-13.el9_6.1
-    sourcerpm: libxslt-1.1.34-13.el9_6.1.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libxslt-devel-1.1.34-13.el9_6.1.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-eus-rpms
     size: 326584
