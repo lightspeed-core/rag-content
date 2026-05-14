@@ -10,10 +10,10 @@ Audit Dependabot vulnerabilities for `$repo` (default: `lightspeed-core/rag-cont
 Fetch open Dependabot alerts using:
 
 ```
-gh api "repos/$repo/dependabot/alerts" --paginate --jq '.[] | select(.state == "open") | {number, state, severity: .security_vulnerability.severity, package: .security_vulnerability.package.name, ecosystem: .security_vulnerability.package.ecosystem, summary: .security_advisory.summary, cve: (.security_advisory.cve_id // "N/A"), created: .created_at, fixed_version: (.security_vulnerability.first_patched_version.identifier // "N/A")}'
+gh api "repos/$repo/dependabot/alerts" --paginate --jq '.[] | select(.state == "open") | {number, state, severity: .security_vulnerability.severity, package: .security_vulnerability.package.name, ecosystem: .security_vulnerability.package.ecosystem, summary: .security_advisory.summary, cve: (.security_advisory.cve_id // "N/A"), ghsa: .security_advisory.ghsa_id, created: .created_at, fixed_version: (.security_vulnerability.first_patched_version.identifier // "N/A")}'
 ```
 
-If `$repo` is not provided, default to `lightspeed-core/rag-content`. Deduplicate results by CVE + package name (multiple alerts for the same CVE across different manifest files count as one unique vulnerability).
+If `$repo` is not provided, default to `lightspeed-core/rag-content`. Deduplicate results by (CVE + package name) when a CVE is present, or (GHSA ID + package name) when CVE is null/N/A. This prevents collapsing distinct GHSA-only advisories for the same package into a single entry.
 
 ## Step 2: Present severity summary
 
