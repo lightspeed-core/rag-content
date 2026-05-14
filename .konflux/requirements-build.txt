@@ -84,7 +84,6 @@ hatchling==1.29.0
     #   polyfactory
     #   pygments
     #   python-multipart
-    #   semchunk
     #   soupsieve
     #   starlette
     #   urllib3
@@ -159,7 +158,6 @@ wheel==0.47.0
     #   pyclipper
     #   sentence-transformers
     #   tornado
-    #   tree-sitter-c
     #   tzdata
     #   wrapt
 
@@ -179,7 +177,6 @@ setuptools==82.0.1
     #   lxml
     #   markupsafe
     #   maturin
-    #   multiprocess
     #   oracledb
     #   pathspec
     #   pgvector
@@ -198,7 +195,6 @@ setuptools==82.0.1
     #   tabulate
     #   tenacity
     #   tornado
-    #   tree-sitter-c
     #   trove-classifiers
     #   tzdata
     #   vcs-versioning

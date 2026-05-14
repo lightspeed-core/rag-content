@@ -85,7 +85,6 @@ hatchling==1.29.0
     #   polyfactory
     #   pygments
     #   python-multipart
-    #   semchunk
     #   soupsieve
     #   starlette
     #   urllib3
@@ -163,7 +162,6 @@ wheel==0.47.0
     #   pycparser
     #   sentence-transformers
     #   tornado
-    #   tree-sitter-c
     #   tzdata
 
 # The following packages are considered to be unsafe in a requirements file:
@@ -177,7 +175,6 @@ setuptools==82.0.1
     #   certifi
     #   charset-normalizer
     #   colorlog
-    #   dill
     #   fire
     #   googleapis-common-protos
     #   llama-stack
@@ -186,7 +183,6 @@ setuptools==82.0.1
     #   markupsafe
     #   maturin
     #   multidict
-    #   multiprocess
     #   oracledb
     #   pathspec
     #   pgvector
@@ -207,7 +203,6 @@ setuptools==82.0.1
     #   tenacity
     #   tornado
     #   tqdm
-    #   tree-sitter-c
     #   trove-classifiers
     #   tzdata
     #   vcs-versioning
