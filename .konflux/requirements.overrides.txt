@@ -8,7 +8,6 @@ aiohttp==3.13.3
 aiosqlite==0.22.0
 anyio==4.12.0
 datasets==4.4.1
-pillow==11.3.0
 faiss-cpu==1.12.0
 setuptools==80.9
 # 0.12.x sdist Cargo.lock is inconsistent with Cargo.toml; Hermeto cargo vendor --locked fails.
@@ -23,5 +22,9 @@ hf-xet==1.2.0
 torch==2.9.0
 torchvision==0.24.0
 pypdfium2==4.30.0
+pydantic-core==2.41.5
+pydantic==2.12.5
+pydantic-settings==2.12.0
+docling-core==2.74.0
 # Pin to 1.2.0; we fetch as wheel only (PYPI_WHEELS) — sdists need Rust 1.85+.
 hf-xet==1.2.0
