@@ -129,6 +129,15 @@ prompt-toolkit==3.0.52 \
     --hash=sha256:c329e921742d68b12ff8543ca7004be7b4ccd8a69317bea8d9a6e524dd48cdbe
 pycparser==3.0 \
     --hash=sha256:86072d0cf4bf7e125171d79036c2126a2fa377687520e834987c2de4b4e5a9e9
+pydantic==2.12.5 \
+    --hash=sha256:ba78cfc9d85e40047d67d32828da04ddbe9a27bd0718983938629bfca0d3cc6c
+pydantic-core==2.41.5 \
+    --hash=sha256:280238d34598c8e0eac77c2d96456cb5657f4afc3235d6afa15859a143cc3885 \
+    --hash=sha256:2c1462d1bdf9b8b13c8afa43856d7163c5a2567e9f05fcd5d26f54f23f35edf0 \
+    --hash=sha256:3713d923ca3dd74e51ad6ce5be8e2bb9b8398cbc3cdbe7bd959282e9e9694fff \
+    --hash=sha256:41f74ba1ea18462d7cc27155581a9b23165adc7b009c6d467542274d63db163c
+pydantic-settings==2.12.0 \
+    --hash=sha256:c4dd60402e9b83d10b2f99414655aee5465ca2549f78c2eaf994c2153bc4d628
 pylatexenc==2.10 \
     --hash=sha256:53e0cbcaa0ca9cfd7b45e4cf06bc1c82d9001f969079f775714b411dd3716c54
 pypdfium2==4.30.0 \
