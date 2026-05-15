@@ -25,7 +25,7 @@ RUN pip3.12 install uv>=0.7.20
 
 WORKDIR /rag-content
 
-COPY Makefile pyproject.toml uv.lock README.md Gemfile Gemfile.lock .konflux/requirements.hashes.wheel.txt .konflux/requirements.hashes.wheel.cpu.x86_64.txt .konflux/requirements.hashes.wheel.cpu.aarch64.txt .konflux/requirements.hashes.wheel.pypi.txt .konflux/requirements.hashes.source.txt .konflux/requirements-build.txt ./
+COPY Makefile pyproject.toml uv.lock README.md Gemfile Gemfile.lock .konflux/requirements.hashes.wheel.txt .konflux/requirements.hashes.wheel.pypi.txt .konflux/requirements.hashes.source.txt .konflux/requirements-build.txt ./
 COPY src ./src
 COPY tests ./tests
 COPY scripts ./scripts
