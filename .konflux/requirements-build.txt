@@ -130,9 +130,7 @@ scikit-build-core==0.12.2
 semantic-version==2.10.0
     # via setuptools-rust
 setuptools-rust==1.12.1
-    # via
-    #   maturin
-    #   tiktoken
+    # via maturin
 setuptools-scm==10.0.5
     # via
     #   anyio
@@ -168,7 +166,6 @@ wheel==0.47.0
     #   oracledb
     #   pyclipper
     #   sentence-transformers
-    #   tiktoken
     #   tornado
     #   tzdata
     #   wrapt
@@ -207,7 +204,6 @@ setuptools==82.0.1
     #   sse-starlette
     #   tabulate
     #   tenacity
-    #   tiktoken
     #   tornado
     #   trove-classifiers
     #   tzdata
