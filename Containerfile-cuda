@@ -24,6 +24,19 @@ RUN if [ -f /cachi2/cachi2.env ]; then \
 # Install uv package manager
 RUN pip3.12 install "uv>=0.7.20"
 
+WORKDIR /rag-content
+
+COPY Makefile pyproject.toml uv.lock README.md Gemfile Gemfile.lock .konflux/requirements.hashes.wheel.cuda.txt .konflux/requirements.hashes.source.cuda.txt .konflux/requirements.hashes.wheel.pypi.cuda.txt .konflux/requirements-build.cuda.txt ./
+COPY src ./src
+COPY tests ./tests
+COPY scripts ./scripts
+COPY embeddings_model ./embeddings_model
+COPY LICENSE /licenses/LICENSE
+
+# Install Ruby Gems
+RUN BUNDLE_PATH__SYSTEM=true bundle install
+
+# Configure UV environment variables for optimal performance
 ENV UV_COMPILE_BYTECODE=0 \
     UV_LINK_MODE=copy \
     UV_PYTHON_DOWNLOADS=0 \
@@ -35,7 +48,6 @@ ENV UV_COMPILE_BYTECODE=0 \
 ARG TARGETARCH
 RUN if [ -f /cachi2/cachi2.env ]; then \
     . /cachi2/cachi2.env && \
-    FAISS_ARCH=$(echo "${TARGETARCH:-$(uname -m)}" | sed 's/amd64/x86_64/;s/arm64/aarch64/') && \
     uv venv --seed --no-index --find-links ${PIP_FIND_LINKS} && \
     . .venv/bin/activate && \
     pip install --no-cache-dir --ignore-installed --no-index --find-links ${PIP_FIND_LINKS} --no-deps -r requirements.hashes.wheel.cuda.txt -r requirements.hashes.source.cuda.txt -r requirements.hashes.wheel.pypi.cuda.txt && \

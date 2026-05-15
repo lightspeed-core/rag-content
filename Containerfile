@@ -22,6 +22,21 @@ RUN if [ -f /cachi2/cachi2.env ]; then \
 # Install uv package manager
 RUN pip3.12 install uv>=0.7.20
 
+WORKDIR /rag-content
+
+COPY Makefile pyproject.toml uv.lock README.md Gemfile Gemfile.lock .konflux/requirements.hashes.wheel.txt .konflux/requirements.hashes.wheel.pypi.txt .konflux/requirements.hashes.source.txt .konflux/requirements-build.txt ./
+COPY src ./src
+COPY tests ./tests
+COPY scripts ./scripts
+COPY embeddings_model ./embeddings_model
+COPY LICENSE /licenses/LICENSE
+
+# Install Ruby Gems
+RUN BUNDLE_PATH__SYSTEM=true bundle install
+
+# Configure UV environment variables for optimal performance
+# Pytorch backend - cpu. `uv` contains convenient way to specify the backend.
+# MATURIN_NO_INSTALL_RUST=1 : Disable installation of Rust dependencies by Maturin.
 ENV UV_COMPILE_BYTECODE=0 \
     UV_LINK_MODE=copy \
     UV_PYTHON_DOWNLOADS=0 \
