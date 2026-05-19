@@ -383,6 +383,29 @@ skip && /^[a-zA-Z0-9]/ { skip=0 }
 { print }
 ' "$WHEEL_HASH_FILE" > "${WHEEL_HASH_FILE}.bs4" && mv "${WHEEL_HASH_FILE}.bs4" "$WHEEL_HASH_FILE"
 fi
+# cffi: RHOAI *-8-cp312-*linux_*.whl ≠ PyPI hashes; pin pulp URL per arch.
+CFFI_CUDA_PULP_BASE="https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.3/cuda12.9-ubi9"
+CFFI_CUDA_X86_WHEEL="cffi-2.0.0-8-cp312-cp312-linux_x86_64.whl"
+CFFI_CUDA_X86_SHA256="2a909b200a31843ae8a0c4d080553673bfa1b7b7ed5b7718687771c7dfa7eb2d"
+CFFI_CUDA_AARCH_WHEEL="cffi-2.0.0-8-cp312-cp312-linux_aarch64.whl"
+CFFI_CUDA_AARCH_SHA256="fd3092cfea62fdf9375106ce741f9a8e57893ebd639d1a9140cf9f1a25d864f5"
+if grep -qE '^cffi(==| @)' "$WHEEL_HASH_FILE"; then
+	awk -v basex="$CFFI_CUDA_PULP_BASE" -v wfx="$CFFI_CUDA_X86_WHEEL" -v whx="$CFFI_CUDA_X86_SHA256" \
+	    -v basea="$CFFI_CUDA_PULP_BASE" -v wfa="$CFFI_CUDA_AARCH_WHEEL" -v wha="$CFFI_CUDA_AARCH_SHA256" '
+/^cffi==|^cffi @/ {
+  print "cffi @ " basex "/" wfx " \\"
+  print "    --hash=sha256:" whx
+  print "cffi @ " basea "/" wfa " \\"
+  print "    --hash=sha256:" wha
+  skip=1
+  next
+}
+skip && /^[ \t]+--hash=/ { next }
+skip && /^[[:space:]]*$/ { next }
+skip && /^[a-zA-Z0-9]/ { skip=0 }
+{ print }
+' "$WHEEL_HASH_FILE" > "${WHEEL_HASH_FILE}.cffi" && mv "${WHEEL_HASH_FILE}.cffi" "$WHEEL_HASH_FILE"
+fi
 # PyPI nvidia-* cu12 wheels must not be installed: they duplicate/conflict with RHOAI torch (bundled CUDA) and break the stack.
 awk '/^nvidia-[a-zA-Z0-9_-]+==/{skip=1; next}
 skip && /^[[:space:]]/{next}

@@ -175,6 +175,20 @@ skip && /^[a-zA-Z0-9]/ { skip=0 }
 { print }
 ' "$WHEEL_HASH_FILE" > "${WHEEL_HASH_FILE}.stripms" && mv "${WHEEL_HASH_FILE}.stripms" "$WHEEL_HASH_FILE"
 fi
+# cffi: RHOAI *-2-cp312-*linux_*.whl ≠ PyPI hashes; arch-split like aiohttp/markupsafe.
+CFFI_CPU_PULP_BASE="https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.3/cpu-ubi9"
+CFFI_CPU_X86_WHEEL="cffi-2.0.0-2-cp312-cp312-linux_x86_64.whl"
+CFFI_CPU_X86_SHA256="34cf2187e399eb7baaa20488d0b78ab20be91060ef9ac531685f37478ca1a12a"
+CFFI_CPU_AARCH_WHEEL="cffi-2.0.0-2-cp312-cp312-linux_aarch64.whl"
+CFFI_CPU_AARCH_SHA256="257e90f733c1a33b9f5ade4a4f47db6a3984de5c2d2654848feca129888ff9d5"
+if grep -qE '^cffi(==| @)' "$WHEEL_HASH_FILE"; then
+	awk '
+/^cffi==|^cffi @/ { skip=1; next }
+skip && /^[ \t]/ { next }
+skip && /^[a-zA-Z0-9]/ { skip=0 }
+{ print }
+' "$WHEEL_HASH_FILE" > "${WHEEL_HASH_FILE}.stripcffi" && mv "${WHEEL_HASH_FILE}.stripcffi" "$WHEEL_HASH_FILE"
+fi
 CPU_PULP_32="https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.2/cpu-ubi9"
 TV_X86_URL="https://files.pythonhosted.org/packages/7e/e6/7324ead6793075a8c75c56abeed1236d1750de16a5613cfe2ddad164a92a/torchvision-0.24.0-cp312-cp312-manylinux_2_28_x86_64.whl"
 TV_X86_SHA="26b9dd9c083f8e5f7ac827de6d5b88c615d9c582dc87666770fbdf16887e4c25"
@@ -209,6 +223,12 @@ if grep -qE '^markupsafe==' "$WHEEL_FILE"; then
 	printf '%s\n' "    --hash=sha256:${MARKUPSAFE_CPU_X86_SHA256}" >> "$WHEEL_HASH_CPU_X86"
 	printf '%s\n' "markupsafe @ ${MARKUPSAFE_CPU_PULP_BASE}/${MARKUPSAFE_CPU_AARCH_WHEEL} \\" >> "$WHEEL_HASH_CPU_AARCH"
 	printf '%s\n' "    --hash=sha256:${MARKUPSAFE_CPU_AARCH_SHA256}" >> "$WHEEL_HASH_CPU_AARCH"
+fi
+if grep -qE '^cffi==' "$WHEEL_FILE"; then
+	printf '%s\n' "cffi @ ${CFFI_CPU_PULP_BASE}/${CFFI_CPU_X86_WHEEL} \\" >> "$WHEEL_HASH_CPU_X86"
+	printf '%s\n' "    --hash=sha256:${CFFI_CPU_X86_SHA256}" >> "$WHEEL_HASH_CPU_X86"
+	printf '%s\n' "cffi @ ${CFFI_CPU_PULP_BASE}/${CFFI_CPU_AARCH_WHEEL} \\" >> "$WHEEL_HASH_CPU_AARCH"
+	printf '%s\n' "    --hash=sha256:${CFFI_CPU_AARCH_SHA256}" >> "$WHEEL_HASH_CPU_AARCH"
 fi
 if grep -qE '^[a-zA-Z0-9][a-zA-Z0-9_.-]*==' "$WHEEL_FILE_PYPI"; then
 	uv pip compile "$WHEEL_FILE_PYPI" --refresh --generate-hashes --python-version 3.12 --emit-index-url --no-deps --no-annotate > "$WHEEL_HASH_FILE_PYPI"
