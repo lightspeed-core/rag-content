@@ -7,13 +7,19 @@ ARG DNF_COMMAND=microdnf
 ARG TARGETARCH
 USER root
 
-# Install Python, build toolchain, and dev libraries (unconditionally — builder is discarded).
+# Install Python and git (always needed).
 RUN ${DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
-    python3.12 python3.12-devel python3.12-pip \
-    gcc cmake cargo rust swig autoconf automake libtool git \
+    python3.12 python3.12-devel python3.12-pip git && \
+    ${DNF_COMMAND} clean all
+
+# Hermetic: install build toolchain and dev libs for compiling sdists.
+RUN if [ -f /cachi2/cachi2.env ]; then \
+    ${DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
+    gcc cmake cargo rust swig autoconf automake libtool \
     libpq-devel libxml2-devel libxslt-devel \
     libjpeg-turbo-devel zlib-devel libtiff-devel freetype-devel libwebp-devel && \
-    ${DNF_COMMAND} clean all
+    ${DNF_COMMAND} clean all; \
+    fi
 
 # Install uv package manager
 RUN pip3.12 install uv>=0.7.20
