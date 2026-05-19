@@ -6,8 +6,6 @@
 #
 calver==2025.10.20
     # via trove-classifiers
-coherent-licensed==0.5.2
-    # via zipp
 cython==3.2.4
     # via
     #   lxml
@@ -24,7 +22,6 @@ flit-core==3.12.0
     # via
     #   aiosqlite
     #   click
-    #   coherent-licensed
     #   idna
     #   jinja2
     #   markdown-it-py
@@ -143,7 +140,6 @@ setuptools-scm==10.0.5
     #   tabulate
     #   tenacity
     #   urllib3
-    #   zipp
 tomlkit==0.15.0
     # via uv-dynamic-versioning
 trove-classifiers==2026.5.7.17
@@ -210,4 +206,3 @@ setuptools==82.0.1
     #   vcs-versioning
     #   wrapt
     #   yarl
-    #   zipp
