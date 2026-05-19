@@ -25,11 +25,6 @@ cffi==2.0.0 \
     --hash=sha256:ffe747cf5e265169ad5bd64b4359368f74e445cf8ea3cfe99045450554fb4e13
 colorama==0.4.6 \
     --hash=sha256:6a666a04575143daff7ee645ed455ecd7b108f1a1e2bb8afd24e0e58dc7a7969
-cryptography==46.0.3 \
-    --hash=sha256:66ce9fc152c36e72fc2ef35a278e9ccc0861afbdf4096f6a0b4221d64ebaead0 \
-    --hash=sha256:77d3ab32961821b5c91e10fc0d943d725d3545fee2a1d4985fb30a26b4ed79cc \
-    --hash=sha256:a2c7213647c9a23b30d21966c721f94d32a6de6728d1e7da88b7ce55cc658b0c \
-    --hash=sha256:b501441a03c71a7b9caaa22f37e3f1ce1b2dfd126c80500cac6ac156c0138de5
 dataclasses-json==0.6.7 \
     --hash=sha256:1155da9dafe10961a05459d1e2ae87709913edfaf261d8a2512da91d4fb673ae
 defusedxml==0.7.1 \
@@ -74,8 +69,6 @@ httpx==0.28.1 \
     --hash=sha256:c75bc8d287ff8e92be7e4359732032ba1b93fa3f920ee1cb179ba09bb613dc7a
 httpx-sse==0.4.3 \
     --hash=sha256:74d0e4713b33a61ca0083d00841f00f12d6b3dd311edb62ccc85809b607b9fb5
-importlib-metadata==8.7.1 \
-    --hash=sha256:a3f29411f5f628be21c445082ff4f844a26ff1a0893d6fabaa55509c63ddbfaf
 jinja2==3.1.6 \
     --hash=sha256:961c7281585491fb02ca0027b29e9ffc7a1bd7b52a5e03095f3a4e3afc42336e
 joblib==1.5.3 \

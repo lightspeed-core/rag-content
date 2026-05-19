@@ -6,8 +6,8 @@
 #
 calver==2025.10.20
     # via trove-classifiers
-coherent-licensed==0.5.2
-    # via zipp
+cffi==2.0.0
+    # via cryptography
 cython==3.2.4
     # via
     #   lxml
@@ -24,7 +24,6 @@ flit-core==3.12.0
     # via
     #   aiosqlite
     #   click
-    #   coherent-licensed
     #   idna
     #   jinja2
     #   markdown-it-py
@@ -97,7 +96,9 @@ jinja2==3.1.6
 markupsafe==3.0.3
     # via jinja2
 maturin==1.10.2
-    # via uv-build
+    # via
+    #   cryptography
+    #   uv-build
 packaging==26.2
     # via
     #   hatchling
@@ -125,6 +126,8 @@ poetry-core==2.4.0
     #   tomlkit
 pybind11==3.0.4
     # via pillow
+pycparser==3.0
+    # via cffi
 scikit-build-core==0.12.2
     # via pybind11
 semantic-version==2.10.0
@@ -143,7 +146,6 @@ setuptools-scm==10.0.5
     #   tabulate
     #   tenacity
     #   urllib3
-    #   zipp
 tomlkit==0.15.0
     # via uv-dynamic-versioning
 trove-classifiers==2026.5.7.17
@@ -165,6 +167,7 @@ wheel==0.47.0
     #   oci
     #   oracledb
     #   pyclipper
+    #   pycparser
     #   sentence-transformers
     #   tornado
     #   tzdata
@@ -178,8 +181,10 @@ setuptools==82.0.1
     #   anyio
     #   calver
     #   certifi
+    #   cffi
     #   charset-normalizer
     #   colorlog
+    #   cryptography
     #   googleapis-common-protos
     #   llama-stack
     #   llama-stack-api
@@ -194,6 +199,7 @@ setuptools==82.0.1
     #   propcache
     #   psutil
     #   pyclipper
+    #   pycparser
     #   pyjwt
     #   regex
     #   requests
@@ -210,4 +216,3 @@ setuptools==82.0.1
     #   vcs-versioning
     #   wrapt
     #   yarl
-    #   zipp
