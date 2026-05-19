@@ -1,48 +1,34 @@
-ARG BASE_IMAGE=registry.access.redhat.com/ubi9/ubi-minimal
+ARG BUILDER_BASE_IMAGE=registry.access.redhat.com/ubi9/ubi-minimal
+ARG RUNTIME_BASE_IMAGE=registry.access.redhat.com/ubi9/ubi-minimal
 
-# Image with CPU only backend. Smaller images.
-FROM ${BASE_IMAGE}
+# Stage 1: Builder — install build tools, compile Python deps from sdist, then discard.
+FROM ${BUILDER_BASE_IMAGE} AS builder
 ARG DNF_COMMAND=microdnf
 ARG TARGETARCH
 USER root
 
-# Install Python and Ruby
+# Install Python, build toolchain, and dev libraries (unconditionally — builder is discarded).
 RUN ${DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
-    python3.12 python3.12-devel python3.12-pip git \
-    rubygems rubygem-bundler \
-    skopeo && \
+    python3.12 python3.12-devel python3.12-pip \
+    gcc cmake cargo rust swig autoconf automake libtool git \
+    libpq-devel libxml2-devel libxslt-devel \
+    libjpeg-turbo-devel zlib-devel libtiff-devel freetype-devel libwebp-devel && \
     ${DNF_COMMAND} clean all
 
 # Install uv package manager
 RUN pip3.12 install uv>=0.7.20
 
-WORKDIR /rag-content
-
-COPY Makefile pyproject.toml uv.lock README.md Gemfile Gemfile.lock .konflux/requirements.hashes.wheel.txt .konflux/requirements.hashes.wheel.cpu.x86_64.txt .konflux/requirements.hashes.wheel.cpu.aarch64.txt .konflux/requirements.hashes.wheel.pypi.txt .konflux/requirements.hashes.source.txt .konflux/requirements-build.txt ./
-COPY src ./src
-COPY tests ./tests
-COPY scripts ./scripts
-COPY embeddings_model ./embeddings_model
-COPY LICENSE /licenses/LICENSE
-
-# Install Ruby Gems
-RUN BUNDLE_PATH__SYSTEM=true bundle install
-
-# Configure UV environment variables for optimal performance
-# Pytorch backend - cpu. `uv` contains convenient way to specify the backend.
-# MATURIN_NO_INSTALL_RUST=1 : Disable installation of Rust dependencies by Maturin.
 ENV UV_COMPILE_BYTECODE=0 \
     UV_LINK_MODE=copy \
     UV_PYTHON_DOWNLOADS=0 \
     MATURIN_NO_INSTALL_RUST=1
 
-# Hermetic: install build tools (gcc, cargo, dev libs), build Python deps from sdist,
-# then remove build-only tools in the same layer to avoid image bloat.
+WORKDIR /rag-content
+
+COPY pyproject.toml uv.lock README.md .konflux/requirements.hashes.wheel.txt .konflux/requirements.hashes.wheel.cpu.x86_64.txt .konflux/requirements.hashes.wheel.cpu.aarch64.txt .konflux/requirements.hashes.wheel.pypi.txt .konflux/requirements.hashes.source.txt .konflux/requirements-build.txt ./
+COPY src ./src
+
 RUN if [ -f /cachi2/cachi2.env ]; then \
-    ${DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
-    gcc cmake git libpq-devel swig autoconf automake libtool libxml2-devel libxslt-devel \
-    libjpeg-turbo-devel zlib-devel libtiff-devel freetype-devel libwebp-devel \
-    cargo rust && \
     . /cachi2/cachi2.env && \
     uv venv --seed --no-index --find-links ${PIP_FIND_LINKS} && \
     . .venv/bin/activate && \
@@ -53,13 +39,38 @@ RUN if [ -f /cachi2/cachi2.env ]; then \
       -r requirements.hashes.wheel.pypi.txt \
       -r requirements.hashes.source.txt && \
     pip install --no-cache-dir --no-deps . && \
-    pip check && \
-    ${DNF_COMMAND} remove -y cargo rust rust-std-static && ${DNF_COMMAND} clean all; \
+    pip check; \
     else \
     uv sync --locked --no-dev; \
     fi
 
-# Add executables from .venv to system PATH
+# Stage 2: Runtime — clean image with only runtime dependencies.
+FROM ${RUNTIME_BASE_IMAGE}
+ARG DNF_COMMAND=microdnf
+USER root
+
+RUN ${DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
+    python3.12 python3.12-pip git \
+    libpq \
+    rubygems rubygem-bundler \
+    skopeo && \
+    ${DNF_COMMAND} clean all
+
+WORKDIR /rag-content
+
+# Copy the built venv from the builder stage.
+COPY --from=builder --chown=1000:1000 /rag-content/.venv .venv
+
+COPY Makefile pyproject.toml uv.lock README.md Gemfile Gemfile.lock ./
+COPY src ./src
+COPY tests ./tests
+COPY scripts ./scripts
+COPY embeddings_model ./embeddings_model
+COPY LICENSE /licenses/LICENSE
+
+# Install Ruby Gems
+RUN BUNDLE_PATH__SYSTEM=true bundle install
+
 ENV PATH="/rag-content/.venv/bin:$PATH"
 
 # Download embeddings model
