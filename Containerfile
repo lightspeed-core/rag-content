@@ -13,14 +13,6 @@ RUN ${DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nod
     skopeo && \
     ${DNF_COMMAND} clean all
 
-# Hermetic: some sdists (e.g. Python patchelf for docling-parse/cibuildwheel) need autotools + a compiler.
-RUN if [ -f /cachi2/cachi2.env ]; then \
-    ${DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
-    gcc cmake git libpq-devel swig autoconf automake libtool libxml2-devel libxslt-devel \
-    libjpeg-turbo-devel zlib-devel libtiff-devel freetype-devel libwebp-devel && \
-    ${DNF_COMMAND} clean all; \
-    fi
-
 # Install uv package manager
 RUN pip3.12 install uv>=0.7.20
 
@@ -44,8 +36,13 @@ ENV UV_COMPILE_BYTECODE=0 \
     UV_PYTHON_DOWNLOADS=0 \
     MATURIN_NO_INSTALL_RUST=1
 
-# If Cachi2 is present, use pip to install dependencies, otherwise use uv.
+# Hermetic: install build tools (gcc, cargo, dev libs), build Python deps from sdist,
+# then remove build-only tools in the same layer to avoid image bloat.
 RUN if [ -f /cachi2/cachi2.env ]; then \
+    ${DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
+    gcc cmake git libpq-devel swig autoconf automake libtool libxml2-devel libxslt-devel \
+    libjpeg-turbo-devel zlib-devel libtiff-devel freetype-devel libwebp-devel \
+    cargo rust && \
     . /cachi2/cachi2.env && \
     uv venv --seed --no-index --find-links ${PIP_FIND_LINKS} && \
     . .venv/bin/activate && \
@@ -56,7 +53,8 @@ RUN if [ -f /cachi2/cachi2.env ]; then \
       -r requirements.hashes.wheel.pypi.txt \
       -r requirements.hashes.source.txt && \
     pip install --no-cache-dir --no-deps . && \
-    pip check; \
+    pip check && \
+    ${DNF_COMMAND} remove -y cargo rust rust-std-static && ${DNF_COMMAND} clean all; \
     else \
     uv sync --locked --no-dev; \
     fi
