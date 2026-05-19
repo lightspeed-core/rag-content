@@ -4,10 +4,6 @@
 
 beautifulsoup4 @ https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.3/cuda12.9-ubi9/beautifulsoup4-4.14.3-8-py3-none-any.whl \
     --hash=sha256:456f13ad4168acf1c041660bf3b48cee0b8079e633eaeb1bf0e27d1909c758a3
-cffi @ https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.3/cuda12.9-ubi9/cffi-2.0.0-8-cp312-cp312-linux_x86_64.whl \
-    --hash=sha256:2a909b200a31843ae8a0c4d080553673bfa1b7b7ed5b7718687771c7dfa7eb2d
-cffi @ https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.3/cuda12.9-ubi9/cffi-2.0.0-8-cp312-cp312-linux_aarch64.whl \
-    --hash=sha256:fd3092cfea62fdf9375106ce741f9a8e57893ebd639d1a9140cf9f1a25d864f5
 distro==1.9.0 \
     --hash=sha256:8094e3c7bb184c8db134dc611f24dbc3fafb55d78389ccca3e920066ce4890b3
 et-xmlfile==2.0.0 \
