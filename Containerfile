@@ -17,7 +17,8 @@ RUN if [ -f /cachi2/cachi2.env ]; then \
     ${DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
     gcc cmake cargo rust swig autoconf automake libtool \
     libpq-devel libxml2-devel libxslt-devel \
-    libjpeg-turbo-devel zlib-devel libtiff-devel freetype-devel libwebp-devel && \
+    libjpeg-turbo-devel zlib-devel libtiff-devel freetype-devel libwebp-devel \
+    openssl-devel && \
     ${DNF_COMMAND} clean all; \
     fi
 
