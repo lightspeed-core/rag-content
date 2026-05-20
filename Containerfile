@@ -58,7 +58,7 @@ USER root
 
 RUN ${DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
     python3.12 python3.12-pip git \
-    libpq \
+    libpq libxml2 libxslt libjpeg-turbo libtiff freetype libwebp \
     rubygems rubygem-bundler \
     skopeo && \
     ${DNF_COMMAND} clean all

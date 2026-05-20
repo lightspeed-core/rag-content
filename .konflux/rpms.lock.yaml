@@ -186,13 +186,13 @@ arches:
     name: git-core-doc
     evr: 2.47.3-1.el9_6
     sourcerpm: git-2.47.3-1.el9_6.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/g/glib2-devel-2.68.4-16.el9_6.4.aarch64.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/g/glib2-devel-2.68.4-16.el9_6.5.aarch64.rpm
     repoid: rhel-9-for-aarch64-appstream-eus-rpms
-    size: 562675
-    checksum: sha256:d4ee610489951c3d3412df404b7b2e02fe4ac6426e2fd5bd82dff67c6f025c97
+    size: 562591
+    checksum: sha256:dd38dc7a5f082a4343e8e6bf3373f227d188a60b481af5b8ef4ce1e5aad69b36
     name: glib2-devel
-    evr: 2.68.4-16.el9_6.4
-    sourcerpm: glib2-2.68.4-16.el9_6.4.src.rpm
+    evr: 2.68.4-16.el9_6.5
+    sourcerpm: glib2-2.68.4-16.el9_6.5.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/g/glibc-devel-2.34-168.el9_6.24.aarch64.rpm
     repoid: rhel-9-for-aarch64-appstream-eus-rpms
     size: 561564
@@ -494,6 +494,13 @@ arches:
     name: mpdecimal
     evr: 2.5.1-3.el9
     sourcerpm: mpdecimal-2.5.1-3.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/o/openssl-devel-3.2.2-7.el9_6.2.aarch64.rpm
+    repoid: rhel-9-for-aarch64-appstream-eus-rpms
+    size: 4627737
+    checksum: sha256:e13aee56bab18df29daf00c6b8a72dc66d1863c3ad6e71045d752729dbfeb828
+    name: openssl-devel
+    evr: 1:3.2.2-7.el9_6.2
+    sourcerpm: openssl-3.2.2-7.el9_6.2.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/p/pcre-cpp-8.44-4.el9.aarch64.rpm
     repoid: rhel-9-for-aarch64-appstream-eus-rpms
     size: 26773
@@ -1222,6 +1229,13 @@ arches:
     name: binutils-gold
     evr: 2.35.2-63.el9_6.1
     sourcerpm: binutils-2.35.2-63.el9_6.1.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/baseos/os/Packages/b/bzip2-libs-1.0.8-10.el9_5.aarch64.rpm
+    repoid: rhel-9-for-aarch64-baseos-eus-rpms
+    size: 43945
+    checksum: sha256:d5ae9d4fc841dbfa72948e6810cbc1baf0430545a2cb195683b1b5b950ae8cc6
+    name: bzip2-libs
+    evr: 1.0.8-10.el9_5
+    sourcerpm: bzip2-1.0.8-10.el9_5.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/baseos/os/Packages/c/cracklib-2.9.6-27.el9.aarch64.rpm
     repoid: rhel-9-for-aarch64-baseos-eus-rpms
     size: 100995
@@ -1236,6 +1250,13 @@ arches:
     name: cracklib-dicts
     evr: 2.9.6-27.el9
     sourcerpm: cracklib-2.9.6-27.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/baseos/os/Packages/c/crypto-policies-20250128-1.git5269e22.el9.noarch.rpm
+    repoid: rhel-9-for-aarch64-baseos-eus-rpms
+    size: 92144
+    checksum: sha256:e3ca18b4805fe8624d7d884859c167c14f48a4a1565b75403bb7470e7132cc1a
+    name: crypto-policies
+    evr: 20250128-1.git5269e22.el9
+    sourcerpm: crypto-policies-20250128-1.git5269e22.el9.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/baseos/os/Packages/c/curl-minimal-7.76.1-31.el9_6.3.aarch64.rpm
     repoid: rhel-9-for-aarch64-baseos-eus-rpms
     size: 124776
@@ -1278,13 +1299,6 @@ arches:
     name: expat
     evr: 2.5.0-5.el9_6.1
     sourcerpm: expat-2.5.0-5.el9_6.1.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/baseos/os/Packages/f/findutils-4.8.0-7.el9.aarch64.rpm
-    repoid: rhel-9-for-aarch64-baseos-eus-rpms
-    size: 564807
-    checksum: sha256:158af4d5ecbd8b87f0da762ea1655bd4c86512071a95d8307eda3e0b3991105d
-    name: findutils
-    evr: 1:4.8.0-7.el9
-    sourcerpm: findutils-4.8.0-7.el9.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/baseos/os/Packages/f/freetype-2.10.4-10.el9_5.aarch64.rpm
     repoid: rhel-9-for-aarch64-baseos-eus-rpms
     size: 392547
@@ -1299,13 +1313,13 @@ arches:
     name: fuse-common
     evr: 3.10.2-9.el9
     sourcerpm: fuse3-3.10.2-9.el9.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/baseos/os/Packages/g/glib2-2.68.4-16.el9_6.4.aarch64.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/baseos/os/Packages/g/glib2-2.68.4-16.el9_6.5.aarch64.rpm
     repoid: rhel-9-for-aarch64-baseos-eus-rpms
-    size: 2736323
-    checksum: sha256:4c04aff96ae3c0c9c4c5cd8900cb4450b8dbc0a5b0a6a71c1012167bc9d63f32
+    size: 2736687
+    checksum: sha256:5d5c69b80f40a1d23ea2616e5a65e06a21182d1971d3c4017001e43a58308eea
     name: glib2
-    evr: 2.68.4-16.el9_6.4
-    sourcerpm: glib2-2.68.4-16.el9_6.4.src.rpm
+    evr: 2.68.4-16.el9_6.5
+    sourcerpm: glib2-2.68.4-16.el9_6.5.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/baseos/os/Packages/g/glibc-2.34-168.el9_6.24.aarch64.rpm
     repoid: rhel-9-for-aarch64-baseos-eus-rpms
     size: 1786734
@@ -1905,13 +1919,13 @@ arches:
     name: git-core-doc
     evr: 2.47.3-1.el9_6
     sourcerpm: git-2.47.3-1.el9_6.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/g/glib2-devel-2.68.4-16.el9_6.4.x86_64.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/g/glib2-devel-2.68.4-16.el9_6.5.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-eus-rpms
-    size: 562982
-    checksum: sha256:570d92e0ebee0742a412cbc88abe0ca8c46e68704f61440852f354f610d01c5b
+    size: 563267
+    checksum: sha256:0e247a08fad0aea31c3777f25d30cc3a45e1b7133091ffb24a4bed84f5b00569
     name: glib2-devel
-    evr: 2.68.4-16.el9_6.4
-    sourcerpm: glib2-2.68.4-16.el9_6.4.src.rpm
+    evr: 2.68.4-16.el9_6.5
+    sourcerpm: glib2-2.68.4-16.el9_6.5.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/g/glibc-devel-2.34-168.el9_6.24.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-eus-rpms
     size: 32863
@@ -2213,6 +2227,13 @@ arches:
     name: mpdecimal
     evr: 2.5.1-3.el9
     sourcerpm: mpdecimal-2.5.1-3.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/o/openssl-devel-3.2.2-7.el9_6.2.x86_64.rpm
+    repoid: rhel-9-for-x86_64-appstream-eus-rpms
+    size: 4629447
+    checksum: sha256:0fff18a263f807676867271254439ee40fa51edc1aa104e769211337c394a5c0
+    name: openssl-devel
+    evr: 1:3.2.2-7.el9_6.2
+    sourcerpm: openssl-3.2.2-7.el9_6.2.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/p/pcre-cpp-8.44-4.el9.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-eus-rpms
     size: 27327
@@ -2941,6 +2962,13 @@ arches:
     name: binutils-gold
     evr: 2.35.2-63.el9_6.1
     sourcerpm: binutils-2.35.2-63.el9_6.1.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/baseos/os/Packages/b/bzip2-libs-1.0.8-10.el9_5.x86_64.rpm
+    repoid: rhel-9-for-x86_64-baseos-eus-rpms
+    size: 42618
+    checksum: sha256:5058aca2a4c5ac3356fb42e6e423e4101bc29199e0ae80d79d3fc564ba9d7c84
+    name: bzip2-libs
+    evr: 1.0.8-10.el9_5
+    sourcerpm: bzip2-1.0.8-10.el9_5.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/baseos/os/Packages/c/cracklib-2.9.6-27.el9.x86_64.rpm
     repoid: rhel-9-for-x86_64-baseos-eus-rpms
     size: 100903
@@ -2955,6 +2983,13 @@ arches:
     name: cracklib-dicts
     evr: 2.9.6-27.el9
     sourcerpm: cracklib-2.9.6-27.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/baseos/os/Packages/c/crypto-policies-20250128-1.git5269e22.el9.noarch.rpm
+    repoid: rhel-9-for-x86_64-baseos-eus-rpms
+    size: 92144
+    checksum: sha256:e3ca18b4805fe8624d7d884859c167c14f48a4a1565b75403bb7470e7132cc1a
+    name: crypto-policies
+    evr: 20250128-1.git5269e22.el9
+    sourcerpm: crypto-policies-20250128-1.git5269e22.el9.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/baseos/os/Packages/c/curl-minimal-7.76.1-31.el9_6.3.x86_64.rpm
     repoid: rhel-9-for-x86_64-baseos-eus-rpms
     size: 128397
@@ -2997,13 +3032,6 @@ arches:
     name: expat
     evr: 2.5.0-5.el9_6.1
     sourcerpm: expat-2.5.0-5.el9_6.1.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/baseos/os/Packages/f/findutils-4.8.0-7.el9.x86_64.rpm
-    repoid: rhel-9-for-x86_64-baseos-eus-rpms
-    size: 563531
-    checksum: sha256:a6328afea0a11647b7fb5c48436f0af6c795407bac0650676d3196dd47070de6
-    name: findutils
-    evr: 1:4.8.0-7.el9
-    sourcerpm: findutils-4.8.0-7.el9.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/baseos/os/Packages/f/freetype-2.10.4-10.el9_5.x86_64.rpm
     repoid: rhel-9-for-x86_64-baseos-eus-rpms
     size: 398342
@@ -3018,13 +3046,13 @@ arches:
     name: fuse-common
     evr: 3.10.2-9.el9
     sourcerpm: fuse3-3.10.2-9.el9.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/baseos/os/Packages/g/glib2-2.68.4-16.el9_6.4.x86_64.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/baseos/os/Packages/g/glib2-2.68.4-16.el9_6.5.x86_64.rpm
     repoid: rhel-9-for-x86_64-baseos-eus-rpms
-    size: 2767714
-    checksum: sha256:712a8fcfca9fd8fe4d4a8e6ec01ac615638445a175f2f358a89f9a6435b2eda9
+    size: 2767189
+    checksum: sha256:d6e8f9fb6a36377f9077928e1751c7ade9e67df04cec916495aff132e6f544ea
     name: glib2
-    evr: 2.68.4-16.el9_6.4
-    sourcerpm: glib2-2.68.4-16.el9_6.4.src.rpm
+    evr: 2.68.4-16.el9_6.5
+    sourcerpm: glib2-2.68.4-16.el9_6.5.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/baseos/os/Packages/g/glibc-2.34-168.el9_6.24.x86_64.rpm
     repoid: rhel-9-for-x86_64-baseos-eus-rpms
     size: 2050334
