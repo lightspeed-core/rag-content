@@ -145,7 +145,7 @@ konflux-requirements:	## generate hermetic requirements.*.txt file and gemfile.l
 	bundle _2.2.33_ lock --add-platform aarch64-linux
 
 konflux-requirements-cuda:	## generate hermetic requirements.*.cuda.txt for CUDA konflux build
-	./scripts/konflux_requirements_cuda.sh
+	./scripts/konflux_requirements.sh cuda
 
 BASE_IMAGE := $(shell grep '^BASE_IMAGE=' build-args-konflux.conf | cut -d= -f2-)
 konflux-rpm-lock:	## generate rpm.lock.yaml file for konflux build
