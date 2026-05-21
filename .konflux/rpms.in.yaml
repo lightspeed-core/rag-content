@@ -21,6 +21,7 @@ packages:
     libtiff-devel,
     freetype-devel,
     libwebp-devel,
+    openssl-devel,
   ]
 contentOrigin:
   repofiles: ["./redhat.repo"]
