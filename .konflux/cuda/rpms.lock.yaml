@@ -521,6 +521,13 @@ arches:
     name: libxml2
     evr: 2.9.13-12.el9_6.1
     sourcerpm: libxml2-2.9.13-12.el9_6.1.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/z/zlib-devel-1.2.11-40.el9.aarch64.rpm
+    repoid: rhel-9-for-aarch64-appstream-eus-rpms
+    size: 47965
+    checksum: sha256:ec1e974313c06f71a11a0732b9b08ef588e3cc58bd7ee0c02df792a1b196f60b
+    name: zlib-devel
+    evr: 1.2.11-40.el9
+    sourcerpm: zlib-1.2.11-40.el9.src.rpm
   source: []
   module_metadata: []
 - arch: x86_64
@@ -1043,5 +1050,12 @@ arches:
     name: libxml2
     evr: 2.9.13-12.el9_6.1
     sourcerpm: libxml2-2.9.13-12.el9_6.1.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/z/zlib-devel-1.2.11-40.el9.x86_64.rpm
+    repoid: rhel-9-for-x86_64-appstream-eus-rpms
+    size: 48017
+    checksum: sha256:9775022716a2b6dd51d151a40aa4a6bcb466edeb01b747f48072703e509be097
+    name: zlib-devel
+    evr: 1.2.11-40.el9
+    sourcerpm: zlib-1.2.11-40.el9.src.rpm
   source: []
   module_metadata: []

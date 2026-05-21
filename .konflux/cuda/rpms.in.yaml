@@ -21,6 +21,7 @@ packages:
     freetype-devel,
     libwebp-devel,
     openssl-devel,
+    zlib-devel,
     libcudnn9,
     libnccl,
     libcusparselt0
