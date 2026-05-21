@@ -26,7 +26,7 @@ readonly STATE_FILE="${STATE_DIR}/state"
 readonly INSTALL_LOG="${STATE_DIR}/install.log"
 readonly UNIT_PATH="/etc/systemd/system/nvidia-ec2-install-continue.service"
 
-readonly NVIDIA_TESLA_VERSION="575.57.08"
+readonly NVIDIA_TESLA_VERSION="580.159.03"
 readonly NVIDIA_CONTAINER_TOOLKIT_VERSION="1.19.0-1"
 
 SUDO=""
@@ -104,7 +104,7 @@ log_install() {
 # do not spin forever on e.g. post_phase_a after dnf/rpm errors.
 on_install_err() {
   local ec=$?
-  trap - ERR
+  trap - ERR EXIT
   local prev
   prev="$(cat "$STATE_FILE" 2>/dev/null || echo none)"
   log_install "ERR exit=${ec} previous_state=${prev} line=${BASH_LINENO[0]}"
@@ -114,8 +114,70 @@ on_install_err() {
   exit "$ec"
 }
 
+# Safety-net EXIT trap: if advance_install exits non-zero without the ERR trap
+# having fired (can happen with certain bash versions / function-call contexts),
+# mark the state as failed so the poller doesn't spin forever.
+on_install_exit() {
+  local ec=$?
+  trap - EXIT ERR
+  if [[ $ec -ne 0 ]]; then
+    local cur
+    cur="$(cat "$STATE_FILE" 2>/dev/null || echo unknown)"
+    if [[ "$cur" != "done" && "$cur" != "failed" ]]; then
+      log_install "EXIT-trap exit=${ec} state=${cur} (ERR trap missed); marking failed"
+      write_state "failed" 2>/dev/null || true
+      systemctl disable nvidia-ec2-install-continue.service 2>/dev/null || true
+      systemctl daemon-reload 2>/dev/null || true
+    fi
+  fi
+}
+
 phase_a() {
-  $SUDO dnf update -y
+  # Update everything EXCEPT the kernel.  Letting dnf freely upgrade the
+  # kernel risks DKMS build failures when a new kernel introduces API
+  # changes (e.g. DRM signature changes in RHEL 9.8 5.14.0-687.10.1
+  # broke NVIDIA 575.x).
+  $SUDO dnf update -y --exclude='kernel*'
+
+  # We need a kernel + kernel-devel pair.  The AMI's running kernel may
+  # be an errata build whose -devel was never published (e.g.
+  # 5.14.0-427.111.1 ships in the AMI but only 427.42.1 -devel exists).
+  # Strategy: try the running kernel first; if its -devel is unavailable,
+  # find the newest kernel-devel in the repos, install the matching
+  # kernel-core + devel + headers, and set it as the boot default.
+  local kver arch
+  kver="$(uname -r)"
+  arch="$(uname -m)"
+
+  if $SUDO dnf install -y "kernel-devel-${kver}" "kernel-headers-${kver}" 2>/dev/null; then
+    log_install "phase_a: kernel-devel for running kernel ${kver} installed"
+    return 0
+  fi
+
+  log_install "phase_a: kernel-devel-${kver} not available; finding newest available pair"
+  local best_kver
+  best_kver="$(dnf repoquery --latest-limit=1 --qf '%{VERSION}-%{RELEASE}.%{ARCH}' \
+    kernel-devel."${arch}" 2>/dev/null | tail -1)"
+  if [[ -z "$best_kver" ]]; then
+    log_install "phase_a: dnf repoquery found no kernel-devel for ${arch}"
+    echo "No kernel-devel available in repos. Check RHUI mirror state." >&2
+    return 1
+  fi
+  log_install "phase_a: installing kernel + devel for ${best_kver}"
+  $SUDO dnf install -y \
+    "kernel-core-${best_kver}" \
+    "kernel-devel-${best_kver}" \
+    "kernel-headers-${best_kver}"
+
+  local target_vmlinuz="/boot/vmlinuz-${best_kver}"
+  if [[ -f "$target_vmlinuz" ]]; then
+    local current_default
+    current_default="$(grubby --default-kernel 2>/dev/null || true)"
+    if [[ "$current_default" != "$target_vmlinuz" ]]; then
+      log_install "phase_a: setting default kernel to ${target_vmlinuz} (was ${current_default})"
+      $SUDO grubby --set-default "$target_vmlinuz"
+    fi
+  fi
 }
 
 phase_b() {
@@ -127,22 +189,47 @@ phase_b() {
 
   local kver
   kver="$(uname -r)"
-  $SUDO dnf install -y "kernel-devel-${kver}" "kernel-headers-${kver}" dkms
 
-  local arch rpm url
+  # kernel-devel/headers are normally pre-installed by phase_a; install here
+  # only if missing (e.g. manual phase-b invocation).
+  if ! rpm -q "kernel-devel-${kver}" >/dev/null 2>&1; then
+    log_install "phase_b: kernel-devel-${kver} not found, installing"
+    $SUDO dnf install -y "kernel-devel-${kver}" "kernel-headers-${kver}"
+  else
+    log_install "phase_b: kernel-devel-${kver} already installed (from phase_a)"
+  fi
+  $SUDO dnf install -y dkms
+
+  local arch nv_rpm url
   arch="$(uname -m)"
-  rpm="nvidia-driver-local-repo-rhel9-${NVIDIA_TESLA_VERSION}-1.0-1.${arch}.rpm"
-  url="https://us.download.nvidia.com/tesla/${NVIDIA_TESLA_VERSION}/${rpm}"
+  nv_rpm="nvidia-driver-local-repo-rhel9-${NVIDIA_TESLA_VERSION}-1.0-1.${arch}.rpm"
+  url="https://us.download.nvidia.com/tesla/${NVIDIA_TESLA_VERSION}/${nv_rpm}"
 
   if rpm -qa 'nvidia-driver-local-repo*' | grep -q .; then
     log_install "phase_b: nvidia-driver-local-repo RPM already installed, skipping download"
   else
-    curl -fL -o "${rpm}" "${url}"
-    $SUDO rpm -U --replacepkgs "${rpm}" || { rm -f "${rpm}"; return 1; }
-    rm -f "${rpm}"
+    curl -fL -o "${nv_rpm}" "${url}"
+    $SUDO rpm -U --replacepkgs "${nv_rpm}" || { rm -f "${nv_rpm}"; return 1; }
+    rm -f "${nv_rpm}"
   fi
   $SUDO dnf clean all
   $SUDO dnf -y module install nvidia-driver:latest-dkms
+
+  # Verify DKMS actually built AND installed the module for the running
+  # kernel.  `dnf module install` can succeed (RPM installed) while the
+  # DKMS build itself fails silently.  Require "installed" — not just
+  # "built" — so the module is in /lib/modules/${kver} and will load
+  # after the reboot into phase_c.
+  local dkms_status
+  dkms_status="$(dkms status nvidia/${NVIDIA_TESLA_VERSION} -k "${kver}" 2>/dev/null || true)"
+  if ! echo "$dkms_status" | grep -q 'installed'; then
+    log_install "phase_b: DKMS nvidia/${NVIDIA_TESLA_VERSION} not installed for ${kver} (status: ${dkms_status})"
+    echo "DKMS module nvidia/${NVIDIA_TESLA_VERSION} is not installed for kernel ${kver}." >&2
+    echo "dkms status: ${dkms_status:-<empty>}" >&2
+    echo "Check: /var/lib/dkms/nvidia/${NVIDIA_TESLA_VERSION}/build/make.log" >&2
+    return 1
+  fi
+  log_install "phase_b: DKMS installed: ${dkms_status}"
 }
 
 phase_c() {
@@ -168,6 +255,20 @@ phase_c() {
     "libnvidia-container-tools-${v}" \
     "libnvidia-container1-${v}"
 
+  # nvidia-ctk cdi generate requires a loaded driver.  After the phase_b
+  # reboot the DKMS module should load automatically, but verify before
+  # running a command that will fail opaquely with "Driver Not Loaded".
+  if ! lsmod | grep -q '^nvidia '; then
+    $SUDO modprobe nvidia 2>/dev/null || true
+  fi
+  if ! lsmod | grep -q '^nvidia '; then
+    log_install "phase_c: nvidia kernel module not loaded after modprobe — DKMS may have failed to build"
+    echo "nvidia kernel module is not loaded. Check:" >&2
+    echo "  dkms status" >&2
+    echo "  /var/lib/dkms/nvidia/${NVIDIA_TESLA_VERSION}/build/make.log" >&2
+    return 1
+  fi
+
   $SUDO mkdir -p /etc/cdi
   if [[ -s /etc/cdi/nvidia.yaml ]] && command -v nvidia-ctk >/dev/null 2>&1; then
     log_install "phase_c: /etc/cdi/nvidia.yaml already present, skipping nvidia-ctk cdi generate"
@@ -184,17 +285,18 @@ check() {
 
 advance_install() {
   trap on_install_err ERR
+  trap on_install_exit EXIT
   local state
   state="$(read_state)"
   log_install "advance_install state=${state}"
 
   case "$state" in
     done)
-      trap - ERR
+      trap - ERR EXIT
       exit 0
       ;;
     failed)
-      trap - ERR
+      trap - ERR EXIT
       systemctl disable nvidia-ec2-install-continue.service 2>/dev/null || true
       systemctl daemon-reload 2>/dev/null || true
       log_install "refusing to continue (state=failed); fix host or run: $0 reset"
@@ -204,13 +306,13 @@ advance_install() {
     new)
       phase_a
       write_state post_phase_a
-      trap - ERR
+      trap - ERR EXIT
       reboot
       ;;
     post_phase_a)
       phase_b
       write_state post_phase_b
-      trap - ERR
+      trap - ERR EXIT
       reboot
       ;;
     post_phase_b)
@@ -218,12 +320,12 @@ advance_install() {
       write_state "done"
       systemctl disable nvidia-ec2-install-continue.service || true
       systemctl daemon-reload
-      trap - ERR
+      trap - ERR EXIT
       log_install "install finished OK"
       echo "Install finished. Run: $INSTALL_BIN check   (as a user with podman access if needed)"
       ;;
     *)
-      trap - ERR
+      trap - ERR EXIT
       echo "Unknown state '$state' in $STATE_FILE — fix or run: $0 reset" >&2
       exit 1
       ;;

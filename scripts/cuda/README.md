@@ -13,6 +13,30 @@ Both run RHEL 9.4 (Hourly2-GP3 marketplace-style AMIs defined in `cuda_cloud_for
 
 ---
 
+## ADR: kernel excluded from blanket update, driver version is explicit
+
+**Context.** `phase_a` originally ran `dnf update -y` with no exclusions. This silently upgraded the kernel to whatever was newest in the AWS RHUI mirror. Two problems followed:
+
+1. **DKMS build failure (x86_64).** RHEL 9.8 kernel `5.14.0-687.10.1` changed the DRM framebuffer API (`drm_helper_mode_fill_fb_struct` gained a `drm_format_info *` parameter). The NVIDIA 575.57.08 DKMS build failed with incompatible-pointer-type errors against the new headers.
+2. **Missing `kernel-devel` (aarch64).** The RHUI `baseos` repo published `kernel-core-5.14.0-687.10.1` before `appstream` published the matching `kernel-devel`. `phase_b` could not install `kernel-devel-$(uname -r)` because it didn't exist yet.
+
+**Decision.** Exclude kernel from `dnf update`; find the newest kernel+devel pair available; keep the driver version explicit.
+
+- `phase_a` runs `dnf update -y --exclude='kernel*'` so userspace security patches still land but the kernel isn't blindly upgraded.
+- `phase_a` then tries to install `kernel-devel` for the running kernel. If that exact `-devel` isn't in the repos (common with errata AMI kernels like `5.14.0-427.111.1`), it falls back to `dnf repoquery` for the newest `kernel-devel` available, installs the matching `kernel-core` + `kernel-devel` + `kernel-headers`, and sets grubby's default boot to that kernel.
+- `NVIDIA_TESLA_VERSION` is set at the top of `install_cuda_rhel9_ec2.sh`. When updating the AMI (new `RegionAMIs` mapping), re-validate the driver version builds cleanly against the available kernel before merging.
+
+**Alternatives considered.**
+
+| Approach | Why not |
+|---|---|
+| Full `dnf update` (no excludes) + find a compatible kernel-devel | The blanket kernel upgrade can pull a kernel whose DRM API is incompatible with the pinned driver, and the matching `-devel` may not be published yet. |
+| Pin the kernel to the exact AMI version only | AMI errata kernels (e.g. `427.111.1`) often have no `-devel` in the repos. |
+| Pin both kernel *and* driver to exact NVRs in the template | Over-constrained; userspace CVE patches would also be blocked. |
+| No `dnf update` at all | Leaves known CVEs in openssl, glibc, etc. unpatched on the instance. |
+
+---
+
 ## Prerequisites
 
 - **AWS CLI** configured (`aws configure` or environment variables) with permission to create the stack and use EC2 APIs.
