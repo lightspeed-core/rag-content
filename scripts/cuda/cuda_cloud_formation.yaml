@@ -13,10 +13,10 @@ Parameters:
     Description: "The username used to prefix AWS resource names."
   PublicSubnetAAvailabilityZone:
     Type: AWS::EC2::AvailabilityZone::Name
-    Description: "AZ for public subnet A (x86_64 g6.2xlarge). Must offer that instance type in this region."
+    Description: "AZ for public subnet A (x86_64 G6). Must offer that instance type. provision_cuda_lab.sh defaults this and subnet B from EC2 offerings (preferring same AZ when both GPUs are offered)."
   PublicSubnetBAvailabilityZone:
     Type: AWS::EC2::AvailabilityZone::Name
-    Description: "AZ for public subnet B (aarch64 g5g.4xlarge). Must offer that instance type in this region."
+    Description: "AZ for public subnet B (aarch64 G5g). Must offer that instance type. Same notes as subnet A."
   AllowedIngressCidr:
     Type: String
     Description: "IPv4 CIDR allowed for inbound SSH (22) and HTTP/S (80, 8000, 443, 8443). Use a specific range (e.g. 203.0.113.4/32); do not use 0.0.0.0/0."
@@ -65,8 +65,6 @@ Resources:
         - Key: "Name"
           Value: !Sub "${username}-vpc"
 
-  # Public subnets: AZs come from parameters (provision_cuda_lab.sh sets them from
-  # describe-instance-type-offerings for g6.2xlarge / g5g.4xlarge).
   PublicSubnetA:
     Type: "AWS::EC2::Subnet"
     Properties:

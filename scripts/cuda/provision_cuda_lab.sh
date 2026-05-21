@@ -111,7 +111,7 @@ cuda_lab_instance_type_aarch64() {
     | sed 's/.*InstanceType:[[:space:]]*"\([^"]*\)".*/\1/'
 }
 
-# AZs (e.g. us-east-1a) where an instance type is offered in this region.
+# AZs (e.g. us-east-1a) where EC2 lists an instance type as offered in this region (not spare capacity).
 list_azs_for_instance_type() {
   local reg="$1"
   local it="$2"
@@ -123,8 +123,19 @@ list_azs_for_instance_type() {
     --output text 2>/dev/null | tr '\t' '\n' | sort -u
 }
 
-# First AZ (alphabetically) per instance type that offers it; used as stack parameters.
-# Same ordering as sort -u on zone names from describe-instance-type-offerings.
+# Pick one pseudo-random AZ from newline-separated nonempty list $1 ($RANDOM modulo count).
+_pick_random_az() {
+  local lines=() line
+  while IFS= read -r line; do
+    lines+=("$line")
+  done < <(printf '%s\n' "$1" | sort -u)
+  ((${#lines[@]} > 0)) || return 1
+  # No trailing newline — value is reused in aws cloudformation --parameters ParameterValue=
+  printf '%s' "${lines[$((RANDOM % ${#lines[@]}))]}"
+}
+
+# Two AZ strings for subnets A/B: prefer overlap (both GPUs in one AZ avoids CFN-independent bad picks)
+# randomize overlap set to ease capacity contention vs always alphabetical us-east-1a-style pinning.
 resolve_lab_subnet_azs() {
   local reg="$1"
   local x86_type arm_type
@@ -133,35 +144,44 @@ resolve_lab_subnet_azs() {
   [[ -n "$x86_type" && -n "$arm_type" ]] \
     || die "could not parse CudaInstanceTypes from ${CFN_TEMPLATE}"
 
-  local azs_x86 azs_arm
+  local azs_x86 azs_arm common az_a az_b
   azs_x86="$(list_azs_for_instance_type "$reg" "$x86_type")"
   azs_arm="$(list_azs_for_instance_type "$reg" "$arm_type")"
   [[ -n "$azs_x86" ]] || die "no AZ offers ${x86_type} in ${reg} (required for subnet A / x86_64)."
   [[ -n "$azs_arm" ]] || die "no AZ offers ${arm_type} in ${reg} (required for subnet B / aarch64)."
 
-  local az_a az_b
-  az_a="$(echo "$azs_x86" | head -1)"
-  az_b="$(echo "$azs_arm" | head -1)"
+  common="$(comm -12 \
+    <(printf '%s\n' "$azs_x86") \
+    <(printf '%s\n' "$azs_arm"))"
+
+  if [[ -n "$(printf '%s' "$common" | tr -d '[:space:]')" ]]; then
+    az_a="$(_pick_random_az "$common")"
+    az_b="$az_a"
+  else
+    echo "note: ${x86_type} and ${arm_type} have no overlapping offered AZ in ${reg} per describe-instance-type-offerings; using separate picks per subnet (may rarely fail at launch)." >&2
+    az_a="$(_pick_random_az "$azs_x86")"
+    az_b="$(_pick_random_az "$azs_arm")"
+  fi
   printf '%s %s\n' "$az_a" "$az_b"
 }
 
-# Print offerings and the AZ pair passed into the template as PublicSubnet*AvailabilityZone.
-report_cuda_lab_instance_type_azs() {
+report_cuda_lab_subnet_az_pick() {
   local reg="$1"
   local az_a="$2"
   local az_b="$3"
-  local x86_type arm_type
+  local x86_type arm_type offered_x86 offered_arm
   x86_type="$(cuda_lab_instance_type_x86)"
   arm_type="$(cuda_lab_instance_type_aarch64)"
+  offered_x86="$(list_azs_for_instance_type "$reg" "$x86_type" | paste -sd ', ' -)"
+  offered_arm="$(list_azs_for_instance_type "$reg" "$arm_type" | paste -sd ', ' -)"
 
-  local az_x86 az_arm
-  az_x86="$(list_azs_for_instance_type "$reg" "$x86_type" | paste -sd ', ' -)"
-  az_arm="$(list_azs_for_instance_type "$reg" "$arm_type" | paste -sd ', ' -)"
-
-  echo "EC2 availability zones offering lab instance types in ${reg}:"
-  echo "  ${x86_type} (x86_64 / subnet A): ${az_x86}"
-  echo "  ${arm_type} (aarch64 / subnet B): ${az_arm}"
-  echo "Stack will use: PublicSubnetAAvailabilityZone=${az_a}, PublicSubnetBAvailabilityZone=${az_b}"
+  echo "CUDA lab instance types in ${reg}: ${x86_type} (subnet A), ${arm_type} (subnet B)."
+  echo "EC2 Offered Availability Zones (${reg}): ${x86_type}: ${offered_x86}; ${arm_type}: ${offered_arm}"
+  if [[ "$az_a" == "$az_b" ]]; then
+    echo "Stack subnets: both in ${az_a} (overlap of offered zones avoids aarch64 subnet landing in unsupported AZ)."
+  else
+    echo "Stack subnets: PublicSubnetAAvailabilityZone=${az_a}, PublicSubnetBAvailabilityZone=${az_b}"
+  fi
 }
 
 need_cmd() {
@@ -347,7 +367,7 @@ main() {
 
   local subnet_az_a subnet_az_b
   read -r subnet_az_a subnet_az_b < <(resolve_lab_subnet_azs "$region")
-  report_cuda_lab_instance_type_azs "$region" "$subnet_az_a" "$subnet_az_b"
+  report_cuda_lab_subnet_az_pick "$region" "$subnet_az_a" "$subnet_az_b"
 
   if [[ "$reuse_stack" -eq 0 ]]; then
     if aws cloudformation describe-stacks --stack-name "$stack_name" >/dev/null 2>&1; then
