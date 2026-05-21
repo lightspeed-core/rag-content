@@ -1,4 +1,3 @@
----
 lockfileVersion: 1
 lockfileVendor: redhat
 arches:
@@ -375,6 +374,153 @@ arches:
     name: swig
     evr: 4.0.2-8.el9
     sourcerpm: swig-4.0.2-8.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/f/freetype-devel-2.10.4-10.el9_5.aarch64.rpm
+    repoid: rhel-9-for-aarch64-appstream-eus-rpms
+    size: 1160750
+    checksum: sha256:eb6a7d15e6906e227205499d107ef76018bcbda6b7787ee297552e10b253de83
+    name: freetype-devel
+    evr: 2.10.4-10.el9_5
+    sourcerpm: freetype-2.10.4-10.el9_5.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/j/jbigkit-libs-2.1-23.el9.aarch64.rpm
+    repoid: rhel-9-for-aarch64-appstream-eus-rpms
+    size: 57006
+    checksum: sha256:f9fd62dfb74900a238cba5346d3932f32a802b6d6a161c47935938f392a7adf2
+    name: jbigkit-libs
+    evr: 2.1-23.el9
+    sourcerpm: jbigkit-2.1-23.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libX11-1.7.0-11.el9.aarch64.rpm
+    repoid: rhel-9-for-aarch64-appstream-eus-rpms
+    size: 653150
+    checksum: sha256:e2b2dfffeb8fb95eadd6f947247a2d9097c5526f38e426ee2fe58a08313174d7
+    name: libX11
+    evr: 1.7.0-11.el9
+    sourcerpm: libX11-1.7.0-11.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libX11-common-1.7.0-11.el9.noarch.rpm
+    repoid: rhel-9-for-aarch64-appstream-eus-rpms
+    size: 214201
+    checksum: sha256:6c71dcb5ecbf19b1d7cd72a48a399d0208942bf07afd529effe3ed426499512b
+    name: libX11-common
+    evr: 1.7.0-11.el9
+    sourcerpm: libX11-1.7.0-11.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libXau-1.0.9-8.el9.aarch64.rpm
+    repoid: rhel-9-for-aarch64-appstream-eus-rpms
+    size: 34407
+    checksum: sha256:e9e34ac759a87357a5fa3d4155985a17b56967b3e036c7a438cc4314c0c23456
+    name: libXau
+    evr: 1.0.9-8.el9
+    sourcerpm: libXau-1.0.9-8.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libXext-1.3.4-8.el9.aarch64.rpm
+    repoid: rhel-9-for-aarch64-appstream-eus-rpms
+    size: 41839
+    checksum: sha256:f72c5e42c9fac94f410cb0f58fcf6ce718575b6703e4f8adf83b2a4860a706dc
+    name: libXext
+    evr: 1.3.4-8.el9
+    sourcerpm: libXext-1.3.4-8.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libXrender-0.9.10-16.el9.aarch64.rpm
+    repoid: rhel-9-for-aarch64-appstream-eus-rpms
+    size: 29483
+    checksum: sha256:06920454ec27e62fd482834d72ef6a6d3b3454ef111e5e7843355ed3d0ae20b5
+    name: libXrender
+    evr: 0.9.10-16.el9
+    sourcerpm: libXrender-0.9.10-16.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libjpeg-turbo-2.0.90-7.el9.aarch64.rpm
+    repoid: rhel-9-for-aarch64-appstream-eus-rpms
+    size: 175739
+    checksum: sha256:b549971d7418fffff89092888c8d213dd63401f4b9cd2ecd1a9892c7cee9ab24
+    name: libjpeg-turbo
+    evr: 2.0.90-7.el9
+    sourcerpm: libjpeg-turbo-2.0.90-7.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libjpeg-turbo-devel-2.0.90-7.el9.aarch64.rpm
+    repoid: rhel-9-for-aarch64-appstream-eus-rpms
+    size: 104818
+    checksum: sha256:d455116c42fe8411808dd1be01ef488b33744a8bd1c372882b2fa41c9b7507b3
+    name: libjpeg-turbo-devel
+    evr: 2.0.90-7.el9
+    sourcerpm: libjpeg-turbo-2.0.90-7.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libtiff-4.4.0-13.el9_6.3.aarch64.rpm
+    repoid: rhel-9-for-aarch64-appstream-eus-rpms
+    size: 195170
+    checksum: sha256:b67843685407a0fb46a5ff34ad0124cd4a038fdbf2c837d2e17898e3dd982b80
+    name: libtiff
+    evr: 4.4.0-13.el9_6.3
+    sourcerpm: libtiff-4.4.0-13.el9_6.3.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libtiff-devel-4.4.0-13.el9_6.3.aarch64.rpm
+    repoid: rhel-9-for-aarch64-appstream-eus-rpms
+    size: 566918
+    checksum: sha256:18872b4ee01836d5b4c67742cd949f6465431ca63ec3a32d4cf65cf8e10022f9
+    name: libtiff-devel
+    evr: 4.4.0-13.el9_6.3
+    sourcerpm: libtiff-4.4.0-13.el9_6.3.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libwebp-1.2.0-8.el9_3.aarch64.rpm
+    repoid: rhel-9-for-aarch64-appstream-eus-rpms
+    size: 272276
+    checksum: sha256:5692fd846f9b41b3b6d6194f80dc52248c2ae1e7b0560b29bd0ed2f5bcb4506a
+    name: libwebp
+    evr: 1.2.0-8.el9_3
+    sourcerpm: libwebp-1.2.0-8.el9_3.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libwebp-devel-1.2.0-8.el9_3.aarch64.rpm
+    repoid: rhel-9-for-aarch64-appstream-eus-rpms
+    size: 36884
+    checksum: sha256:6ad97214b40f00013141412500deca57573c493b8325e437e2c65e88053a7552
+    name: libwebp-devel
+    evr: 1.2.0-8.el9_3
+    sourcerpm: libwebp-1.2.0-8.el9_3.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libxcb-1.13.1-9.el9.aarch64.rpm
+    repoid: rhel-9-for-aarch64-appstream-eus-rpms
+    size: 252623
+    checksum: sha256:d98d6099494f737daa25cea2987a784f1bd2ba54293c5259dbcb326f64e7bbce
+    name: libxcb
+    evr: 1.13.1-9.el9
+    sourcerpm: libxcb-1.13.1-9.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libxml2-devel-2.9.13-12.el9_6.1.aarch64.rpm
+    repoid: rhel-9-for-aarch64-appstream-eus-rpms
+    size: 919913
+    checksum: sha256:973797681e092703e080cace1997172e06ba37b457313564b5b75fab87694479
+    name: libxml2-devel
+    evr: 2.9.13-12.el9_6.1
+    sourcerpm: libxml2-2.9.13-12.el9_6.1.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libxslt-1.1.34-13.el9_6.1.aarch64.rpm
+    repoid: rhel-9-for-aarch64-appstream-eus-rpms
+    size: 244463
+    checksum: sha256:5c2b240916b054dd00e8add4fe43479816f2b214ea8be3461de6a710bc5e39d1
+    name: libxslt
+    evr: 1.1.34-13.el9_6.1
+    sourcerpm: libxslt-1.1.34-13.el9_6.1.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libxslt-devel-1.1.34-13.el9_6.1.aarch64.rpm
+    repoid: rhel-9-for-aarch64-appstream-eus-rpms
+    size: 326591
+    checksum: sha256:86edc3d9c985360a117ae5c1bd094bdfbd6a000d1119bd1033ca35420b78c8b9
+    name: libxslt-devel
+    evr: 1.1.34-13.el9_6.1
+    sourcerpm: libxslt-1.1.34-13.el9_6.1.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/o/openssl-devel-3.2.2-7.el9_6.2.aarch64.rpm
+    repoid: rhel-9-for-aarch64-appstream-eus-rpms
+    size: 4627737
+    checksum: sha256:e13aee56bab18df29daf00c6b8a72dc66d1863c3ad6e71045d752729dbfeb828
+    name: openssl-devel
+    evr: 1:3.2.2-7.el9_6.2
+    sourcerpm: openssl-3.2.2-7.el9_6.2.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/baseos/os/Packages/f/freetype-2.10.4-10.el9_5.aarch64.rpm
+    repoid: rhel-9-for-aarch64-baseos-eus-rpms
+    size: 392547
+    checksum: sha256:13fdfc2af790d82a178c3626ee7b93071cc490551c95837492e25dfe66cd730c
+    name: freetype
+    evr: 2.10.4-10.el9_5
+    sourcerpm: freetype-2.10.4-10.el9_5.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/baseos/os/Packages/l/libpng-1.6.37-12.el9_6.3.aarch64.rpm
+    repoid: rhel-9-for-aarch64-baseos-eus-rpms
+    size: 116412
+    checksum: sha256:1c57658c8994c15cf2dddc0fe2a66d849514a1e502d1020729586dfb652c94e7
+    name: libpng
+    evr: 2:1.6.37-12.el9_6.3
+    sourcerpm: libpng-1.6.37-12.el9_6.3.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/baseos/os/Packages/l/libxml2-2.9.13-12.el9_6.1.aarch64.rpm
+    repoid: rhel-9-for-aarch64-baseos-eus-rpms
+    size: 747293
+    checksum: sha256:73583dc39fe165586789691ce503dc6df9957bbd2f3503642102e14634fd1a0b
+    name: libxml2
+    evr: 2.9.13-12.el9_6.1
+    sourcerpm: libxml2-2.9.13-12.el9_6.1.src.rpm
   source: []
   module_metadata: []
 - arch: x86_64
@@ -750,5 +896,152 @@ arches:
     name: swig
     evr: 4.0.2-8.el9
     sourcerpm: swig-4.0.2-8.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/f/freetype-devel-2.10.4-10.el9_5.x86_64.rpm
+    repoid: rhel-9-for-x86_64-appstream-eus-rpms
+    size: 1160737
+    checksum: sha256:423659ae998891e807e124d6ea6bd0d5bc911e457f6dabef6924ada794420886
+    name: freetype-devel
+    evr: 2.10.4-10.el9_5
+    sourcerpm: freetype-2.10.4-10.el9_5.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/j/jbigkit-libs-2.1-23.el9.x86_64.rpm
+    repoid: rhel-9-for-x86_64-appstream-eus-rpms
+    size: 57187
+    checksum: sha256:7da8bd49c92d873386b40567a7fa6b8604425bef2b5b1c5b8197bb999422dfb7
+    name: jbigkit-libs
+    evr: 2.1-23.el9
+    sourcerpm: jbigkit-2.1-23.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libX11-1.7.0-11.el9.x86_64.rpm
+    repoid: rhel-9-for-x86_64-appstream-eus-rpms
+    size: 663116
+    checksum: sha256:d9b515a65727621e20804bf5bc0c1cb80466c3eb1070cc755fa54014bbbe580b
+    name: libX11
+    evr: 1.7.0-11.el9
+    sourcerpm: libX11-1.7.0-11.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libX11-common-1.7.0-11.el9.noarch.rpm
+    repoid: rhel-9-for-x86_64-appstream-eus-rpms
+    size: 214201
+    checksum: sha256:6c71dcb5ecbf19b1d7cd72a48a399d0208942bf07afd529effe3ed426499512b
+    name: libX11-common
+    evr: 1.7.0-11.el9
+    sourcerpm: libX11-1.7.0-11.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libXau-1.0.9-8.el9.x86_64.rpm
+    repoid: rhel-9-for-x86_64-appstream-eus-rpms
+    size: 34395
+    checksum: sha256:ec895f13b3babb4ed27e5c5f6718c462808af58d636a90a45745accca8e26a94
+    name: libXau
+    evr: 1.0.9-8.el9
+    sourcerpm: libXau-1.0.9-8.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libXext-1.3.4-8.el9.x86_64.rpm
+    repoid: rhel-9-for-x86_64-appstream-eus-rpms
+    size: 42529
+    checksum: sha256:c295f071518f6366131e7b143e6c37f30caf6fdb51a0aec8ba516364e6bbde91
+    name: libXext
+    evr: 1.3.4-8.el9
+    sourcerpm: libXext-1.3.4-8.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libXrender-0.9.10-16.el9.x86_64.rpm
+    repoid: rhel-9-for-x86_64-appstream-eus-rpms
+    size: 30453
+    checksum: sha256:ab69ef172aaae7535eac07e516a4973d5d7e386e0e693af5f901806f7b527676
+    name: libXrender
+    evr: 0.9.10-16.el9
+    sourcerpm: libXrender-0.9.10-16.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libjpeg-turbo-2.0.90-7.el9.x86_64.rpm
+    repoid: rhel-9-for-x86_64-appstream-eus-rpms
+    size: 181774
+    checksum: sha256:281d740f3732d785382e56fdd61a62c2608bcce740c3dc34b57ec55136cf7201
+    name: libjpeg-turbo
+    evr: 2.0.90-7.el9
+    sourcerpm: libjpeg-turbo-2.0.90-7.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libjpeg-turbo-devel-2.0.90-7.el9.x86_64.rpm
+    repoid: rhel-9-for-x86_64-appstream-eus-rpms
+    size: 105265
+    checksum: sha256:29bc1734fd78b4d11c71adbf37fb11c2fbe7920884c0dd475d9b0a6bc05bc6ba
+    name: libjpeg-turbo-devel
+    evr: 2.0.90-7.el9
+    sourcerpm: libjpeg-turbo-2.0.90-7.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libtiff-4.4.0-13.el9_6.3.x86_64.rpm
+    repoid: rhel-9-for-x86_64-appstream-eus-rpms
+    size: 200378
+    checksum: sha256:b1bf16a20c4173e094cd5bb5fe61e00db08f156e77c3079b590affcd8f7c2e9b
+    name: libtiff
+    evr: 4.4.0-13.el9_6.3
+    sourcerpm: libtiff-4.4.0-13.el9_6.3.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libtiff-devel-4.4.0-13.el9_6.3.x86_64.rpm
+    repoid: rhel-9-for-x86_64-appstream-eus-rpms
+    size: 567409
+    checksum: sha256:55672edd6fef618b0dfcfd445e7ef91fa3b961568ee3129738fbbcaac1b2613a
+    name: libtiff-devel
+    evr: 4.4.0-13.el9_6.3
+    sourcerpm: libtiff-4.4.0-13.el9_6.3.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libwebp-1.2.0-8.el9_3.x86_64.rpm
+    repoid: rhel-9-for-x86_64-appstream-eus-rpms
+    size: 289212
+    checksum: sha256:6b99032107aa1d6b28dd98c44b0dc6451ce632627ccf6da0c29ac34fd5f501e8
+    name: libwebp
+    evr: 1.2.0-8.el9_3
+    sourcerpm: libwebp-1.2.0-8.el9_3.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libwebp-devel-1.2.0-8.el9_3.x86_64.rpm
+    repoid: rhel-9-for-x86_64-appstream-eus-rpms
+    size: 36924
+    checksum: sha256:227d7a6e63cd3ebde97981ba9ea5adbf88e75c87579881fd5d084c8409bb7ad7
+    name: libwebp-devel
+    evr: 1.2.0-8.el9_3
+    sourcerpm: libwebp-1.2.0-8.el9_3.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libxcb-1.13.1-9.el9.x86_64.rpm
+    repoid: rhel-9-for-x86_64-appstream-eus-rpms
+    size: 252989
+    checksum: sha256:a95c41c93768b9f4a1a0a57140866f5e48dc722d15ae10b39edab8b24794e5bf
+    name: libxcb
+    evr: 1.13.1-9.el9
+    sourcerpm: libxcb-1.13.1-9.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libxml2-devel-2.9.13-12.el9_6.1.x86_64.rpm
+    repoid: rhel-9-for-x86_64-appstream-eus-rpms
+    size: 919871
+    checksum: sha256:cd23d9105f65f23208db3a2ecc3f26d985d9ff1793f58ff33d1ca13456c81f00
+    name: libxml2-devel
+    evr: 2.9.13-12.el9_6.1
+    sourcerpm: libxml2-2.9.13-12.el9_6.1.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libxslt-1.1.34-13.el9_6.1.x86_64.rpm
+    repoid: rhel-9-for-x86_64-appstream-eus-rpms
+    size: 247056
+    checksum: sha256:89efaa836dd7787e19f09426a306bcbbbe37cf061fd9c9406e43a9a420a3ab1e
+    name: libxslt
+    evr: 1.1.34-13.el9_6.1
+    sourcerpm: libxslt-1.1.34-13.el9_6.1.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libxslt-devel-1.1.34-13.el9_6.1.x86_64.rpm
+    repoid: rhel-9-for-x86_64-appstream-eus-rpms
+    size: 326584
+    checksum: sha256:c2b9f22bea44a9b49dec17fc10e9e282aa48d1f65d2bf0c9b197b5b699e0c09e
+    name: libxslt-devel
+    evr: 1.1.34-13.el9_6.1
+    sourcerpm: libxslt-1.1.34-13.el9_6.1.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/o/openssl-devel-3.2.2-7.el9_6.2.x86_64.rpm
+    repoid: rhel-9-for-x86_64-appstream-eus-rpms
+    size: 4629447
+    checksum: sha256:0fff18a263f807676867271254439ee40fa51edc1aa104e769211337c394a5c0
+    name: openssl-devel
+    evr: 1:3.2.2-7.el9_6.2
+    sourcerpm: openssl-3.2.2-7.el9_6.2.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/baseos/os/Packages/f/freetype-2.10.4-10.el9_5.x86_64.rpm
+    repoid: rhel-9-for-x86_64-baseos-eus-rpms
+    size: 398342
+    checksum: sha256:712719db8e6aecc252ce30ac0418226f0ea7828d596084fe7da88937df9b72a1
+    name: freetype
+    evr: 2.10.4-10.el9_5
+    sourcerpm: freetype-2.10.4-10.el9_5.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/baseos/os/Packages/l/libpng-1.6.37-12.el9_6.3.x86_64.rpm
+    repoid: rhel-9-for-x86_64-baseos-eus-rpms
+    size: 118118
+    checksum: sha256:c3fcf87f9c7b160638ff9f37b25602ebee289ca500bd5dc45213a160650f576b
+    name: libpng
+    evr: 2:1.6.37-12.el9_6.3
+    sourcerpm: libpng-1.6.37-12.el9_6.3.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/baseos/os/Packages/l/libxml2-2.9.13-12.el9_6.1.x86_64.rpm
+    repoid: rhel-9-for-x86_64-baseos-eus-rpms
+    size: 764543
+    checksum: sha256:4a8611931e62e9ebbb0cae4c857d6ec669a542f8939e97dce63c4e81a7257f71
+    name: libxml2
+    evr: 2.9.13-12.el9_6.1
+    sourcerpm: libxml2-2.9.13-12.el9_6.1.src.rpm
   source: []
   module_metadata: []
