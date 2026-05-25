@@ -34,3 +34,4 @@ urllib3==2.7.0
 # hf-xet: pin wheel-only 1.2.0 (same as CPU). Newer releases (e.g. 1.4.x) use Rust edition 2024; image Cargo
 # (~1.84) cannot build the sdist — pip must never fall back to building hf-xet.
 hf-xet==1.2.0
+huggingface-hub==0.36.2

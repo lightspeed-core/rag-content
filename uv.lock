@@ -1116,7 +1116,7 @@ requires-dist = [
     { name = "einops", specifier = ">=0.8.1" },
     { name = "faiss-cpu", specifier = ">=1.11.0.post1" },
     { name = "hf-xet", specifier = ">=1.2.0" },
-    { name = "huggingface-hub", specifier = ">=0.33.4" },
+    { name = "huggingface-hub", specifier = ">=0.33.4,<1.0" },
     { name = "llama-index", specifier = ">=0.12.51" },
     { name = "llama-index-embeddings-huggingface", specifier = ">=0.4.0" },
     { name = "llama-index-readers-file", specifier = ">=0.4.11" },
@@ -1136,7 +1136,7 @@ requires-dist = [
 dev = [
     { name = "black", specifier = ">=25.1.0" },
     { name = "coverage", specifier = ">=7.6.12" },
-    { name = "huggingface-hub", specifier = ">=0.33.4" },
+    { name = "huggingface-hub", specifier = ">=0.33.4,<1.0" },
     { name = "mypy", specifier = ">=1.15.0" },
     { name = "pip", specifier = "==24.3.1" },
     { name = "pre-commit", specifier = ">=4.2.0" },

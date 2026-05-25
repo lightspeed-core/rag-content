@@ -235,7 +235,7 @@ if grep -qE '^hf-xet==' "$WHEEL_FILE_PYPI"; then
 else
 	echo "hf-xet==1.2.0" >> "$WHEEL_FILE_PYPI"
 fi
-uv pip compile "$WHEEL_FILE_PYPI" --refresh --generate-hashes --only-binary ':all:' --python-version 3.12 --emit-index-url --no-annotate > "$WHEEL_HASH_FILE_PYPI"
+uv pip compile "$WHEEL_FILE_PYPI" --refresh --generate-hashes --only-binary ':all:' --python-version 3.12 --emit-index-url --no-annotate --constraint ${KONFLUX_DIR}/constraints.cuda.txt > "$WHEEL_HASH_FILE_PYPI"
 # Lock antlr4 digest to pulp bytes (uv may emit a trailing " \" already; replace whole stanza).
 ANTLR4_WHEEL_SHA256="52d3ffc4af2125d2bf4e7f8e1f3f794f4394c029e491532a47d52f2b7098f14f"
 if grep -q '^antlr4-python3-runtime @ ' "$WHEEL_HASH_FILE_PYPI"; then
