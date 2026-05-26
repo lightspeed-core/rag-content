@@ -144,22 +144,6 @@ skip && /^[a-zA-Z0-9]/ { skip=0 }
 { print }
 ' "$WHEEL_HASH_FILE" > "${WHEEL_HASH_FILE}.aioh" && mv "${WHEEL_HASH_FILE}.aioh" "$WHEEL_HASH_FILE"
 fi
-# aiohttp: RHOAI publishes separate linux_x86_64 / linux_aarch64 wheels. If both appear in the universal
-# wheel file, pip installs every line and fails on the wrong arch ("not a supported wheel on this platform").
-# Strip aiohttp from the main file and pin each arch in requirements.hashes.wheel.cpu.{x86_64,aarch64}.txt (like torch).
-AIOHTTP_CPU_PULP_BASE="https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.2/cpu-ubi9"
-AIOHTTP_CPU_X86_WHEEL="aiohttp-3.13.3-2-cp312-cp312-linux_x86_64.whl"
-AIOHTTP_CPU_X86_SHA256="19f57e62cb4ee5baf6463ea09a386f91fd82d18bbb6f01fd69462ebb7493f1c6"
-AIOHTTP_CPU_AARCH_WHEEL="aiohttp-3.13.3-2-cp312-cp312-linux_aarch64.whl"
-AIOHTTP_CPU_AARCH_SHA256="3ad7241c57279824a2811527054c8c9ee7ed9d4c6d5fbdaba0e3a8ea95d294a4"
-if grep -qE '^aiohttp(==| @)' "$WHEEL_HASH_FILE"; then
-	awk '
-/^aiohttp==|^aiohttp @/ { skip=1; next }
-skip && /^[ \t]/ { next }
-skip && /^[a-zA-Z0-9]/ { skip=0 }
-{ print }
-' "$WHEEL_HASH_FILE" > "${WHEEL_HASH_FILE}.stripaio" && mv "${WHEEL_HASH_FILE}.stripaio" "$WHEEL_HASH_FILE"
-fi
 # markupsafe: RHOAI *-2-cp312-*linux_*.whl bytes ≠ PyPI hashes in uv lock; Hermeto prefetches RHOAI. Split per
 # arch (same pip issue as aiohttp if both arches appear in the universal wheel file).
 MARKUPSAFE_CPU_PULP_BASE="https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.2/cpu-ubi9"
@@ -212,12 +196,6 @@ TV_AARCH_SHA="b0531d1483fc322d7da0d83be52f0df860a75114ab87dbeeb9de765feaeda843"
 	printf '%s\n' "triton @ ${CPU_PULP_32}/triton-3.5.0-3-cp312-cp312-linux_aarch64.whl \\"
 	printf '%s\n' "    --hash=sha256:8325dca63029c7fedd3e70c11ba9abc472e94f54eaddfbe872a7d823d167e595"
 } > "$WHEEL_HASH_CPU_AARCH"
-if grep -qE '^aiohttp==' "$WHEEL_FILE"; then
-	printf '%s\n' "aiohttp @ ${AIOHTTP_CPU_PULP_BASE}/${AIOHTTP_CPU_X86_WHEEL} \\" >> "$WHEEL_HASH_CPU_X86"
-	printf '%s\n' "    --hash=sha256:${AIOHTTP_CPU_X86_SHA256}" >> "$WHEEL_HASH_CPU_X86"
-	printf '%s\n' "aiohttp @ ${AIOHTTP_CPU_PULP_BASE}/${AIOHTTP_CPU_AARCH_WHEEL} \\" >> "$WHEEL_HASH_CPU_AARCH"
-	printf '%s\n' "    --hash=sha256:${AIOHTTP_CPU_AARCH_SHA256}" >> "$WHEEL_HASH_CPU_AARCH"
-fi
 if grep -qE '^markupsafe==' "$WHEEL_FILE"; then
 	printf '%s\n' "markupsafe @ ${MARKUPSAFE_CPU_PULP_BASE}/${MARKUPSAFE_CPU_X86_WHEEL} \\" >> "$WHEEL_HASH_CPU_X86"
 	printf '%s\n' "    --hash=sha256:${MARKUPSAFE_CPU_X86_SHA256}" >> "$WHEEL_HASH_CPU_X86"

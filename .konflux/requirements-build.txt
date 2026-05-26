@@ -45,7 +45,6 @@ hatch-vcs==0.5.0
     #   fsspec
     #   platformdirs
     #   scikit-build-core
-    #   urllib3
 hatchling==1.26.3
     # via
     #   hatch-fancy-pypi-readme
@@ -87,7 +86,6 @@ hatchling==1.29.0
     #   scikit-build-core
     #   soupsieve
     #   starlette
-    #   urllib3
     #   uv-dynamic-versioning
     #   uvicorn
     #   wcwidth
@@ -149,7 +147,6 @@ setuptools-scm==10.0.5
     #   setuptools-rust
     #   tabulate
     #   tenacity
-    #   urllib3
 tomlkit==0.15.0
     # via uv-dynamic-versioning
 trove-classifiers==2026.5.22.10
