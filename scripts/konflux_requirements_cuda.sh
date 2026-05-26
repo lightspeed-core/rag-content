@@ -408,6 +408,8 @@ skip && /^[[:space:]]/{next}
 skip {skip=0}
 /^nvidia-[a-zA-Z0-9_-]+==/{skip=1; next}
 {print}' "$WHEEL_HASH_FILE_PYPI" > "${WHEEL_HASH_FILE_PYPI}.nonv" && mv "${WHEEL_HASH_FILE_PYPI}.nonv" "$WHEEL_HASH_FILE_PYPI"
+# aiohttp: build from source (not PYPI_WHEEL_LAST_RESORT); strip from PyPI wheel file if the second compile pulled it in as transitive.
+awk '/^aiohttp==/{skip=1; next} skip && /^[[:space:]]/{next} skip {skip=0} {print}' "$WHEEL_HASH_FILE_PYPI" > "${WHEEL_HASH_FILE_PYPI}.noaio" && mv "${WHEEL_HASH_FILE_PYPI}.noaio" "$WHEEL_HASH_FILE_PYPI"
 uv pip compile "$SOURCE_FILE" --refresh --generate-hashes --python-version 3.12 --emit-index-url --no-deps --no-annotate > "$SOURCE_HASH_FILE"
 # Keep hf-xet out of the *source* hash file (install is wheel-only from .wheel.pypi.cuda.base.txt).
 awk '/^hf-xet==/{skip=1; next} skip && /^[a-zA-Z0-9][a-zA-Z0-9_.-]*==/{skip=0} !skip{print}' "$SOURCE_HASH_FILE" > "$SOURCE_HASH_FILE.tmp" && mv "$SOURCE_HASH_FILE.tmp" "$SOURCE_HASH_FILE"
@@ -503,3 +505,26 @@ echo "Packages from packages.redhat.com written to: $WHEEL_HASH_FILE ($(grep -Eo
 echo "Packages from pypi.org (wheels) written to: ${WHEEL_HASH_FILE_PYPI%.txt}.base.txt + .x86_64.txt + .aarch64.txt ($(grep -Eo '==[0-9.]+' "${WHEEL_HASH_FILE_PYPI%.txt}.base.txt" | wc -l) in base, faiss-cpu per arch)"
 echo "Build dependencies written to: $BUILD_FILE ($(grep -Eo '==[0-9.]+' "$BUILD_FILE" | wc -l) packages)"
 echo "Remember to commit the .cuda.txt requirement files, pipeline configurations and push the changes"
+
+# Validation: detect packages that appear in both source and wheel files (conflict).
+echo ""
+echo "Running validation checks..."
+_all_wheel_pkgs=$(cat "$WHEEL_HASH_FILE" "${WHEEL_HASH_FILE_PYPI%.txt}.base.txt" "${WHEEL_HASH_FILE_PYPI%.txt}.x86_64.txt" "${WHEEL_HASH_FILE_PYPI%.txt}.aarch64.txt" 2>/dev/null \
+  | grep -oE '^[a-zA-Z0-9][a-zA-Z0-9_.-]*==' | sed 's/==//' | sort -u)
+_source_pkgs=$(grep -oE '^[a-zA-Z0-9][a-zA-Z0-9_.-]*==' "$SOURCE_HASH_FILE" | sed 's/==//' | sort -u)
+_conflicts=$(comm -12 <(echo "$_all_wheel_pkgs") <(echo "$_source_pkgs"))
+if [ -n "$_conflicts" ]; then
+  echo "WARNING: packages found in BOTH source and wheel files (possible conflict):"
+  echo "$_conflicts" | sed 's/^/  - /'
+fi
+_wheel_only="torch torchvision triton faiss-cpu hf-xet tokenizers"
+_wheel_only_in_source=""
+for pkg in $_wheel_only; do
+  echo "$_source_pkgs" | grep -qx "$pkg" && _wheel_only_in_source="$_wheel_only_in_source $pkg"
+done
+if [ -n "$_wheel_only_in_source" ]; then
+  echo "ERROR: wheel-only packages found in source file (will fail to build):"
+  echo "$_wheel_only_in_source" | tr ' ' '\n' | sed '/^$/d; s/^/  - /'
+  exit 1
+fi
+echo "✓ Validation passed"
