@@ -75,8 +75,10 @@ hatchling==1.29.0
     #   llama-index-vector-stores-postgres
     #   mcp
     #   opentelemetry-api
+    #   opentelemetry-distro
     #   opentelemetry-exporter-otlp-proto-common
     #   opentelemetry-exporter-otlp-proto-http
+    #   opentelemetry-instrumentation
     #   opentelemetry-proto
     #   opentelemetry-sdk
     #   opentelemetry-semantic-conventions

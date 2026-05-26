@@ -304,15 +304,15 @@ llama-index-readers-file==0.6.0 \
 llama-index-vector-stores-postgres==0.8.1 \
     --hash=sha256:832a79f2276b51cbb249e34cdb27911b2369c1b9a29e9d39359879bfe789b196 \
     --hash=sha256:e3f72f16f0a8776b610b44625b5fcab55a5977ce2fa5a7d3b162306a10d9b4e8
-llama-stack==0.5.0 \
-    --hash=sha256:a1bb2aacf61c293693e9d1986a173cd5088c3ee7269d9fd1f584bbca98e98f40 \
-    --hash=sha256:ec3b0455eaa5b24fa53c1b789c18ff8d14580109c7f4ccb64da069b25d0ccde9
-llama-stack-api==0.5.0 \
-    --hash=sha256:51074ec06ab87ece7e9461bf47d878b25eb232b2a009749314e2b8a5a5d83ca0 \
-    --hash=sha256:dfd4ffff70207c49c8e734b503b42bc41860d271e7fe8745a26a41a4d4419ff8
-llama-stack-client==0.5.0 \
-    --hash=sha256:5e7272c7fb58cd169985191c42af78dc6c4d212b7050949b063788bfb9e7ed36 \
-    --hash=sha256:e005ae9d975cda30b3b86261057f228d700107e263e12b796b920cd1fb9ba968
+llama-stack==0.6.0 \
+    --hash=sha256:b804830664dc91e54c7225a7a081cb1874c48fc18573569c19fac4a9397e8076 \
+    --hash=sha256:d92711791633f5505a4473ffba3f3e26acb700716fddab5aec419d99e614c802
+llama-stack-api==0.6.0 \
+    --hash=sha256:b99a03aba3659736b6b540c9e5e674b1daac2bf5eeb2a68795113d62b8250672 \
+    --hash=sha256:f0f3a1a6239a5d3b8c7ef02cefdf817c96c6461dcd8a82c1689ac67ec3107270
+llama-stack-client==0.6.0 \
+    --hash=sha256:3290aac36dcafbd1bc0baaf995522e2037f57056672b5a1516af112a4210f3ea \
+    --hash=sha256:7e514a6ffd92f237aceb062dadc4db44e24a3cd9c4ea35e25173d1e0739beb8e
 lxml==6.1.1 \
     --hash=sha256:05a82eb6e1530a64f26225b55cbd178113bd0b5af1c2b625f25e5296742c26d2 \
     --hash=sha256:07a4a68e286ee7a1ed7dfb8af83e615757c0ccfe9f18c6b4ea6771388d9ba8c9 \
@@ -460,12 +460,18 @@ openai==2.38.0 \
 opentelemetry-api==1.42.1 \
     --hash=sha256:51a69edacadbc03a8950ace1c4c21099cacc538820ac2c9e36277e78cebba714 \
     --hash=sha256:56c63bea9f77b62856be8c47600474acad853b2924b99b1687c4cb6297166716
+opentelemetry-distro==0.63b1 \
+    --hash=sha256:b405b04ad70e430390265eb38e82e067a84ca1f49a21429eaadb930c13330d66 \
+    --hash=sha256:f435098abc7953f58226e8bf79e4c90bc6b32e50aa75d6fa074201db8243b577
 opentelemetry-exporter-otlp-proto-common==1.42.1 \
     --hash=sha256:04f1f01fb597c4249dfcd7f8b861c902c2102369d376d9d346ff38de4469a2ee \
     --hash=sha256:f48d395ab815b444da118868977e9798ea354c25737d5cf39578ae894011c140
 opentelemetry-exporter-otlp-proto-http==1.42.1 \
     --hash=sha256:00a16da1b312a1d6c7233d600d557c91df71125af73020f3b9a7765bd699d59d \
     --hash=sha256:bf142a21035d7571ac3a09cb2e5639f49886f243972883cfe777ed3bf02b734d
+opentelemetry-instrumentation==0.63b1 \
+    --hash=sha256:32368d6ae52c8de20aa790a6ad86b10a76f09956092337ae37d675773990e541 \
+    --hash=sha256:f1986716d52cc316ea5f60189098726a9071d8ecc0eee96c9ed110be08bade9c
 opentelemetry-proto==1.42.1 \
     --hash=sha256:c6a51e6b4f05ae63565f3a113217f3d2bfaec68f78c02d7a6c85f9010d1cfca6 \
     --hash=sha256:dedb74cba2886c59c7789b227a7a670613025a07489040050aedff6e5c0fb43c
