@@ -8,7 +8,7 @@ calver==2025.10.20
     # via trove-classifiers
 cffi==2.0.0
     # via cryptography
-cython==3.2.4
+cython==3.2.5
     # via
     #   lxml
     #   oracledb
@@ -117,11 +117,15 @@ pdm-backend==2.4.8
     #   griffecli
     #   griffelib
     #   typer
+pkgconfig==1.6.0
+    # via aiohttp
 pluggy==1.6.0
     # via hatchling
-poetry-core==2.4.0
+poetry-core==2.4.1
     # via
+    #   aiohappyeyeballs
     #   dunamai
+    #   pkgconfig
     #   rich
     #   tomlkit
 pybind11==3.0.4
@@ -148,10 +152,12 @@ setuptools-scm==10.0.5
     #   urllib3
 tomlkit==0.15.0
     # via uv-dynamic-versioning
-trove-classifiers==2026.5.7.17
+trove-classifiers==2026.5.22.10
     # via hatchling
 uv-build==0.10.12
     # via latex2mathml
+uv-build==0.11.16
+    # via python-frontmatter
 uv-build==0.9.30
     # via llama-index-workflows
 uv-dynamic-versioning==0.14.0
@@ -178,6 +184,7 @@ setuptools==78.1.1
     # via oci
 setuptools==82.0.1
     # via
+    #   aiohttp
     #   anyio
     #   calver
     #   certifi

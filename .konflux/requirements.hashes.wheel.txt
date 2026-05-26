@@ -2,8 +2,6 @@
 #    uv pip compile requirements.wheel.txt --refresh --generate-hashes --index-url https://packages.redhat.com/api/pypi/public-rhai/rhoai/3.3/cpu-ubi9/simple/ --index-strategy unsafe-best-match --python-version 3.12 --emit-index-url --no-deps --no-annotate --universal
 --index-url https://packages.redhat.com/api/pypi/public-rhai/rhoai/3.3/cpu-ubi9/simple/
 
-aiohappyeyeballs @ https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.2/cpu-ubi9/aiohappyeyeballs-2.6.1-2-py3-none-any.whl \
-    --hash=sha256:e63730c7e8303fe9b9b25dfdf72f49ed74380176609a5d11cf7b634058e986d9
 aiosignal==1.4.0 \
     --hash=sha256:9d5af4742d4552e8a3f2fbd48237e07cab578e7175af2f952c420d2e98b731f0
 annotated-doc==0.0.4 \

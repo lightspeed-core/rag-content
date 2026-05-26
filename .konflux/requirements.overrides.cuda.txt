@@ -8,7 +8,7 @@ tokenizers==0.22.1
 scipy==1.16.3
 numpy==2.3.5
 omegaconf==2.3.0
-aiohttp==3.13.3
+aiohttp==3.13.5
 aiosqlite==0.22.0
 anyio==4.12.0
 datasets==4.4.1

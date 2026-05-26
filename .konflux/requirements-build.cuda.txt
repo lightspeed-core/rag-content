@@ -118,12 +118,15 @@ pdm-backend==2.4.8
     #   griffecli
     #   griffelib
     #   typer
+pkgconfig==1.6.0
+    # via aiohttp
 pluggy==1.6.0
     # via hatchling
 poetry-core==2.4.1
     # via
     #   aiohappyeyeballs
     #   dunamai
+    #   pkgconfig
     #   rich
     #   tomlkit
 pybind11==3.0.4
@@ -183,6 +186,7 @@ setuptools==78.1.1
     # via oci
 setuptools==82.0.1
     # via
+    #   aiohttp
     #   anyio
     #   asyncpg
     #   calver
