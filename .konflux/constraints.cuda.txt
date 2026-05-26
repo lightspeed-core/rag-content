@@ -1,0 +1,5 @@
+# Constraints for the second uv pip compile in konflux_requirements_cuda.sh.
+# That compile re-resolves transitive deps of PyPI wheel packages independently
+# of pyproject.toml, so upper bounds must be repeated here to prevent resolution
+# to incompatible versions (e.g. huggingface-hub 1.x breaks transformers <1.0).
+huggingface-hub<1.0
