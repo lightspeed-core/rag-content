@@ -1126,7 +1126,73 @@ def _fetch_hashes_for_pypi_packages(
 # ---------------------------------------------------------------------------
 
 
-def main() -> None:  # noqa: C901
+def _write_hashed_file_via_uv(
+    uv_bin: str,
+    packages: dict[str, dict[str, Any]],
+    python_version: str,
+    output_path: str,
+    index_url: str,
+) -> None:
+    """Write a hashed requirements file using ``uv pip compile --generate-hashes``.
+
+    This ensures hashes match what Hermeto will download from the same index.
+    """
+    if not packages:
+        with open(output_path, "w") as f:
+            f.write(f"--index-url {index_url}\n")
+        return
+
+    tmp_input = output_path + ".in"
+    try:
+        with open(tmp_input, "w") as f:
+            for name in sorted(packages):
+                f.write(
+                    f"{packages[name]['version']}\n".replace(
+                        packages[name]["version"],
+                        f"{name}=={packages[name]['version']}",
+                    )
+                )
+        cmd = [
+            uv_bin,
+            "pip",
+            "compile",
+            tmp_input,
+            "--no-deps",
+            "--no-annotate",
+            "--generate-hashes",
+            "--python-version",
+            python_version,
+            "--index-url",
+            index_url,
+            "--index-strategy",
+            "unsafe-best-match",
+            "--emit-index-url",
+            "--universal",
+        ]
+        logger.debug("Running: %s", " ".join(cmd))
+        result = subprocess.run(cmd, capture_output=True, text=True, check=False)
+        if result.returncode != 0:
+            logger.warning(
+                "uv pip compile --generate-hashes failed for %s: %s",
+                output_path,
+                result.stderr.strip(),
+            )
+            write_hashed_requirements(packages, output_path, index_url)
+            return
+        # Strip any --extra-index-url lines uv might add
+        lines = [
+            line + "\n"
+            for line in result.stdout.splitlines()
+            if not line.strip().startswith("--extra-index-url")
+        ]
+        with open(output_path, "w") as f:
+            f.writelines(lines)
+    finally:
+        if os.path.exists(tmp_input):
+            os.remove(tmp_input)
+
+
+def main() -> None:
     """Resolve dependencies with RHOAI-first policy and write Hermeto output files."""
     parser = argparse.ArgumentParser(
         description="Policy-driven dependency resolver for Hermeto/Cachi2 builds."
@@ -1157,6 +1223,9 @@ def main() -> None:  # noqa: C901
     tekton_files = config.get("tekton_files", [])
     bootstrap_packages = config.get("bootstrap_packages", [])
 
+    # Determine uv binary path
+    uv = UV_BINARY if os.path.isfile(UV_BINARY) else "uv"
+
     # Step 1: Resolve via uv with prefer-index strategy
     logger.info("Running uv pip compile --index-strategy prefer-index …")
     uv_resolved = uv_resolve(python_version, rhoai_index_url, suffix)
@@ -1186,37 +1255,30 @@ def main() -> None:  # noqa: C901
     pypi_count = len(resolved) - rhoai_count
     logger.info("Classified: %d RHOAI, %d PyPI", rhoai_count, pypi_count)
 
-    # Step 3: Fetch hashes — RHOAI from the RHOAI index, PyPI from PyPI
-    logger.info("Fetching hashes …")
-    rhoai = RhoaiIndex(rhoai_index_url, python_version, platforms)
-    rhoai.load()
-    for name, info in resolved.items():
-        if info["source"] == "rhoai":
-            match = rhoai.find_best(name, f"=={info['version']}")
-            if match:
-                info["platforms"] = match["platforms"]
-
-    pypi = PypiClient(python_version, platforms)
-    _fetch_hashes_for_pypi_packages(resolved, pypi)
-
-    # Step 5: Classify into buckets
+    # Step 3: Classify into buckets
     buckets = classify_packages(resolved, wheel_only)
 
-    # Step 6: Write hashed requirements files
-    write_hashed_requirements(
+    # Step 4: Write hashed requirements files via uv pip compile --generate-hashes
+    _write_hashed_file_via_uv(
+        uv,
         buckets["rhoai_wheel"],
+        python_version,
         os.path.join(KONFLUX_DIR, f"requirements.hashes.wheel{suffix}.txt"),
         rhoai_index_url,
     )
-    write_hashed_requirements(
+    _write_hashed_file_via_uv(
+        uv,
         buckets["pypi_sdist"],
+        python_version,
         os.path.join(KONFLUX_DIR, f"requirements.hashes.source{suffix}.txt"),
-        "https://pypi.org/simple",
+        "https://pypi.org/simple/",
     )
-    write_hashed_requirements(
+    _write_hashed_file_via_uv(
+        uv,
         buckets["pypi_wheel"],
+        python_version,
         os.path.join(KONFLUX_DIR, f"requirements.hashes.wheel.pypi{suffix}.txt"),
-        "https://pypi.org/simple",
+        "https://pypi.org/simple/",
     )
 
     # Step 7: Build dependencies via pybuild-deps

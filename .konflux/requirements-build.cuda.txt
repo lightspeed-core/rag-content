@@ -23,6 +23,7 @@ hatchling==1.29.0
     #   llama-index-embeddings-huggingface
     #   llama-index-vector-stores-faiss
     #   llama-index-vector-stores-postgres
+    #   opentelemetry-distro
 maturin==1.13.3
     # via uv-build
 packaging==26.2
@@ -45,9 +46,9 @@ setuptools-scm==10.0.5
     #   llama-stack-api
     #   pluggy
     #   setuptools-rust
-trove-classifiers==2026.5.20.19
+trove-classifiers==2026.5.22.10
     # via hatchling
-uv-build==0.11.15
+uv-build==0.11.16
     # via python-frontmatter
 vcs-versioning==1.1.1
     # via setuptools-scm
