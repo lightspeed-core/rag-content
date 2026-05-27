@@ -2,8 +2,6 @@
 #    uv pip compile requirements.wheel.txt --refresh --generate-hashes --index-url https://packages.redhat.com/api/pypi/public-rhai/rhoai/3.3/cpu-ubi9/simple/ --index-strategy unsafe-best-match --python-version 3.12 --emit-index-url --no-deps --no-annotate --universal
 --index-url https://packages.redhat.com/api/pypi/public-rhai/rhoai/3.3/cpu-ubi9/simple/
 
-aiohappyeyeballs @ https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.2/cpu-ubi9/aiohappyeyeballs-2.6.1-2-py3-none-any.whl \
-    --hash=sha256:e63730c7e8303fe9b9b25dfdf72f49ed74380176609a5d11cf7b634058e986d9
 aiosignal==1.4.0 \
     --hash=sha256:9d5af4742d4552e8a3f2fbd48237e07cab578e7175af2f952c420d2e98b731f0
 annotated-doc==0.0.4 \
@@ -102,6 +100,8 @@ omegaconf==2.3.0 \
     --hash=sha256:8e67e241d1055e8385f9e46823ed07f8179c5f02a4eb9c66bae1fea89d2f8abc
 openpyxl==3.1.5 \
     --hash=sha256:4514b1f770df62a4b37af18716c644c3faf6c32bbd78317d34dcb09ae4303f1e
+packaging==26.2 \
+    --hash=sha256:93887c677c440c1fa57d1c1c5b215638fc66f79af3450b33c640335ce281312a
 pandas==2.3.3 \
     --hash=sha256:308c8ca6262e058136d91a7d4d2bd84dd02e65caf60340fefd20bcf26b97e819 \
     --hash=sha256:6ba245cff03afa84a0bc5e715a11caafab1dc51ca8fe4d827017706c4b62f238 \
@@ -196,5 +196,7 @@ typing-inspect==0.9.0 \
     --hash=sha256:369f80dd867ce208d61bc645e236c5049273c6e0f46c090fb9c7a9655fc8320b
 typing-inspection==0.4.2 \
     --hash=sha256:4baec0c9a4ad5cc8a85c71c387e98ff9ecc7b85b6e538e204343940090be3b63
+urllib3==2.7.0 \
+    --hash=sha256:2c89459e59ada9c2656df2bfa310adb4e68f96a08a95a65f4276d15ca20cb71d
 xlsxwriter==3.2.9 \
     --hash=sha256:35358bbc5bb4085bc6c1bc97622791ad5d9c4c19e3ccc1f8708d8b4e6a7a84de
