@@ -9,5 +9,5 @@ torch @ https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.3/cuda1
 torchvision @ https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.3/cuda12.9-ubi9/torchvision-0.24.0-9-cp312-cp312-linux_x86_64.whl \
     --hash=sha256:c1b4ffe7435b2a6e4c849b1be3b1f50d8f1fcb5a9c1bbe6f38e59af57eb27abb
 # triton from RHOAI cpu-ubi9 (declared by RHOAI torch METADATA)
-triton @ https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.3/cpu-ubi9/triton-3.5.0-3-cp312-cp312-linux_x86_64.whl \
-    --hash=sha256:a916a1758674bbc35545f3aed9c1e83ed581b59a277cfffca1926c6f5f567a96
+triton @ https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.3/cpu-ubi9/triton-3.5.1-2-cp312-cp312-linux_x86_64.whl \
+    --hash=sha256:7b1a1b9ab53eafe7a65ae25861ac7df5541ea706b3baebe2306580127825e222

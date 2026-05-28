@@ -10,7 +10,7 @@
 #   Runtime deps must be satisfied in the image; where RHOAI publishes wheels (cuda12.9-ubi9 or
 #   cpu-ubi9), use those—not PyPI's separate CUDA torch stack. PyPI CUDA torch adds nvidia-* cu12
 #   wheels; RHOAI torch does *not* declare those in METADATA, so do not treat them as required
-#   companions to RHOAI torch. triton is declared (e.g. triton==3.5.0) and is installed from
+#   companions to RHOAI torch. triton is declared (e.g. triton==3.5.1) and is installed from
 #   RHOAI cpu-ubi9 pulp URLs in the arch-specific requirement files.
 #
 # Other packages available from RHOAI (cuda12.9-ubi9): see the full list at
@@ -301,8 +301,8 @@ skip && /^[a-zA-Z0-9][a-zA-Z0-9_.-]*(==| @ )/ && $0 !~ /^faiss-cpu/ { skip=0 }
   AARCH64_TORCHVISION_URL="${RHOAI_PULP}/torchvision-0.24.0-9-cp312-cp312-linux_aarch64.whl"
   AARCH64_TORCHVISION_HASH="569d6ab37fb575f514d04c04706a65fc599f24c7b6264b44e54b9b9c017e353a"
   RHOAI_PULP_CPU="https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.3/cpu-ubi9"
-  AARCH64_TRITON_URL="${RHOAI_PULP_CPU}/triton-3.5.0-3-cp312-cp312-linux_aarch64.whl"
-  AARCH64_TRITON_HASH="a46eaadd18e726ff38f9cfb53c4e641dfe937741394cdf45e2981858200fae1d"
+  AARCH64_TRITON_URL="${RHOAI_PULP_CPU}/triton-3.5.1-2-cp312-cp312-linux_aarch64.whl"
+  AARCH64_TRITON_HASH="f45cd8a990cde562e64b6ef00969dc3751a49e90651216e7f7b44ba997c9e19d"
   {
     echo ""
     echo "# aarch64 CUDA: torch and torchvision from RHOAI (PyPI only has CPU on aarch64)"
@@ -469,11 +469,11 @@ skip && /^[a-zA-Z0-9]/ { skip=0 }
 skip { next }
 { print }
 ' "$WHEEL_HASH_FILE_PYPI" > "${WHEEL_HASH_FILE_PYPI%.txt}.base.txt"
-# x86_64: torch, torchvision, triton from RHOAI (triton: cpu-ubi9, matches torch Requires-Dist triton==3.5.0).
+# x86_64: torch, torchvision, triton from RHOAI (triton: cpu-ubi9, matches torch Requires-Dist triton==3.5.1).
 RHOAI_PULP="https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.3/cuda12.9-ubi9"
 RHOAI_PULP_CPU="https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.3/cpu-ubi9"
-TRITON_350_X86_URL="${RHOAI_PULP_CPU}/triton-3.5.0-3-cp312-cp312-linux_x86_64.whl"
-TRITON_350_X86_HASH="a916a1758674bbc35545f3aed9c1e83ed581b59a277cfffca1926c6f5f567a96"
+TRITON_351_X86_URL="${RHOAI_PULP_CPU}/triton-3.5.1-2-cp312-cp312-linux_x86_64.whl"
+TRITON_351_X86_HASH="7b1a1b9ab53eafe7a65ae25861ac7df5541ea706b3baebe2306580127825e222"
 if [ -f "${WHEEL_HASH_FILE_PYPI%.txt}.x86_64.txt" ]; then
   {
     echo ""
@@ -483,8 +483,8 @@ if [ -f "${WHEEL_HASH_FILE_PYPI%.txt}.x86_64.txt" ]; then
     echo "torchvision @ ${RHOAI_PULP}/torchvision-0.24.0-9-cp312-cp312-linux_x86_64.whl \\"
     echo "    --hash=sha256:c1b4ffe7435b2a6e4c849b1be3b1f50d8f1fcb5a9c1bbe6f38e59af57eb27abb"
     echo "# triton from RHOAI cpu-ubi9 (declared by RHOAI torch METADATA)"
-    echo "triton @ ${TRITON_350_X86_URL} \\"
-    echo "    --hash=sha256:${TRITON_350_X86_HASH}"
+    echo "triton @ ${TRITON_351_X86_URL} \\"
+    echo "    --hash=sha256:${TRITON_351_X86_HASH}"
   } >> "${WHEEL_HASH_FILE_PYPI%.txt}.x86_64.txt"
 fi
 rm -f "$WHEEL_HASH_FILE_PYPI"

@@ -3,8 +3,8 @@ torch @ https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.3/cpu-u
     --hash=sha256:e42ab849b64444059f5eda352d61c9c3a078f30797e48e2972857182c9a00cf8
 torchvision @ https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.3/cpu-ubi9/torchvision-0.24.1-2-cp312-cp312-linux_x86_64.whl \
     --hash=sha256:e8fc51b8b29433d2dd51d46da204c1d613c65d788f65559cdcb8a3585092a7e7
-triton @ https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.3/cpu-ubi9/triton-3.5.0-3-cp312-cp312-linux_x86_64.whl \
-    --hash=sha256:a916a1758674bbc35545f3aed9c1e83ed581b59a277cfffca1926c6f5f567a96
+triton @ https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.3/cpu-ubi9/triton-3.5.1-2-cp312-cp312-linux_x86_64.whl \
+    --hash=sha256:7b1a1b9ab53eafe7a65ae25861ac7df5541ea706b3baebe2306580127825e222
 markupsafe @ https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.2/cpu-ubi9/markupsafe-3.0.3-2-cp312-cp312-linux_x86_64.whl \
     --hash=sha256:0af6343bc5950d7402fac77cd858153863f2c6ea8fec825bf42b4a779617b228
 cffi @ https://packages.redhat.com/api/pulp-content/public-rhai/rhoai/3.3/cpu-ubi9/cffi-2.0.0-2-cp312-cp312-linux_x86_64.whl \
