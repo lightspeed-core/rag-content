@@ -99,7 +99,6 @@ markupsafe==3.0.3
 maturin==1.10.2
     # via
     #   cryptography
-    #   rpds-py
     #   uv-build
 packaging==26.2
     # via
