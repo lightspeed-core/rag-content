@@ -9,7 +9,8 @@ USER root
 
 # Install Python and git (always needed).
 RUN ${DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
-    python3.12 python3.12-devel python3.12-pip git && \
+    python3.12 python3.12-devel python3.12-pip git \
+    rubygems rubygem-bundler && \
     ${DNF_COMMAND} clean all
 
 # Hermetic: install build toolchain and dev libs for compiling sdists.
@@ -44,7 +45,7 @@ ENV UV_COMPILE_BYTECODE=0 \
 
 WORKDIR /rag-content
 
-COPY pyproject.toml uv.lock README.md .konflux/requirements.hashes.wheel.txt .konflux/requirements.hashes.wheel.cpu.x86_64.txt .konflux/requirements.hashes.wheel.cpu.aarch64.txt .konflux/requirements.hashes.wheel.pypi.txt .konflux/requirements.hashes.source.txt .konflux/requirements-build.txt ./
+COPY pyproject.toml uv.lock README.md .konflux/requirements.hashes.wheel.txt .konflux/requirements.hashes.wheel.pypi.txt .konflux/requirements.hashes.source.txt .konflux/requirements-build.txt ./
 COPY src ./src
 
 RUN if [ -f /cachi2/cachi2.env ]; then \

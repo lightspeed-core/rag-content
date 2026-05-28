@@ -1,24 +1,27 @@
 # Image with CUDA backend. Hermetic build uses requirements.*.cuda.txt (see scripts/konflux_requirements.sh cuda).
-ARG BASE_IMAGE=nvcr.io/nvidia/cuda:12.9.1-devel-ubi9
-FROM ${BASE_IMAGE}
+ARG BUILDER_BASE_IMAGE=nvcr.io/nvidia/cuda:12.9.1-devel-ubi9
+ARG RUNTIME_BASE_IMAGE=nvcr.io/nvidia/cuda:12.9.1-runtime-ubi9
+FROM ${BUILDER_BASE_IMAGE} AS builder
+ARG DNF_COMMAND=dnf
 USER root
 
-# Install Python (CUDA base uses dnf).
-RUN dnf install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
+# Install Python and system packages.
+# In hermetic (Konflux) builds the RHAI base image already ships Python 3.12
+# and CUDA libs; we only need the extra tooling packages.
+RUN ${DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
     python3.12 python3.12-devel python3.12-pip git \
     skopeo \
     rubygems rubygem-bundler \
     libcudnn9 libnccl libcusparselt0 libxml2-devel libxslt-devel && \
-    dnf clean all
+    ${DNF_COMMAND} clean all
 
 # Hermetic: install build toolchain and dev libs for compiling sdists.
 RUN if [ -f /cachi2/cachi2.env ]; then \
-    dnf install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
+    ${DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
     gcc cmake cargo rust swig autoconf automake libtool \
     libpq-devel libxml2-devel libxslt-devel \
-    libjpeg-turbo-devel zlib-devel libtiff-devel freetype-devel libwebp-devel \
-    openssl-devel && \
-    dnf clean all; \
+    zlib-devel openssl-devel && \
+    ${DNF_COMMAND} clean all; \
     fi
 
 # Install uv package manager
@@ -61,16 +64,18 @@ RUN if [ -f /cachi2/cachi2.env ]; then \
     fi
 
 # Stage 2: Runtime — clean image with only runtime dependencies.
+ARG RUNTIME_BASE_IMAGE
 FROM ${RUNTIME_BASE_IMAGE}
+ARG DNF_COMMAND=dnf
 USER root
 
-RUN dnf install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
+RUN ${DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
     python3.12 python3.12-pip git \
     skopeo \
     libpq libxml2 libxslt libjpeg-turbo libtiff freetype libwebp \
     rubygems rubygem-bundler \
     libcudnn9 libnccl libcusparselt0 && \
-    dnf clean all
+    ${DNF_COMMAND} clean all
 
 WORKDIR /rag-content
 
