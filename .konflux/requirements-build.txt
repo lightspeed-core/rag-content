@@ -6,8 +6,6 @@
 #
 calver==2025.10.20
     # via trove-classifiers
-cffi==2.0.0
-    # via cryptography
 cython==3.2.5
     # via
     #   lxml
@@ -97,7 +95,7 @@ markupsafe==3.0.3
     # via jinja2
 maturin==1.10.2
     # via
-    #   cryptography
+    #   rpds-py
     #   uv-build
 packaging==26.2
     # via
@@ -116,6 +114,7 @@ pdm-backend==2.4.8
     #   griffe
     #   griffecli
     #   griffelib
+    #   marko
     #   typer
 pkgconfig==1.6.0
     # via aiohttp
@@ -130,8 +129,6 @@ poetry-core==2.4.1
     #   tomlkit
 pybind11==3.0.4
     # via pillow
-pycparser==3.0
-    # via cffi
 scikit-build-core==0.12.2
     # via pybind11
 semantic-version==2.10.0
@@ -172,7 +169,6 @@ wheel==0.47.0
     #   oci
     #   oracledb
     #   pyclipper
-    #   pycparser
     #   sentence-transformers
     #   tornado
     #   tzdata
@@ -187,10 +183,8 @@ setuptools==82.0.1
     #   anyio
     #   calver
     #   certifi
-    #   cffi
     #   charset-normalizer
     #   colorlog
-    #   cryptography
     #   googleapis-common-protos
     #   llama-stack
     #   llama-stack-api
@@ -205,7 +199,6 @@ setuptools==82.0.1
     #   propcache
     #   psutil
     #   pyclipper
-    #   pycparser
     #   pyjwt
     #   regex
     #   requests

@@ -12,8 +12,6 @@ httpx-sse==0.4.3 \
     --hash=sha256:65fd96aaf1eefd9edd3324bab52cd710c325245381251f5dc9dcf699dab731fb
 jsonlines==4.0.0 \
     --hash=sha256:1e7b463ff451783f6c1c0735d54eaacaa576c081e7036f97a4f8641f949c902e
-marko==2.2.2 \
-    --hash=sha256:6507f902e516694f3aaefb0b1601d3f278bfe68b92e77d74c57ca7db54f237a9
 mpmath==1.3.0 \
     --hash=sha256:b13d6f0a6eb4f9eaf0011ca2193fdbf6b57c6b9a8f576268e95e538f217625eb
 openpyxl==3.1.5 \
