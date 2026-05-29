@@ -305,8 +305,8 @@ sqlalchemy==2.0.49 \
     --hash=sha256:87c7ba6240e2a891c527941f7daf6dc58715bb7310ea7ea0056344d3bf57ed1d
 sse-starlette==3.3.4 \
     --hash=sha256:3ad8535ae771133e8e5ea1fb24e3be0e73e0e16c27d09aa0b5394c3b3dfea030
-starlette==1.0.0 \
-    --hash=sha256:17445f490de34c015ef4199fcba97738db4a5d840be7a28c8cda429b12400097
+starlette==1.2.0 \
+    --hash=sha256:ca88d1faf27d099c957d408bb00b3271fbacd33745449b50c3af9ead4226b2b6
 striprtf==0.0.26 \
     --hash=sha256:337158a24aa9be44915ad33d39c669b1ea778e4acc433707cadce96ad3ac09c8
 sympy==1.14.0 \
