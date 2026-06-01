@@ -35,9 +35,9 @@ setuptools-scm==10.0.5
     # via
     #   pluggy
     #   setuptools-rust
-trove-classifiers==2026.5.22.10
+trove-classifiers==2026.6.1.19
     # via hatchling
-uv-build==0.11.17
+uv-build==0.11.18
     # via python-frontmatter
 vcs-versioning==1.1.1
     # via setuptools-scm
