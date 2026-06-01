@@ -9,22 +9,35 @@ USER root
 
 # Install Python and git (always needed).
 RUN ${DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
-    python3.12 python3.12-devel python3.12-pip git && \
+    python3.12 python3.12-devel python3.12-pip git \
+    rubygems rubygem-bundler && \
     ${DNF_COMMAND} clean all
 
 # Hermetic: install build toolchain and dev libs for compiling sdists.
 RUN if [ -f /cachi2/cachi2.env ]; then \
     ${DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
-    gcc cmake cargo rust swig autoconf automake libtool \
-    libpq-devel libxml2-devel libxslt-devel \
-    libjpeg-turbo-devel zlib-devel libtiff-devel freetype-devel libwebp-devel \
-    openssl-devel && \
+    gcc cmake git libpq-devel swig autoconf automake libtool libxml2-devel libxslt-devel && \
     ${DNF_COMMAND} clean all; \
     fi
 
 # Install uv package manager
 RUN pip3.12 install uv>=0.7.20
 
+WORKDIR /rag-content
+
+COPY Makefile pyproject.toml uv.lock README.md Gemfile Gemfile.lock .konflux/requirements.hashes.wheel.txt .konflux/requirements.hashes.wheel.pypi.txt .konflux/requirements.hashes.source.txt .konflux/requirements-build.txt ./
+COPY src ./src
+COPY tests ./tests
+COPY scripts ./scripts
+COPY embeddings_model ./embeddings_model
+COPY LICENSE /licenses/LICENSE
+
+# Install Ruby Gems
+RUN BUNDLE_PATH__SYSTEM=true bundle install
+
+# Configure UV environment variables for optimal performance
+# Pytorch backend - cpu. `uv` contains convenient way to specify the backend.
+# MATURIN_NO_INSTALL_RUST=1 : Disable installation of Rust dependencies by Maturin.
 ENV UV_COMPILE_BYTECODE=0 \
     UV_LINK_MODE=copy \
     UV_PYTHON_DOWNLOADS=0 \
@@ -32,7 +45,7 @@ ENV UV_COMPILE_BYTECODE=0 \
 
 WORKDIR /rag-content
 
-COPY pyproject.toml uv.lock README.md .konflux/requirements.hashes.wheel.txt .konflux/requirements.hashes.wheel.cpu.x86_64.txt .konflux/requirements.hashes.wheel.cpu.aarch64.txt .konflux/requirements.hashes.wheel.pypi.txt .konflux/requirements.hashes.source.txt .konflux/requirements-build.txt ./
+COPY pyproject.toml uv.lock README.md .konflux/requirements.hashes.wheel.txt .konflux/requirements.hashes.wheel.pypi.txt .konflux/requirements.hashes.source.txt .konflux/requirements-build.txt ./
 COPY src ./src
 
 RUN if [ -f /cachi2/cachi2.env ]; then \
@@ -42,7 +55,6 @@ RUN if [ -f /cachi2/cachi2.env ]; then \
     case "${TARGETARCH:-amd64}" in amd64) CPU_WHEEL_ARCH=x86_64 ;; arm64) CPU_WHEEL_ARCH=aarch64 ;; *) CPU_WHEEL_ARCH=x86_64 ;; esac && \
     pip install --no-cache-dir --ignore-installed --no-index --find-links ${PIP_FIND_LINKS} --no-deps \
       -r requirements.hashes.wheel.txt \
-      -r requirements.hashes.wheel.cpu.${CPU_WHEEL_ARCH}.txt \
       -r requirements.hashes.wheel.pypi.txt \
       -r requirements.hashes.source.txt && \
     pip install --no-cache-dir --no-deps . && \

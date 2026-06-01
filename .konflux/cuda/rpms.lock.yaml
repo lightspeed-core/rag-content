@@ -137,48 +137,6 @@ arches:
     name: git-core-doc
     evr: 2.47.3-1.el9_6
     sourcerpm: git-2.47.3-1.el9_6.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/g/glib2-devel-2.68.4-16.el9_6.4.aarch64.rpm
-    repoid: rhel-9-for-aarch64-appstream-eus-rpms
-    size: 562675
-    checksum: sha256:d4ee610489951c3d3412df404b7b2e02fe4ac6426e2fd5bd82dff67c6f025c97
-    name: glib2-devel
-    evr: 2.68.4-16.el9_6.4
-    sourcerpm: glib2-2.68.4-16.el9_6.4.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/g/graphite2-devel-1.3.14-9.el9.aarch64.rpm
-    repoid: rhel-9-for-aarch64-appstream-eus-rpms
-    size: 24602
-    checksum: sha256:7c1eee902960bf27a492a7eaa2ecd324830b7ecfedb80de3bff606f3476468da
-    name: graphite2-devel
-    evr: 1.3.14-9.el9
-    sourcerpm: graphite2-1.3.14-9.el9.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/h/harfbuzz-devel-2.7.4-10.el9.aarch64.rpm
-    repoid: rhel-9-for-aarch64-appstream-eus-rpms
-    size: 358742
-    checksum: sha256:7e8f25f2425f4e1797714f4a923324f7024ea34c9bbe37039b1b5a42f5440436
-    name: harfbuzz-devel
-    evr: 2.7.4-10.el9
-    sourcerpm: harfbuzz-2.7.4-10.el9.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/h/harfbuzz-icu-2.7.4-10.el9.aarch64.rpm
-    repoid: rhel-9-for-aarch64-appstream-eus-rpms
-    size: 15271
-    checksum: sha256:3a1b0ed8e1fbc7858f6810e72ad39448994ff1af26a6537d1d7554a5ac8e0a36
-    name: harfbuzz-icu
-    evr: 2.7.4-10.el9
-    sourcerpm: harfbuzz-2.7.4-10.el9.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libblkid-devel-2.37.4-21.el9.aarch64.rpm
-    repoid: rhel-9-for-aarch64-appstream-eus-rpms
-    size: 18820
-    checksum: sha256:41a14a958ddb7b3dd1f01f3ac19a75156e551d088c1fc7e5d77e060119537ee3
-    name: libblkid-devel
-    evr: 2.37.4-21.el9
-    sourcerpm: util-linux-2.37.4-21.el9.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libffi-devel-3.4.2-8.el9.aarch64.rpm
-    repoid: rhel-9-for-aarch64-appstream-eus-rpms
-    size: 31109
-    checksum: sha256:5cbe643ebd6c7608b127ccb0eaff9320db2e77b60dd79a3bfbf1b49cd1877bd6
-    name: libffi-devel
-    evr: 3.4.2-8.el9
-    sourcerpm: libffi-3.4.2-8.el9.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libgpg-error-devel-1.42-5.el9.aarch64.rpm
     repoid: rhel-9-for-aarch64-appstream-eus-rpms
     size: 70304
@@ -186,27 +144,6 @@ arches:
     name: libgpg-error-devel
     evr: 1.42-5.el9
     sourcerpm: libgpg-error-1.42-5.el9.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libicu-devel-67.1-10.el9_6.aarch64.rpm
-    repoid: rhel-9-for-aarch64-appstream-eus-rpms
-    size: 959074
-    checksum: sha256:bca0256312856eb2b3ba4d66aca63d0738b5bd32bece0c5a53aa7c883d5cfb26
-    name: libicu-devel
-    evr: 67.1-10.el9_6
-    sourcerpm: icu-67.1-10.el9_6.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libjpeg-turbo-devel-2.0.90-7.el9.aarch64.rpm
-    repoid: rhel-9-for-aarch64-appstream-eus-rpms
-    size: 104818
-    checksum: sha256:d455116c42fe8411808dd1be01ef488b33744a8bd1c372882b2fa41c9b7507b3
-    name: libjpeg-turbo-devel
-    evr: 2.0.90-7.el9
-    sourcerpm: libjpeg-turbo-2.0.90-7.el9.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libmount-devel-2.37.4-21.el9.aarch64.rpm
-    repoid: rhel-9-for-aarch64-appstream-eus-rpms
-    size: 19507
-    checksum: sha256:cc916cb9374d41ccd421f89f9330310ebc8e9980386194c2f80dd409805ffba8
-    name: libmount-devel
-    evr: 2.37.4-21.el9
-    sourcerpm: util-linux-2.37.4-21.el9.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libnet-1.2-7.el9.aarch64.rpm
     repoid: rhel-9-for-aarch64-appstream-eus-rpms
     size: 62963
@@ -277,13 +214,6 @@ arches:
     name: libuv
     evr: 1:1.42.0-2.el9_4
     sourcerpm: libuv-1.42.0-2.el9_4.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libwebp-devel-1.2.0-8.el9_3.aarch64.rpm
-    repoid: rhel-9-for-aarch64-appstream-eus-rpms
-    size: 36884
-    checksum: sha256:6ad97214b40f00013141412500deca57573c493b8325e437e2c65e88053a7552
-    name: libwebp-devel
-    evr: 1.2.0-8.el9_3
-    sourcerpm: libwebp-1.2.0-8.el9_3.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libxml2-devel-2.9.13-12.el9_6.1.aarch64.rpm
     repoid: rhel-9-for-aarch64-appstream-eus-rpms
     size: 919913
@@ -291,13 +221,6 @@ arches:
     name: libxml2-devel
     evr: 2.9.13-12.el9_6.1
     sourcerpm: libxml2-2.9.13-12.el9_6.1.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libxslt-1.1.34-13.el9_6.1.aarch64.rpm
-    repoid: rhel-9-for-aarch64-appstream-eus-rpms
-    size: 244463
-    checksum: sha256:5c2b240916b054dd00e8add4fe43479816f2b214ea8be3461de6a710bc5e39d1
-    name: libxslt
-    evr: 1.1.34-13.el9_6.1
-    sourcerpm: libxslt-1.1.34-13.el9_6.1.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/l/libxslt-devel-1.1.34-13.el9_6.1.aarch64.rpm
     repoid: rhel-9-for-aarch64-appstream-eus-rpms
     size: 326591
@@ -557,13 +480,6 @@ arches:
     name: slirp4netns
     evr: 1.3.2-1.el9
     sourcerpm: slirp4netns-1.3.2-1.el9.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/s/sysprof-capture-devel-3.40.1-3.el9.aarch64.rpm
-    repoid: rhel-9-for-aarch64-appstream-eus-rpms
-    size: 66841
-    checksum: sha256:47307f58e4707dc31c1bf096e095653aff30837cea5cb4a8820c4c6d57870eb3
-    name: sysprof-capture-devel
-    evr: 3.40.1-3.el9
-    sourcerpm: sysprof-3.40.1-3.el9.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/x/xz-devel-5.2.5-8.el9_0.aarch64.rpm
     repoid: rhel-9-for-aarch64-appstream-eus-rpms
     size: 60585
@@ -750,48 +666,6 @@ arches:
     name: git-core-doc
     evr: 2.47.3-1.el9_6
     sourcerpm: git-2.47.3-1.el9_6.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/g/glib2-devel-2.68.4-16.el9_6.4.x86_64.rpm
-    repoid: rhel-9-for-x86_64-appstream-eus-rpms
-    size: 562982
-    checksum: sha256:570d92e0ebee0742a412cbc88abe0ca8c46e68704f61440852f354f610d01c5b
-    name: glib2-devel
-    evr: 2.68.4-16.el9_6.4
-    sourcerpm: glib2-2.68.4-16.el9_6.4.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/g/graphite2-devel-1.3.14-9.el9.x86_64.rpm
-    repoid: rhel-9-for-x86_64-appstream-eus-rpms
-    size: 24651
-    checksum: sha256:c582065c2166a903aefa31d74faca878ed5220fed6fa1ec2cc15d8bcd267d2f4
-    name: graphite2-devel
-    evr: 1.3.14-9.el9
-    sourcerpm: graphite2-1.3.14-9.el9.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/h/harfbuzz-devel-2.7.4-10.el9.x86_64.rpm
-    repoid: rhel-9-for-x86_64-appstream-eus-rpms
-    size: 359203
-    checksum: sha256:23aa743ca73b972c98c4ef005f26414030cbc62c6a940a5b54ae47665870ae5c
-    name: harfbuzz-devel
-    evr: 2.7.4-10.el9
-    sourcerpm: harfbuzz-2.7.4-10.el9.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/h/harfbuzz-icu-2.7.4-10.el9.x86_64.rpm
-    repoid: rhel-9-for-x86_64-appstream-eus-rpms
-    size: 14916
-    checksum: sha256:a31ef6dbaf55c7b3d824dad300058aee3fa741c7679c50b313862580879b94e5
-    name: harfbuzz-icu
-    evr: 2.7.4-10.el9
-    sourcerpm: harfbuzz-2.7.4-10.el9.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libblkid-devel-2.37.4-21.el9.x86_64.rpm
-    repoid: rhel-9-for-x86_64-appstream-eus-rpms
-    size: 18854
-    checksum: sha256:f0bcbd0d6d96405d96e6a5326ec382d37133af36b6f8c491506b4e2e2785f702
-    name: libblkid-devel
-    evr: 2.37.4-21.el9
-    sourcerpm: util-linux-2.37.4-21.el9.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libffi-devel-3.4.2-8.el9.x86_64.rpm
-    repoid: rhel-9-for-x86_64-appstream-eus-rpms
-    size: 32520
-    checksum: sha256:cd74ba2a4bac6b9f7df20e50915e0aeee6581dd815d3a388eb3f9c45565cef68
-    name: libffi-devel
-    evr: 3.4.2-8.el9
-    sourcerpm: libffi-3.4.2-8.el9.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libgpg-error-devel-1.42-5.el9.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-eus-rpms
     size: 70899
@@ -799,27 +673,6 @@ arches:
     name: libgpg-error-devel
     evr: 1.42-5.el9
     sourcerpm: libgpg-error-1.42-5.el9.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libicu-devel-67.1-10.el9_6.x86_64.rpm
-    repoid: rhel-9-for-x86_64-appstream-eus-rpms
-    size: 960174
-    checksum: sha256:07719c3e97e12ad06e9678a4a53859c823909468a72e006d7d92e7c6d581b104
-    name: libicu-devel
-    evr: 67.1-10.el9_6
-    sourcerpm: icu-67.1-10.el9_6.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libjpeg-turbo-devel-2.0.90-7.el9.x86_64.rpm
-    repoid: rhel-9-for-x86_64-appstream-eus-rpms
-    size: 105265
-    checksum: sha256:29bc1734fd78b4d11c71adbf37fb11c2fbe7920884c0dd475d9b0a6bc05bc6ba
-    name: libjpeg-turbo-devel
-    evr: 2.0.90-7.el9
-    sourcerpm: libjpeg-turbo-2.0.90-7.el9.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libmount-devel-2.37.4-21.el9.x86_64.rpm
-    repoid: rhel-9-for-x86_64-appstream-eus-rpms
-    size: 19542
-    checksum: sha256:b6cc197e511d7326496d6b4a14614b972bcd3e7170d7d5736073139891a775b5
-    name: libmount-devel
-    evr: 2.37.4-21.el9
-    sourcerpm: util-linux-2.37.4-21.el9.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libnet-1.2-7.el9.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-eus-rpms
     size: 61278
@@ -890,13 +743,6 @@ arches:
     name: libuv
     evr: 1:1.42.0-2.el9_4
     sourcerpm: libuv-1.42.0-2.el9_4.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libwebp-devel-1.2.0-8.el9_3.x86_64.rpm
-    repoid: rhel-9-for-x86_64-appstream-eus-rpms
-    size: 36924
-    checksum: sha256:227d7a6e63cd3ebde97981ba9ea5adbf88e75c87579881fd5d084c8409bb7ad7
-    name: libwebp-devel
-    evr: 1.2.0-8.el9_3
-    sourcerpm: libwebp-1.2.0-8.el9_3.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libxml2-devel-2.9.13-12.el9_6.1.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-eus-rpms
     size: 919871
@@ -904,13 +750,6 @@ arches:
     name: libxml2-devel
     evr: 2.9.13-12.el9_6.1
     sourcerpm: libxml2-2.9.13-12.el9_6.1.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libxslt-1.1.34-13.el9_6.1.x86_64.rpm
-    repoid: rhel-9-for-x86_64-appstream-eus-rpms
-    size: 247056
-    checksum: sha256:89efaa836dd7787e19f09426a306bcbbbe37cf061fd9c9406e43a9a420a3ab1e
-    name: libxslt
-    evr: 1.1.34-13.el9_6.1
-    sourcerpm: libxslt-1.1.34-13.el9_6.1.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/l/libxslt-devel-1.1.34-13.el9_6.1.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-eus-rpms
     size: 326584
@@ -1170,13 +1009,6 @@ arches:
     name: slirp4netns
     evr: 1.3.2-1.el9
     sourcerpm: slirp4netns-1.3.2-1.el9.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/s/sysprof-capture-devel-3.40.1-3.el9.x86_64.rpm
-    repoid: rhel-9-for-x86_64-appstream-eus-rpms
-    size: 65413
-    checksum: sha256:3006309779a18bde4fff7e633881218284a46584e4d529a14fbbc4bc0683ebae
-    name: sysprof-capture-devel
-    evr: 3.40.1-3.el9
-    sourcerpm: sysprof-3.40.1-3.el9.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/x/xz-devel-5.2.5-8.el9_0.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-eus-rpms
     size: 60644

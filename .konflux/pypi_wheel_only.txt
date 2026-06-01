@@ -1,0 +1,13 @@
+# Packages where PyPI has an sdist but it cannot be built reliably.
+# Rust/C++ bootstrap, binary-only distributions, CUDA stack.
+hf-xet
+psycopg2-binary
+jiter
+docling-parse
+tokenizers
+torch
+torchvision
+triton
+opencv-python
+rapidocr
+sqlite-vec
