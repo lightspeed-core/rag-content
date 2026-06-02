@@ -24,8 +24,8 @@ asyncpg==0.31.0 \
     --hash=sha256:8c1dc6c46b38322e39d46cfc2020fdefb4944d605eb7e36e8e438b977462de54
 attrs==26.1.0 \
     --hash=sha256:27f4dcccbdbdaab789db1f85858b8e74d2668525cb3d01adb26504eb0eec7f8d
-banks==2.4.1 \
-    --hash=sha256:7167369b40a82e64de80d524f2e37f257b7c2213ada0d3684a3780ae34675624
+banks==2.4.2 \
+    --hash=sha256:39656cc77deda9dd77b5e2cbb4e9d2e1774675650ed8d5c999640911de7d8f6e
 beautifulsoup4==4.14.3 \
     --hash=sha256:97995dcf9b69432ac5f33f0fc4b9050a4969decbb4b1bb0c522257b03f8690ee
 certifi==2026.2.25 \
@@ -109,8 +109,8 @@ httpx-sse==0.4.3 \
     --hash=sha256:3066da668a47a07c4123d6e1f776136c61bcabbf441b05a29025cb3d8f19a448
 huggingface-hub==1.10.2 \
     --hash=sha256:c84bee0fb68d1436a0b07f7ce7b2083f87a87e6d7034970d784902a1ff85a324
-idna==3.11 \
-    --hash=sha256:3a8ca6829f69e0245e7cf50fa47c1b176fc5767f1de9259c6b61acfde0acf20c
+idna==3.17 \
+    --hash=sha256:9a7e9d24e19e47ce2070aa366c30ae2e839bcdc30c6c4ab7bced91b053455f34
 importlib-metadata==8.7.1 \
     --hash=sha256:b74417c9e408b624a12896cf4f48b9ce2e0562e4b826e4a03ec5972075378ea9
 jinja2==3.1.6 \
@@ -144,9 +144,9 @@ llama-index-readers-file==0.5.6 \
     --hash=sha256:236d335622fc72d6c1828d249753aeb84d60c91aba302001735a55811140762f
 llama-index-workflows==2.19.0 \
     --hash=sha256:44f1242226006dbc8b0de3804e56b69ab1a2a3eb40026f2208e212f5ec3b5996
-lxml==6.0.4 \
-    --hash=sha256:ae2734d6dc9dd02e74a3f3695bc2e9e7507758b23b7ef54e33e1d1ecaf1493f2 \
-    --hash=sha256:c815237d82bd6f18adfc6fe14ad07f031e232744efec7f9420f4b34b2880201a
+lxml==6.1.1 \
+    --hash=sha256:78c03b198c41e5c95b762f1433c9ce6a1153f97f9ca7e5980f11043b8a1599f2 \
+    --hash=sha256:eb60c0af1eb8464cffc3585f52e87fcd0ceb7cb717acdd9fe461abe5d7ecf354
 markdown-it-py==4.0.0 \
     --hash=sha256:a4d464894242de4f9c04a87593c39193e71f975a6eb4a53805a51902c8b66c84
 marko==2.2.2 \
@@ -255,8 +255,8 @@ python-docx==1.2.0 \
     --hash=sha256:5e89af00f384609729fd43466d2bd7502043b59a879e245a2574375fae254347
 python-dotenv==1.2.2 \
     --hash=sha256:82cf325059c2510f104431a48d84eb52ea41b85ed7b747ee0ea1acb9b927f464
-python-multipart==0.0.26 \
-    --hash=sha256:cfc2d7243bf0ea41ed0c9e4b8530a41f1848086ac9f1c8f15aa4b10e78353112
+python-multipart==0.0.27 \
+    --hash=sha256:40bbf32105748e9b544492dba1ee6dc416bb6bb1a08e6dab486d991c85b5be4d
 python-pptx==1.0.2 \
     --hash=sha256:2edbb8f2f36b8f94bea529005dbf5f6852cebb996b098b56c5c66c3252fa0880
 pytz==2026.1.post1 \
