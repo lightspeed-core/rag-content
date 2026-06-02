@@ -92,6 +92,8 @@ You can generate the vector database either using
 3. [Llama-Stack Faiss Vector-IO](#llama-stack-faiss)
 4. [Llama-Stack Postgres (PGVector) Vector Store](#llama-stack-postgres-pgvector-vector-store)
 
+Each section below shows commands for both **local (uv)** and **container image (podman)** workflows. The container image already includes the default embedding model and all dependencies — no local Python setup required.
+
 Llama-Index approaches require you to download the embedding model, and we also
 recommend it for Llama-Stack targets even though it should work even without
 manually downloading the model, model-download.
@@ -103,9 +105,28 @@ be chunked and map to embeddings generated using the model:
 ([sentence-transformers/all-mpnet-base-v2](https://huggingface.co/sentence-transformers/all-mpnet-base-v2))
 from HuggingFace as follows:
 
+    **Via uv (local):**
+
     ```bash
-   mkdir ./embeddings_model
-   uv run python ./scripts/download_embeddings_model.py -l ./embeddings_model/ -r sentence-transformers/all-mpnet-base-v2
+    mkdir ./embeddings_model
+    uv run python ./scripts/download_embeddings_model.py -l ./embeddings_model/ -r sentence-transformers/all-mpnet-base-v2
+    ```
+
+    **Via podman:**
+
+    > The container image already bundles the default embedding model
+    > (`sentence-transformers/all-mpnet-base-v2`). To use a different model,
+    > download it locally and mount it into the container with
+    > `-v ./embeddings_model:/rag-content/embeddings_model:Z`.
+
+    ```bash
+    mkdir ./embeddings_model
+    podman run --rm \
+      -v ./embeddings_model:/rag-content/output_model:Z \
+      quay.io/lightspeed-core/rag-content-cpu:latest \
+      python ./scripts/download_embeddings_model.py \
+        -l ./output_model/ \
+        -r sentence-transformers/all-mpnet-base-v2
     ```
 
 2. Prepare dummy documentation:
@@ -208,8 +229,26 @@ always reported as `True` in the resulting metadata.
 Generate the documentation using the script from the previous section
 ([Generating the Vector Database](#generating-the-vector-database)):
 
+**Via uv (local):**
+
 ```bash
 uv run ./custom_processor.py -o ./vector_db/custom_docs/0.1 -f ./custom_docs/0.1/ -md embeddings_model/ -mn sentence-transformers/all-mpnet-base-v2 -i custom_docs-0_1
+```
+
+**Via podman:**
+
+```bash
+podman run --rm \
+  -v ./custom_docs:/rag-content/custom_docs:Z \
+  -v ./vector_db:/rag-content/vector_db:Z \
+  -v ./custom_processor.py:/rag-content/custom_processor.py:Z \
+  quay.io/lightspeed-core/rag-content-cpu:latest \
+  python ./custom_processor.py \
+    -o ./vector_db/custom_docs/0.1 \
+    -f ./custom_docs/0.1/ \
+    -md ./embeddings_model/ \
+    -mn sentence-transformers/all-mpnet-base-v2 \
+    -i custom_docs-0_1
 ```
 
 Once the command is done, you can find the vector database at `./vector_db`, the
@@ -232,6 +271,8 @@ commands:
 
 2. Run:
 
+    **Via uv (local):**
+
     ```bash
     POSTGRES_USER=postgres \
     POSTGRES_PASSWORD=somesecret \
@@ -246,6 +287,32 @@ commands:
      -i custom_docs-0_1 \
      --vector-store-type postgres
     ```
+
+    **Via podman:**
+
+    ```bash
+    podman run --rm \
+      --network host \
+      -e POSTGRES_USER=postgres \
+      -e POSTGRES_PASSWORD=somesecret \
+      -e POSTGRES_HOST=localhost \
+      -e POSTGRES_PORT=15432 \
+      -e POSTGRES_DATABASE=postgres \
+      -v ./custom_docs:/rag-content/custom_docs:Z \
+      -v ./output:/rag-content/output:Z \
+      -v ./custom_processor.py:/rag-content/custom_processor.py:Z \
+      quay.io/lightspeed-core/rag-content-cpu:latest \
+      python ./custom_processor.py \
+        -o ./output \
+        -f custom_docs/0.1/ \
+        -md ./embeddings_model/ \
+        -mn sentence-transformers/all-mpnet-base-v2 \
+        -i custom_docs-0_1 \
+        --vector-store-type postgres
+    ```
+
+    > `--network host` is required so the container can reach the PostgreSQL
+    > instance running on the host.
 
     Which generates embeddings on PostgreSQL, which can be used for RAG, and
     `metadata.json` in `./output`. Generated embeddings are stored in the
@@ -302,6 +369,8 @@ The process is basically the same as in the
 `custom_processor.py` script from earlier section
  ([Generating the Vector Database](#generating-the-vector-database)):
 
+**Via uv (local):**
+
 ```bash
 uv run ./custom_processor.py \
   -o ./vector_db/custom_docs/0.1 \
@@ -310,6 +379,23 @@ uv run ./custom_processor.py \
   -mn sentence-transformers/all-mpnet-base-v2 \
   -i custom_docs-0_1 \
   --vector-store-type=llamastack-faiss
+```
+
+**Via podman:**
+
+```bash
+podman run --rm \
+  -v ./custom_docs:/rag-content/custom_docs:Z \
+  -v ./vector_db:/rag-content/vector_db:Z \
+  -v ./custom_processor.py:/rag-content/custom_processor.py:Z \
+  quay.io/lightspeed-core/rag-content-cpu:latest \
+  python ./custom_processor.py \
+    -o ./vector_db/custom_docs/0.1 \
+    -f ./custom_docs/0.1/ \
+    -md ./embeddings_model/ \
+    -mn sentence-transformers/all-mpnet-base-v2 \
+    -i custom_docs-0_1 \
+    --vector-store-type=llamastack-faiss
 ```
 
 Once the command is done, you can find the vector database (embedded with the registry metadata) at
@@ -334,7 +420,7 @@ providers:
 Once we have a database we can use script `query_rag.py` to check some results:
 
 ```bash
-python scripts/query_rag.py \
+uv run python scripts/query_rag.py \
   -p vector_db/custom_docs/0.1 \
   -x custom-docs-0_1 \
   -m embeddings_model \
@@ -358,6 +444,8 @@ commands:
 
 2. Run:
 
+    **Via uv (local):**
+
     ```bash
     POSTGRES_USER=postgres \
     POSTGRES_PASSWORD=somesecret \
@@ -373,23 +461,46 @@ commands:
      --vector-store-type llamastack-pgvector
     ```
 
+    **Via podman:**
+
+    ```bash
+    podman run --rm \
+      --network host \
+      -e POSTGRES_USER=postgres \
+      -e POSTGRES_PASSWORD=somesecret \
+      -e POSTGRES_HOST=localhost \
+      -e POSTGRES_PORT=15432 \
+      -e POSTGRES_DATABASE=postgres \
+      -v ./custom_docs:/rag-content/custom_docs:Z \
+      -v ./output:/rag-content/output:Z \
+      -v ./custom_processor.py:/rag-content/custom_processor.py:Z \
+      quay.io/lightspeed-core/rag-content-cpu:latest \
+      python ./custom_processor.py \
+        -o ./output \
+        -f custom_docs/0.1/ \
+        -md ./embeddings_model/ \
+        -mn sentence-transformers/all-mpnet-base-v2 \
+        -i custom_docs-0_1 \
+        --vector-store-type llamastack-pgvector
+    ```
+
     Which generates embeddings on PostgreSQL, which can be used for RAG.
 
 3. When you run `query_rag.py` to check some results, specify these environment variables for database access:
 
-   ```bash
+    ```bash
     POSTGRES_USER=postgres \
     POSTGRES_PASSWORD=somesecret \
     POSTGRES_HOST=localhost \
     POSTGRES_PORT=15432 \
     POSTGRES_DATABASE=postgres \
     uv run python scripts/query_rag.py \
-    -p vector_db/custom_docs/0.1 \
-    -x custom-docs-0_1 \
-    -m embeddings_model \
-    -k 5 \
-    -q "how can I configure a cinder backend"
-   ```
+      -p vector_db/custom_docs/0.1 \
+      -x custom-docs-0_1 \
+      -m embeddings_model \
+      -k 5 \
+      -q "how can I configure a cinder backend"
+    ```
 ## Packaging the Vector Database as a Container Image
 
 After generating the vector database, you can package it (and optionally the
@@ -412,6 +523,8 @@ registry.access.redhat.com/ubi9/ubi:latest
 
 ### Basic usage
 
+**Via uv (local):**
+
 ```bash
 uv run python scripts/generate_embeddings.py \
   -o ./vector_db/custom_docs/0.1 \
@@ -420,6 +533,22 @@ uv run python scripts/generate_embeddings.py \
   -mn sentence-transformers/all-mpnet-base-v2 \
   -i custom_docs-0_1 \
   --output-image ./my-rag.tar
+```
+
+**Via podman:**
+
+```bash
+podman run --rm \
+  -v ./custom_docs:/rag-content/custom_docs:Z \
+  -v ./vector_db:/rag-content/vector_db:Z \
+  quay.io/lightspeed-core/rag-content-cpu:latest \
+  python scripts/generate_embeddings.py \
+    -o ./vector_db/custom_docs/0.1 \
+    -f ./custom_docs/0.1/ \
+    -d ./embeddings_model/ \
+    -m sentence-transformers/all-mpnet-base-v2 \
+    -i custom_docs-0_1 \
+    --output-image ./vector_db/my-rag.tar
 ```
 
 This produces `./my-rag.tar` containing:
@@ -451,6 +580,8 @@ docker load  < ./my-rag.tar
 
 To override the default base image, pass `--base-image`:
 
+**Via uv (local):**
+
 ```bash
 uv run python scripts/generate_embeddings.py \
   -o ./vector_db/custom_docs/0.1 \
@@ -462,9 +593,28 @@ uv run python scripts/generate_embeddings.py \
   --base-image registry.access.redhat.com/ubi9/ubi:latest
 ```
 
+**Via podman:**
+
+```bash
+podman run --rm \
+  -v ./custom_docs:/rag-content/custom_docs:Z \
+  -v ./vector_db:/rag-content/vector_db:Z \
+  quay.io/lightspeed-core/rag-content-cpu:latest \
+  python scripts/generate_embeddings.py \
+    -o ./vector_db/custom_docs/0.1 \
+    -f ./custom_docs/0.1/ \
+    -d ./embeddings_model/ \
+    -m sentence-transformers/all-mpnet-base-v2 \
+    -i custom_docs-0_1 \
+    --output-image ./vector_db/my-rag.tar \
+    --base-image registry.access.redhat.com/ubi9/ubi:latest
+```
+
 ### Excluding the embedding model
 
 If the model will be provided separately at runtime, pass `--exclude-model`:
+
+**Via uv (local):**
 
 ```bash
 uv run python scripts/generate_embeddings.py \
@@ -477,6 +627,25 @@ uv run python scripts/generate_embeddings.py \
   --image-name my-rag \
   --image-tag v1.0 \
   --exclude-model
+```
+
+**Via podman:**
+
+```bash
+podman run --rm \
+  -v ./custom_docs:/rag-content/custom_docs:Z \
+  -v ./vector_db:/rag-content/vector_db:Z \
+  quay.io/lightspeed-core/rag-content-cpu:latest \
+  python scripts/generate_embeddings.py \
+    -o ./vector_db/custom_docs/0.1 \
+    -f ./custom_docs/0.1/ \
+    -d ./embeddings_model/ \
+    -m sentence-transformers/all-mpnet-base-v2 \
+    -i custom_docs-0_1 \
+    --output-image ./vector_db/my-rag.tar \
+    --image-name my-rag \
+    --image-tag v1.0 \
+    --exclude-model
 ```
 
 ## Update lockfiles
