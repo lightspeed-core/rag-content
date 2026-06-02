@@ -19,7 +19,7 @@ from unittest import mock
 
 import pytest
 from llama_index.core import Document
-from llama_index.core.schema import TextNode
+from llama_index.core.schema import Node, TextNode
 
 from lightspeed_rag_content import document_processor
 from tests.conftest import RagMockEmbedding
@@ -70,15 +70,108 @@ class TestDocumentProcessorLlamaIndex:
         result = doc_processor["processor"].db._got_whitespace(text)
         assert result
 
-    def test__filter_out_invalid_nodes(self, doc_processor):
-        """Test that _filter_out_invalid_nodes only returns nodes with whitespace."""
-        fake_node_0 = mock.Mock(spec=TextNode)
-        fake_node_1 = mock.Mock(spec=TextNode)
-        fake_node_0.text = "Got whitespace"
-        fake_node_1.text = "NoWhitespace"
+    def test__valid_text_node(self, doc_processor):
+        """Test that valid text node checks for got whitespace on non markdown chunker."""
+        db = doc_processor["processor"].db
+        db.config.doc_type = "plain"
 
-        result = doc_processor["processor"].db._filter_out_invalid_nodes([fake_node_0, fake_node_1])
-        assert result == [fake_node_0]
+        with (
+            mock.patch.object(db, "_got_whitespace") as mock_got_ws,
+            mock.patch.object(db, "_got_content") as mock_got_nh,
+        ):
+            text = "NoWhitespace"
+            res = db._valid_text_node(text)
+            assert res is mock_got_ws.return_value
+            mock_got_ws.assert_called_once_with(text)
+            mock_got_nh.assert_not_called()
+
+    def test__valid_text_node_markdown_non_headers_true(self, doc_processor):
+        """Test that text node is valid when markdown has non header content."""
+        db = doc_processor["processor"].db
+        db.config.doc_type = "markdown"
+
+        with (
+            mock.patch.object(db, "_got_content", return_value=True) as mock_got_nh,
+            mock.patch.object(db, "_got_whitespace") as mock_got_ws,
+        ):
+            text = "# Header\nActual content here"
+            res = db._valid_text_node(text)
+            assert res is mock_got_ws.return_value
+            mock_got_nh.assert_called_once_with(text)
+            mock_got_ws.assert_called_once_with(text)
+
+    def test__valid_text_node_markdown_non_headers_false(self, doc_processor):
+        """Test that text node is invalid when markdown only has headers."""
+        db = doc_processor["processor"].db
+        db.config.doc_type = "markdown"
+
+        with (
+            mock.patch.object(db, "_got_content", return_value=False) as mock_got_nh,
+            mock.patch.object(db, "_got_whitespace") as mock_got_ws,
+        ):
+            text = "# Header1\n# Header2\n\n"
+            res = db._valid_text_node(text)
+            assert res is False
+            mock_got_nh.assert_called_once_with(text)
+            mock_got_ws.assert_not_called()
+
+    @pytest.mark.parametrize(
+        "text",
+        [
+            "# Header\nSome content",  # Header followed by content
+            "# Header1\n# Header2\nAlso here",  # Multiple headers, then content
+            "No headers, just content",  # No headers, just content
+            "# H\n# H2\n\tThis is non-header",  # Tabs and spaces before content
+            "   # H\n Header\n ======\n\tThis is non-header",  # Setext header line
+            "  ## H\nHeader\n ------\n```\n# git commit\n```",  # Fenced code block
+            " # H\n    # git commit\n",  # Indented code block
+            " Content\n\n",
+        ],
+    )
+    def test__got_content_with_content(self, doc_processor, text):
+        """Test we detect when markdown has something beside headers."""
+        db = doc_processor["processor"].db
+        assert db._got_content(text) is True
+
+    @pytest.mark.parametrize(
+        "text",
+        [
+            "# Only header",
+            "# Another header\n## Subheader",
+            "# Header with space \n",
+            "## \n#",
+            "#Header1\n#Header2\n#Header3",
+            "#    ",  # header with whitespace
+            "   # Header with leading space",
+            "   \n\t  \n",  # only whitespaces
+            "   \n```\n\n```\n",  # Empty fenced code block
+            "   \n      \n    \n",  # Empty indented code block
+            "  # Header\nAnother header\n====\n\n====",  # Headers and horizontal rules
+        ],
+    )
+    def test__got_content_only_headers(self, doc_processor, text):
+        """Test we detect when markdown only has headers."""
+        db = doc_processor["processor"].db
+        assert db._got_content(text) is False
+
+    def test__filter_out_invalid_nodes(self, doc_processor):
+        """Test that _filter_out_invalid_nodes checks for validity of text nodes."""
+        fake_text_node_0 = mock.Mock(spec=TextNode, text="fake_text_node_0")
+        fake_text_node_1 = mock.Mock(spec=TextNode, text="fake_text_node_1")
+        fake_node_2 = mock.Mock(spec=Node)
+
+        db = doc_processor["processor"].db
+        with mock.patch.object(db, "_valid_text_node", side_effect=(True, False)) as valid_tn_mock:
+            result = db._filter_out_invalid_nodes([fake_text_node_0, fake_text_node_1, fake_node_2])
+
+            expected_calls = [
+                mock.call(fake_text_node_0.text),
+                mock.call(fake_text_node_1.text),
+            ]
+            valid_tn_mock.assert_has_calls(expected_calls)
+            assert len(expected_calls) == valid_tn_mock.call_count
+
+        assert result == [fake_text_node_0]
 
     def test__save_index(self, mocker, doc_processor):
         """Test that _save_index sets index ID and persists the storage context."""
