@@ -1,0 +1,134 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: rag-content-integration-tests-pipeline
+spec:
+  description: |
+    Integration test: validates that the rag-content image can generate a FAISS
+    vector DB that lightspeed-stack can serve end-to-end. Runs on multiple
+    architectures using the Konflux multi-platform controller to provision VMs.
+  params:
+    - name: SNAPSHOT
+      description: 'JSON string representing the snapshot of the application under test.'
+      default: '{"components": [{"name":"rag-tool", "containerImage": "quay.io/example/rag-content:latest"}]}'
+      type: string
+    - name: test-name
+      description: 'The name of the test corresponding to a defined Konflux integration test.'
+      default: 'rag-content-e2e-tests'
+    - name: platforms
+      description: VM platforms on which to run the integration test
+      type: array
+      default:
+        - linux-mlarge/amd64
+        - linux-mlarge/arm64
+    - name: git-url
+      description: URL of the Git repository containing task definitions
+      default: https://github.com/lightspeed-core/rag-content.git
+    - name: git-revision
+      description: Revision of the Git repository containing task definitions
+      default: main
+  tasks:
+    - name: get-rag-content-image
+      description: Extract rag-content image and commit from SNAPSHOT
+      params:
+        - name: SNAPSHOT
+          value: $(params.SNAPSHOT)
+      taskSpec:
+        results:
+          - name: rag-content-image
+            value: "$(steps.extract.results.rag-content-image)"
+          - name: commit
+            value: "$(steps.extract.results.commit)"
+          - name: repo-url
+            value: "$(steps.extract.results.repo-url)"
+        params:
+          - name: SNAPSHOT
+        steps:
+          - name: extract
+            image: registry.redhat.io/openshift4/ose-cli:latest
+            env:
+              - name: SNAPSHOT
+                value: $(params.SNAPSHOT)
+            results:
+              - name: rag-content-image
+                type: string
+              - name: commit
+                type: string
+              - name: repo-url
+                type: string
+            script: |
+              dnf -y install jq
+              echo -n "$(jq -r --arg n "rag-tool" '.components[] | select(.name == $n) | .containerImage // ""' <<< "$SNAPSHOT")" \
+                > $(step.results.rag-content-image.path)
+              echo -n "$(jq -r --arg n "rag-tool" '.components[] | select(.name == $n) | .source.git.revision // "main"' <<< "$SNAPSHOT")" \
+                > $(step.results.commit.path)
+              echo -n "$(jq -r --arg n "rag-tool" '.components[] | select(.name == $n) | .source.git.url // "https://github.com/lightspeed-core/rag-content.git"' <<< "$SNAPSHOT")" \
+                > $(step.results.repo-url.path)
+
+    - name: echo-integration-params
+      description: Log test parameters for debugging
+      runAfter:
+        - get-rag-content-image
+      params:
+        - name: ragcontentimage
+          value: $(tasks.get-rag-content-image.results.rag-content-image)
+        - name: commit
+          value: $(tasks.get-rag-content-image.results.commit)
+        - name: repourl
+          value: $(tasks.get-rag-content-image.results.repo-url)
+      taskSpec:
+        params:
+          - name: ragcontentimage
+          - name: commit
+          - name: repourl
+        steps:
+          - name: echo-params
+            image: registry.access.redhat.com/ubi9/ubi-minimal
+            env:
+              - name: RAG_CONTENT_IMAGE
+                value: $(params.ragcontentimage)
+              - name: COMMIT
+                value: $(params.commit)
+              - name: REPO_URL
+                value: $(params.repourl)
+            script: |
+              echo "========== Integration test parameters =========="
+              echo "RAG_CONTENT_IMAGE=$RAG_CONTENT_IMAGE"
+              echo "COMMIT=$COMMIT"
+              echo "REPO_URL=$REPO_URL"
+              echo "========== End parameters =========="
+
+    - name: run-integration-test
+      description: Run rag-content → lightspeed-stack E2E validation on each platform
+      runAfter:
+        - echo-integration-params
+      matrix:
+        params:
+          - name: PLATFORM
+            value:
+              - $(params.platforms)
+      params:
+        - name: image
+          value: registry.access.redhat.com/ubi9/ubi:latest
+        - name: cmd
+          value: |
+            dnf -y install git jq podman fuse-overlayfs python3
+            git clone -q "$REPO_URL" /tmp/rag-content
+            cd /tmp/rag-content && git fetch origin "$REPO_REV" && git checkout -q "$REPO_REV"
+            cd tests/integration-konflux
+            ./pipeline-konflux.sh
+        - name: envs
+          value:
+            - RAG_CONTENT_IMAGE=$(tasks.get-rag-content-image.results.rag-content-image)
+            - REPO_URL=$(tasks.get-rag-content-image.results.repo-url)
+            - REPO_REV=$(tasks.get-rag-content-image.results.commit)
+      taskRef:
+        resolver: git
+        params:
+          - name: url
+            value: $(params.git-url)
+          - name: revision
+            value: $(params.git-revision)
+          - name: pathInRepo
+            value: .tekton/integration-tests/tasks/test-vm-cmd.yaml
