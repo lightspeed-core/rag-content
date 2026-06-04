@@ -8,6 +8,8 @@
 #
 # Optional:
 #   LIGHTSPEED_STACK_IMAGE — defaults to pinned release image
+#   GPU_ENABLED            — set to "true" to enable GPU device passthrough and
+#                            verify CUDA is available before DB generation
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -35,13 +37,25 @@ trap cleanup EXIT
 
 progress "RAG_CONTENT_IMAGE=$RAG_CONTENT_IMAGE"
 progress "LIGHTSPEED_STACK_IMAGE=$LIGHTSPEED_STACK_IMAGE"
+progress "GPU_ENABLED=${GPU_ENABLED:-false}"
+
+GPU_FLAGS=()
+if [ "${GPU_ENABLED:-}" = "true" ]; then
+  GPU_FLAGS=(--device nvidia.com/gpu=all --security-opt=label=disable)
+
+  progress "GPU pre-check: verifying CUDA is available in rag-content image..."
+  podman run --rm --network=host "${GPU_FLAGS[@]}" \
+    "$RAG_CONTENT_IMAGE" \
+    python -c "import torch; assert torch.cuda.is_available(), 'CUDA not available — GPU device not accessible'; print(f'GPU verified: {torch.cuda.get_device_name(0)}, CUDA {torch.version.cuda}')"
+  progress "GPU pre-check passed"
+fi
 
 #========================================
 # Phase 1: Generate FAISS DB
 #========================================
 progress "Phase 1/6: Generating FAISS vector DB from test corpus..."
 chmod 777 "$RAG_OUTPUT_DIR"
-podman run --rm --network=host \
+podman run --rm --network=host "${GPU_FLAGS[@]}" \
   -v "$CORPUS_DIR":/input:ro \
   -v "$RAG_OUTPUT_DIR":/output \
   "$RAG_CONTENT_IMAGE" \
@@ -59,7 +73,7 @@ ls -la "$RAG_OUTPUT_DIR"
 #========================================
 progress "Phase 2/6: Copying embedding model from rag-content image..."
 chmod 777 "$MODEL_DIR"
-podman run --rm --network=host \
+podman run --rm --network=host "${GPU_FLAGS[@]}" \
   -v "$MODEL_DIR":/out \
   "$RAG_CONTENT_IMAGE" \
   bash -c "cp -r /rag-content/embeddings_model/. /out/"
@@ -94,8 +108,10 @@ progress "FAISS_VECTOR_STORE_ID=$FAISS_VECTOR_STORE_ID"
 # Phase 4: Start lightspeed-stack
 #========================================
 progress "Phase 4/6: Starting lightspeed-stack (library mode)..."
+chmod -R a+r "$CONFIG_DIR"
 podman run -d --name lightspeed-stack-e2e \
   --network=host \
+  --security-opt label=disable \
   -v "$RAG_OUTPUT_DIR":/opt/app-root/src/.llama/storage/rag \
   -v "$MODEL_DIR":/embeddings \
   -v "$CONFIG_DIR/lightspeed-stack.yaml":/app-root/lightspeed-stack.yaml:ro \
