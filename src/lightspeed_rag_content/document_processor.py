@@ -22,7 +22,7 @@ import tempfile
 import time
 from io import BytesIO
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional, Union, cast
+from typing import TYPE_CHECKING, Any, Final, Optional, Union, cast
 
 import faiss
 from llama_index.core import Settings, SimpleDirectoryReader, VectorStoreIndex
@@ -42,6 +42,45 @@ if TYPE_CHECKING:
     from llama_index.core.vector_stores.types import BasePydanticVectorStore
 
 LOG = logging.getLogger(__name__)
+
+# Doc types whose readers emit Markdown (HTML and PDF go through docling, which
+# exports Markdown) and therefore share the MarkdownNodeParser chunking path and
+# the Markdown-aware content-validity filter. Defined once so the predicate
+# cannot drift between its call sites.
+MARKDOWN_COMPATIBLE_DOC_TYPES: Final[tuple[str, ...]] = ("markdown", "html", "pdf")
+
+
+def _default_file_extractor(doc_type: str) -> Optional[dict[str, BaseReader]]:
+    """Build the default docling-backed file_extractor for a document type.
+
+    HTML and PDF inputs must be routed through their docling readers; otherwise
+    SimpleDirectoryReader falls back to llama-index's generic readers, which
+    bypass docling's layout/table parsing and produce poor (or no) text. Markdown
+    and plain text use the default readers and need no extractor.
+
+    Args:
+        doc_type: The configured document type.
+
+    Returns:
+        A mapping of file extension to reader, or None when the default readers
+        are appropriate.
+    """
+    if doc_type == "pdf":
+        # Imported lazily so that importing this module (e.g. for the markdown or
+        # postgres flow) does not pull in docling and its heavy dependencies.
+        from lightspeed_rag_content.pdf import (  # pylint: disable=import-outside-toplevel
+            PDFReader,
+        )
+
+        return {".pdf": PDFReader()}
+    if doc_type == "html":
+        from lightspeed_rag_content.html import (  # pylint: disable=import-outside-toplevel
+            HTMLReader,
+        )
+
+        reader = HTMLReader()
+        return {".html": reader, ".htm": reader}
+    return None
 
 
 class _Config:
@@ -72,7 +111,7 @@ class _BaseDB:
             if config.manual_chunking:
                 Settings.chunk_size = self.config.chunk_size
                 Settings.chunk_overlap = self.config.chunk_overlap
-            if config.doc_type in ("markdown", "html"):
+            if config.doc_type in MARKDOWN_COMPATIBLE_DOC_TYPES:
                 Settings.node_parser = MarkdownNodeParser()
             return
 
@@ -83,8 +122,9 @@ class _BaseDB:
                 model_name=str(self.config.embeddings_model_dir)
             )
             Settings.llm = resolve_llm(None)
-        # HTML uses MarkdownNodeParser since HTMLReader converts to Markdown
-        if config.doc_type in ("markdown", "html"):
+        # HTML and PDF use MarkdownNodeParser since their docling readers convert
+        # to Markdown.
+        if config.doc_type in MARKDOWN_COMPATIBLE_DOC_TYPES:
             Settings.node_parser = MarkdownNodeParser()
 
     @staticmethod
@@ -162,7 +202,7 @@ class _BaseDB:
 
     def _valid_text_node(self, text: str) -> bool:
         """Check if text node is valid: has whitespace and has content."""
-        if self.config.doc_type in ("markdown", "html") and not self._got_content(text):
+        if self.config.doc_type in MARKDOWN_COMPATIBLE_DOC_TYPES and not self._got_content(text):
             return False
         return self._got_whitespace(text)
 
@@ -865,6 +905,13 @@ class DocumentProcessor:
         Documents with titles in this list will be included in the vector database
         regardless of their url_reachable status.
         """
+        # When the caller does not supply an extractor, route HTML/PDF inputs
+        # through their docling readers based on the configured doc_type so the
+        # shipped CLIs (generate_embeddings.py, custom processors) parse them
+        # with docling instead of llama-index's generic fallback readers.
+        if file_extractor is None:
+            file_extractor = _default_file_extractor(self.config.doc_type)
+
         reader = SimpleDirectoryReader(
             str(docs_dir),
             recursive=True,
