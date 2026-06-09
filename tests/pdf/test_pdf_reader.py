@@ -183,5 +183,6 @@ class TestPDFReaderRealDocling:
         assert FIXTURE_HEADING in text
         # The heading line should carry a Markdown heading prefix so that
         # MarkdownNodeParser splits on it downstream.
-        heading_line = next(line for line in text.splitlines() if FIXTURE_HEADING in line)
-        assert heading_line.lstrip().startswith("#")
+        heading_lines = [line for line in text.splitlines() if FIXTURE_HEADING in line]
+        assert heading_lines, f"expected a line containing {FIXTURE_HEADING!r}"
+        assert heading_lines[0].lstrip().startswith("#")
