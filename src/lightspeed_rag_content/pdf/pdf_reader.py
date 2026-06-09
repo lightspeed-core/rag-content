@@ -19,10 +19,10 @@ interface, allowing PDF files to be read and converted to Markdown format using
 the docling library. PDF parsing is docling's primary capability: it performs
 layout analysis, reading-order detection, and table-structure recognition.
 
-OCR is intentionally disabled (see the BYOK PDF spec, requirement R5): scanned or
-image-only PDFs are out of scope and convert to empty or near-empty Markdown
-without erroring. Per R7, load_data emits a warning when that happens so the
-condition is visible in the caller's logs rather than degrading silently.
+OCR is intentionally disabled: scanned or image-only PDFs are out of scope and
+convert to empty or near-empty Markdown without erroring. When that happens,
+load_data emits a warning so the condition is visible in the caller's logs rather
+than degrading silently.
 
 Typical usage example:
 
@@ -61,9 +61,9 @@ from llama_index.core.schema import Document
 
 LOG: logging.Logger = logging.getLogger(__name__)
 
-# Markdown shorter than this (after stripping) is treated as "empty output",
-# the likely signature of a scanned/image-only PDF given OCR is disabled (R5).
-# Kept small and module-level so it is easy to find and tune (R7).
+# Markdown shorter than this (after stripping) is treated as "empty output", the
+# likely signature of a scanned/image-only PDF: OCR is disabled, so a PDF with no
+# text layer extracts nothing. Module-level so it is easy to find and tune.
 EMPTY_OUTPUT_THRESHOLD: Final[int] = 50
 
 
@@ -131,8 +131,8 @@ class PDFReader(BaseReader):
             raise RuntimeError(f"Failed to convert PDF file '{file_path}': {exc}") from exc
 
         if len(markdown_content.strip()) < EMPTY_OUTPUT_THRESHOLD:
-            # R5/R7: most likely a scanned/image-only PDF. Surface it loudly
-            # instead of producing a silently near-empty vector store entry.
+            # Most likely a scanned/image-only PDF (no extractable text, OCR
+            # off). Surface it loudly instead of silently indexing an empty chunk.
             LOG.warning(
                 "PDF produced little or no text (%d chars): %s. It may be scanned or "
                 "image-only; OCR is disabled, so no text was extracted.",
