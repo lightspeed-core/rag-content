@@ -195,3 +195,64 @@ class TestDocumentProcessor:
         doc_processor = document_processor.DocumentProcessor(**mock_processor["params"])
 
         doc_processor.save(mock.sentinel.index, mock.sentinel.output_dir)
+
+
+class TestDefaultFileExtractor:
+    """Tests for the doc_type -> docling reader wiring (no docling models needed)."""
+
+    def test_pdf_returns_pdf_reader(self):
+        """A 'pdf' doc_type maps the .pdf extension to a PDFReader."""
+        from lightspeed_rag_content.pdf import PDFReader
+
+        extractor = document_processor._default_file_extractor("pdf")
+
+        assert extractor is not None
+        assert set(extractor) == {".pdf"}
+        assert isinstance(extractor[".pdf"], PDFReader)
+
+    def test_html_returns_shared_html_reader(self):
+        """An 'html' doc_type maps both HTML extensions to one HTMLReader."""
+        from lightspeed_rag_content.html import HTMLReader
+
+        extractor = document_processor._default_file_extractor("html")
+
+        assert extractor is not None
+        assert set(extractor) == {".html", ".htm"}
+        assert isinstance(extractor[".html"], HTMLReader)
+        assert extractor[".html"] is extractor[".htm"]
+
+    def test_text_returns_none(self):
+        """Plain text and other types need no custom extractor."""
+        assert document_processor._default_file_extractor("text") is None
+
+    def test_process_injects_default_when_extractor_omitted(self, mock_processor, mocker):
+        """process() fills in the doc_type default when no extractor is passed."""
+        reader_mock = mocker.patch.object(document_processor, "SimpleDirectoryReader")
+        reader_mock.return_value.load_data.return_value = []
+        default = mocker.patch.object(
+            document_processor,
+            "_default_file_extractor",
+            return_value=mock.sentinel.default_extractor,
+        )
+
+        doc_processor = document_processor.DocumentProcessor(**mock_processor["params"])
+        doc_processor.process(mock.sentinel.docs_dir, mocker.Mock())
+
+        default.assert_called_once_with("text")
+        assert reader_mock.call_args.kwargs["file_extractor"] is mock.sentinel.default_extractor
+
+    def test_process_keeps_explicit_extractor(self, mock_processor, mocker):
+        """An explicitly supplied extractor is used as-is; the default is not consulted."""
+        reader_mock = mocker.patch.object(document_processor, "SimpleDirectoryReader")
+        reader_mock.return_value.load_data.return_value = []
+        default = mocker.patch.object(document_processor, "_default_file_extractor")
+
+        doc_processor = document_processor.DocumentProcessor(**mock_processor["params"])
+        doc_processor.process(
+            mock.sentinel.docs_dir,
+            mocker.Mock(),
+            file_extractor=mock.sentinel.explicit_extractor,
+        )
+
+        default.assert_not_called()
+        assert reader_mock.call_args.kwargs["file_extractor"] is mock.sentinel.explicit_extractor

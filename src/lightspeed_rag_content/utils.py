@@ -136,7 +136,7 @@ def get_common_arg_parser() -> argparse.ArgumentParser:
         "--document-type",
         dest="doc_type",
         default="text",
-        choices=["text", "markdown", "html"],
+        choices=["text", "markdown", "html", "pdf"],
         help="The type of the document which is to be added to the RAG.",
     )
     return parser

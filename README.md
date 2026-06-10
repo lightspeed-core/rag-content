@@ -173,6 +173,9 @@ different:
             embeddings_model_dir=args.model_dir,
             num_workers=args.workers,
             vector_store_type=args.vector_store_type,
+            # Pass the `-dt/--document-type` value so HTML and PDF inputs are
+            # routed through their docling readers (see "Supported Input Formats").
+            doc_type=args.doc_type,
         )
 
         # Load and embed the documents, this method can be called multiple times
@@ -182,6 +185,32 @@ different:
         # Save the new vector database to the output directory
         document_processor.save(args.index, args.output)
     ```
+
+### Supported Input Formats
+
+`rag-content` selects how to read each input file from the `-dt/--document-type`
+value (`text` by default). Drop the matching files into the `-f/--folder`
+directory and set the document type accordingly:
+
+| `--document-type` | Input files            | How it is read                                   |
+| ----------------- | ---------------------- | ------------------------------------------------ |
+| `text`            | `.txt`                 | Read as plain text.                              |
+| `markdown`        | `.md`                  | Read as Markdown and chunked on headings.        |
+| `html`            | `.html`, `.htm`        | Converted to Markdown with [docling].            |
+| `pdf`             | `.pdf`                 | Converted to Markdown with [docling].            |
+
+HTML and PDF inputs are converted to Markdown by docling (already a dependency)
+and then chunked through the same Markdown-aware path as native Markdown — no
+manual pre-conversion step is required. Just point `-f/--folder` at a directory
+containing them and set `--document-type` accordingly.
+
+> **Scanned / image-only PDFs are out of scope.** OCR is intentionally disabled,
+> so a PDF that contains no embedded text converts to empty or near-empty
+> Markdown. The reader does not error in this case; it logs a warning naming the
+> file so the condition is visible in your processing logs. Run such PDFs through
+> a separate OCR step before ingestion.
+
+[docling]: https://github.com/docling-project/docling
 
 ### YAML Frontmatter Support
 
