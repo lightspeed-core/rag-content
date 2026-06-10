@@ -201,16 +201,8 @@ directory and set the document type accordingly:
 
 HTML and PDF inputs are converted to Markdown by docling (already a dependency)
 and then chunked through the same Markdown-aware path as native Markdown — no
-manual pre-conversion step is required. You can also convert files ahead of time
-with the standalone CLIs, for example:
-
-```bash
-# Single file
-uv run python -m lightspeed_rag_content.pdf convert -i manual.pdf -o manual.md
-
-# A directory tree (structure is preserved)
-uv run python -m lightspeed_rag_content.pdf batch -i ./pdfs -o ./md
-```
+manual pre-conversion step is required. Just point `-f/--folder` at a directory
+containing them and set `--document-type` accordingly.
 
 > **Scanned / image-only PDFs are out of scope.** OCR is intentionally disabled,
 > so a PDF that contains no embedded text converts to empty or near-empty
