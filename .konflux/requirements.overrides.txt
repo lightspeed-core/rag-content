@@ -26,3 +26,4 @@ pydantic==2.13.1
 pydantic_settings==2.13.1
 docling-core==2.74.1
 docling==2.94.0
+antlr4-python3-runtime==4.9.3
