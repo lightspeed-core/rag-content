@@ -17,6 +17,8 @@ annotated-doc==0.0.4 \
     --hash=sha256:f065f20871c6eb71451b226bf58fe336eddb6c8467b9b6b58e4884d894707789
 annotated-types==0.7.0 \
     --hash=sha256:14c29c2eb0627d99fb56c1315cd534ea55d8c35b13e5197c96dc211529148fdb
+antlr4-python3-runtime==4.9.3 \
+    --hash=sha256:25a332c3ba4af04c20a88ddbe218761cfa9edecdb41d6f502bb01c6ebe23f1fc
 anyio==4.13.0 \
     --hash=sha256:e3c6463e6d8aa790d63afebe3f593593928d64c8f37da8a1b594c8544e0fd01d
 asyncpg==0.31.0 \
@@ -41,6 +43,8 @@ click==8.3.2 \
     --hash=sha256:f69eb47d5c6cf5304687a7ff5dae0868bac341e9060998c49e81d6446df43a55
 colorama==0.4.6 \
     --hash=sha256:de0f8eee2e05a7536fd6db91a8a35165cc282f2b0c06517b38046787460d2d94
+colorlog==6.10.1 \
+    --hash=sha256:c0a5a62404be7ad76a8f0fa538624a805b9fa3ed516a23d904d559ebf86b1b0a
 cryptography==46.0.7 \
     --hash=sha256:a003da53e2fb724421efbe27b6577d4ea942eacd25da4396c16d137d53246be2 \
     --hash=sha256:efe5074c504dd1b50ccb33cfbe87cd51a59e622461c2094039c516d12ae929fe
@@ -54,15 +58,17 @@ dirtyjson==1.0.8 \
     --hash=sha256:dffad451b4a66d626b4f66b64ded3b5032e84d4285546eab5885fe6ee23826b3
 distro==1.9.0 \
     --hash=sha256:023584a3e83cd8c22aab2a4d73b7bdbd8bbd62dd74e56ff149dd5bfaeb6e598f
-docling==2.88.0 \
-    --hash=sha256:d53a4ed1300aae672bc38a8cc70bc32cad01657f5c22e03092b3dc72df1568b3
-docling-core==2.73.0 \
-    --hash=sha256:38355f926ea200110eca6e62b3724d99ab5742e573676e40df0d17ebf0217633
+docling==2.94.0 \
+    --hash=sha256:ad39103237994f52b4aec82549202df78b0e9cca051f260164d4d4b2c419b6e4
+docling-core==2.74.1 \
+    --hash=sha256:95d8134bea6963fb9e732cd0a972361c5248415856b35c02512a5193d07949aa
 docling-ibm-models==3.13.0 \
     --hash=sha256:41cd7380aa18a2123b15b47b73cd926ae89fb3af181edd60f24d1e62a8da53ff
 docling-parse==5.6.2 \
     --hash=sha256:c3e1a4aab916d4144890e04d5a1feb07b8b4441633f5db488593713c7ad1c32f \
     --hash=sha256:d9c3dafa1dcc6e5914d5db51a18606efb063de4fdaecef94f73fec938d6ace10
+docling-slim==2.94.0 \
+    --hash=sha256:8d49a53f2df1f341364fb45767d72e210f2f38b33aed6735a444af5fbf3b96e3
 einops==0.8.2 \
     --hash=sha256:149dd73ee28fe5a7ebd0d0014a9f961cff339b9f5667b4923b5a458c12ecc606
 et-xmlfile==2.0.0 \
@@ -176,8 +182,13 @@ nltk==3.9.4 \
 numpy==2.4.4 \
     --hash=sha256:1e4c458ba65c8b14075f5c2f4b940210304aea91764ab5af9ef59140f638f2c5 \
     --hash=sha256:cd796d7b5322597a82568bf25cc6c620546fa6a7e4e585cc7072272b8b907250
+omegaconf==2.3.0 \
+    --hash=sha256:3677af899a02af6a2aca718e73b34bea9f5a4d8975f909fda4659fc71c7067ab
 openai==2.31.0 \
     --hash=sha256:fcc882f4c449f90f068a8088b1465aac1e983efdd5ed5c93343f6082d1b249ec
+opencv-python==4.13.0.92 \
+    --hash=sha256:012cd58eebf385353cf53beefc5addccc6e7fc2fa75bb8ca0c4881237aad7d7c \
+    --hash=sha256:707542b758090500ac1473990f5a62d4a7c4e6809eb7fa0bc71c2d6d63bf12f2
 openpyxl==3.1.5 \
     --hash=sha256:f2332032924c6f1986829191265c5b31472b0f34347b9d188333327a4c1f51e4
 opentelemetry-api==1.41.0 \
@@ -228,6 +239,9 @@ psutil==7.2.2 \
     --hash=sha256:ea747324676498585f289adff22e84e0d4d601e144171c462e62a9ec1ba2eb46
 pyaml==26.2.1 \
     --hash=sha256:66a60db153206b41d8adb7ea57b641d7ac298ec6c24468b3ce731c1f5fa3514a
+pyclipper==1.4.0 \
+    --hash=sha256:666d8e52af0d43b127c00796b2afd3c2b7a54cc297cc749792131f221504f0ed \
+    --hash=sha256:6b1898e575dcdec2a45f11c92e283bd78202724be0a9edad37b19909c32deac4
 pycparser==3.0 \
     --hash=sha256:f16943c09207f0a582e2d0438d4efe90c1f423b973b3af071033858a593cec4e
 pydantic==2.13.1 \
@@ -235,8 +249,8 @@ pydantic==2.13.1 \
 pydantic-core==2.46.1 \
     --hash=sha256:53ee78031c1f098b988e64d8bf87c06e25f89973983dc5130676629b28edad8a \
     --hash=sha256:b5565ce46259010b8f0a00d777e2dc4f7a7b570ff7c4c93af9b2dbb8246a7dd0
-pydantic-settings==2.13.1 \
-    --hash=sha256:934a1122b6f00f05e47ee5af72e76ccab197e31565b4248c5ea4538052e26b7a
+pydantic-settings==2.14.1 \
+    --hash=sha256:9d17d7c5ca03dcabac08c48de8b9950db78b1ccdff7eb14837acb5980e401fe5
 pygments==2.20.0 \
     --hash=sha256:b24941db8a952d67e0f8878037a1c50ebd7b4e1534ae5b7709c552822c52d22e
 pyjwt==2.12.1 \
@@ -264,6 +278,8 @@ pytz==2026.1.post1 \
 pyyaml==6.0.3 \
     --hash=sha256:3e5ebd0f61f3d31ee376f7f0ed20216f15d31c56cb0d31e0bb9f8a216c8955d5 \
     --hash=sha256:811d197963bcf3bfb2fabefa94c3c460a5a1a032bce1791d4ad53a1a7b0760b0
+rapidocr==3.8.1 \
+    --hash=sha256:20c1516236887170cccf2c76469b79d9832e16e96ccc7c8f3accd962f3881398
 referencing==0.37.0 \
     --hash=sha256:6879ee61bc044230118c53606d3bebae99659924513047a95852ecde0ba29481
 regex==2026.4.4 \
@@ -292,6 +308,9 @@ sentence-transformers==5.2.0 \
     --hash=sha256:c96924a8c974b1d1fe8f0b97574a9aa2c8c5f7abcd4d9ac5934a28b5434a228b
 setuptools==80.10.2 \
     --hash=sha256:26cb7c8d3a737628b711ff9ceb852e6ef1aa12596e6c9a3609e5196f31f386dd
+shapely==2.1.2 \
+    --hash=sha256:32baa6c84ea51e0220b88e0b17f99edcecd2844ba9b57b3fc06c8d045172cf5e \
+    --hash=sha256:4052629f384de81f6b15dbf91d78aacf563bcfb0f6954aa4da4e05f627fdb7e9
 shellingham==1.5.4 \
     --hash=sha256:6071a9bcdb5cb9fddadbbcafbf053b337438522a42f45a49d5fa5328ecc1683a
 six==1.17.0 \
@@ -376,9 +395,11 @@ wrapt==2.1.2 \
 xlsxwriter==3.2.9 \
     --hash=sha256:190d8092dd9931a29e9d86242a6fc0291b272299fa6795bf79ce6facfd925833
 yarl==1.23.0 \
+    --hash=sha256:126715989993639b54df31399717efb8d3cd347452ba872939dda48fcbde5678 \
     --hash=sha256:157216b1a209178b5d7be8f4854168fffd05c9d074883705a6a7fac1b723cb98 \
     --hash=sha256:3f5c05557bab8c3ebb8d95e863e62b621d262a71c73aa00ef1785d5c63300b61 \
     --hash=sha256:5c4c922a0eb39a1a8b74f68adedf613ed2faeab2df57560d110681507ab8da3d \
+    --hash=sha256:a3b9eef378c39057ed4d1d7f94f45bb24fbd5f5f3503f2f6b988105734f76718 \
     --hash=sha256:e0d589b9bd196c3a0f1fae4e24ddb797cc6955247e55a19e5981957679ab2e86
 zipp==3.23.1 \
     --hash=sha256:def4e108a1d3abe80f716306cdc70166a97f31018a563fa17926d5d1e57d6805
