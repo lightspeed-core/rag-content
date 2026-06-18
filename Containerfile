@@ -116,11 +116,11 @@ USER 1000
 ENTRYPOINT []
 
 LABEL vendor="Red Hat, Inc." \
-    name="lightspeed-core/rag-tool-rhel9" \
-    com.redhat.component="lightspeed-core/rag-tool" \
-    cpe="cpe:/a:redhat:lightspeed_core:0.4::el9" \
-    io.k8s.display-name="Lightspeed RAG Tool" \
-    summary="RAG tool containing embedding model and dependencies needed to generate a vector database." \
-    description="RAG Tool provides a shared codebase for generating vector databases. It serves as the core framework for Lightspeed-related projects (e.g., OpenShift Lightspeed, OpenStack Lightspeed, etc.) to generate their own vector databases that can be used for RAG." \
-    io.k8s.description="RAG Tool provides a shared codebase for generating vector databases. It serves as the core framework for Lightspeed-related projects (e.g., OpenShift Lightspeed, OpenStack Lightspeed, etc.) to generate their own vector databases that can be used for RAG." \
-    io.openshift.tags="lightspeed-core,lightspeed-rag-tool,lightspeed"
+    name="lightspeed-core/rag-tool-cpu-rhel9" \
+    com.redhat.component="lightspeed-core/rag-tool-cpu-rhel9" \
+    cpe="cpe:/a:redhat:lightspeed_core:0.6::el9" \
+    io.k8s.display-name="Lightspeed RAG Tool (CPU)" \
+    summary="RAG tool (CPU) containing embedding model and dependencies needed to generate a vector database." \
+    description="RAG Tool (CPU) provides a shared codebase for generating vector databases. It serves as the core framework for Lightspeed-related projects (e.g., OpenShift Lightspeed, OpenStack Lightspeed, etc.) to generate their own vector databases that can be used for RAG." \
+    io.k8s.description="RAG Tool (CPU) provides a shared codebase for generating vector databases. It serves as the core framework for Lightspeed-related projects (e.g., OpenShift Lightspeed, OpenStack Lightspeed, etc.) to generate their own vector databases that can be used for RAG." \
+    io.openshift.tags="lightspeed-core,lightspeed-rag-tool-cpu,lightspeed"
