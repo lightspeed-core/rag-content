@@ -131,9 +131,9 @@ llama-stack-api==0.6.0 \
 llama-stack-client==0.6.0 \
     --hash=sha256:3290aac36dcafbd1bc0baaf995522e2037f57056672b5a1516af112a4210f3ea \
     --hash=sha256:7e514a6ffd92f237aceb062dadc4db44e24a3cd9c4ea35e25173d1e0739beb8e
-oci==2.178.0 \
-    --hash=sha256:830cb97cbcac818f8eb8d05d4abbc00192f4bcef10260b14d0978f649799a26e \
-    --hash=sha256:d3a19859d80aa5c4988905e1a30b46dcc2af146c76f3d8c813129d71247d1a94
+oci==2.179.0 \
+    --hash=sha256:0b276d22ddc6eabdf4f4c3d8beefbd1f9d9fc80134d739f51ee0c203f6238eba \
+    --hash=sha256:8d696afb94e7a4f803c4499d172573c36ffa7e685907190d070f353969dba28e
 opentelemetry-distro==0.62b0 \
     --hash=sha256:23e9065a35cef12868ad5efb18ce9c88a9103800256b318dec4c9c850c6c78c1 \
     --hash=sha256:aa0308fbe50ad8f17d4446982dbf26870e20b8031ba38d8e1224ecf7aedd3184

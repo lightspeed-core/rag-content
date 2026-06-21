@@ -9,6 +9,8 @@ output_suffix = ""
 tekton_files = [
     ".tekton/rag-tool-pull-request.yaml",
     ".tekton/rag-tool-push.yaml",
+    ".tekton/rag-content-cpu-0-6-pull-request.yaml",
+    ".tekton/rag-content-cpu-0-6-push.yaml",
 ]
 
 [profiles.cuda]
@@ -17,4 +19,6 @@ output_suffix = ".cuda"
 tekton_files = [
     ".tekton/rag-tool-cuda-pull-request.yaml",
     ".tekton/rag-tool-cuda-push.yaml",
+    ".tekton/rag-content-cuda-12-9-0-6-pull-request.yaml",
+    ".tekton/rag-content-cuda-12-9-0-6-push.yaml",
 ]
