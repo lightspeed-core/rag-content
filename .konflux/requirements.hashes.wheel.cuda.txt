@@ -257,8 +257,8 @@ pydantic==2.13.1 \
 pydantic-core==2.46.1 \
     --hash=sha256:53ee78031c1f098b988e64d8bf87c06e25f89973983dc5130676629b28edad8a \
     --hash=sha256:b5565ce46259010b8f0a00d777e2dc4f7a7b570ff7c4c93af9b2dbb8246a7dd0
-pydantic-settings==2.14.1 \
-    --hash=sha256:9d17d7c5ca03dcabac08c48de8b9950db78b1ccdff7eb14837acb5980e401fe5
+pydantic-settings==2.14.2 \
+    --hash=sha256:e420d797174b59e80c91ddff3f22668b15d400b9eed141d58e57153875294793
 pygments==2.20.0 \
     --hash=sha256:b24941db8a952d67e0f8878037a1c50ebd7b4e1534ae5b7709c552822c52d22e
 pyjwt==2.13.0 \
@@ -267,8 +267,8 @@ pylatexenc==2.10 \
     --hash=sha256:1901281d9e49a3f8e063799f3ad19a40819dfe3815167b955c4842eb5af0a2ac
 pyopenssl==26.0.0 \
     --hash=sha256:af47a1da9e365b5d983afef8cd7bbb743eebe4b2d47aa8c615288a789c225558
-pypdf==6.13.2 \
-    --hash=sha256:08efebf6148e3270a9fd6587313ab36c70a6c55a7d6534f8327b5781f10d5c90
+pypdf==6.13.3 \
+    --hash=sha256:b443cf17322bb9f49908f31406f4d91d16730566b94f5ee4f9701b7736d2e9e6
 pypdfium2==5.7.0 \
     --hash=sha256:ee8104310bc0bfaad5dc61c301ef129d15ceb2199e48f6da76df75bd5313b1a0
 python-dateutil==2.9.0.post0 \

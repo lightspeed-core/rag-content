@@ -31,7 +31,7 @@ semantic-version==2.10.0
     # via setuptools-rust
 setuptools-rust==1.12.1
     # via maturin
-setuptools-scm==10.0.5
+setuptools-scm==10.1.1
     # via
     #   pluggy
     #   setuptools-rust
@@ -39,7 +39,7 @@ trove-classifiers==2026.6.1.19
     # via hatchling
 uv-build==0.11.23
     # via python-frontmatter
-vcs-versioning==1.1.1
+vcs-versioning==2.0.1
     # via setuptools-scm
 
 # The following packages are considered to be unsafe in a requirements file:
