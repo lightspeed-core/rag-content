@@ -1179,11 +1179,14 @@ def _write_hashed_file_via_uv(
             )
             write_hashed_requirements(packages, output_path, index_url)
             return
-        # Strip any --extra-index-url lines uv might add
+        # Strip comment headers and --extra-index-url lines uv might add;
+        # Hermeto requires a clean file starting with --index-url.
         lines = [
             line + "\n"
             for line in result.stdout.splitlines()
-            if not line.strip().startswith("--extra-index-url")
+            if not line.strip().startswith("#")
+            and not line.strip().startswith("--extra-index-url")
+            and line.strip()  # skip blank lines
         ]
         with open(output_path, "w") as f:
             f.writelines(lines)
