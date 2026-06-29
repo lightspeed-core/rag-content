@@ -1,5 +1,0 @@
-uv-build==0.11.18
-uv==0.11.18
-pip==26.1.2
-ninja==1.13
-pdm-backend==2.4.8

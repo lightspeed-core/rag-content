@@ -1,5 +1,4 @@
-# CUDA build: same as requirements.overrides.txt but omit torch/torchvision overrides
-# so uv can resolve them from the primary index (RHOAI cuda12.9-ubi9 before PyPI).
-# Hermetic install always uses RHOAI pulp wheels for torch/torchvision (see
-# requirements.hashes.wheel.pypi.cuda.{x86_64,aarch64}.txt); the script injects those URLs.
+# CUDA build: same overrides as CPU.
 # RHOAI package list: https://packages.redhat.com/api/pypi/public-rhai/rhoai/3.4/cuda12.9-ubi9/simple/
+packaging<26
+python-frontmatter<1.3
