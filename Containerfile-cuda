@@ -2,26 +2,26 @@
 ARG BUILDER_BASE_IMAGE=nvcr.io/nvidia/cuda:12.9.1-devel-ubi9
 ARG RUNTIME_BASE_IMAGE=nvcr.io/nvidia/cuda:12.9.1-runtime-ubi9
 FROM ${BUILDER_BASE_IMAGE} AS builder
-ARG DNF_COMMAND=dnf
+ARG BUILDER_DNF_COMMAND=dnf
 USER root
 
 # Install Python and system packages.
 # In hermetic (Konflux) builds the RHAI base image already ships Python 3.12
 # and CUDA libs; we only need the extra tooling packages.
-RUN ${DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
+RUN ${BUILDER_DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
     python3.12 python3.12-devel python3.12-pip git \
     skopeo \
     rubygems rubygem-bundler \
     libcudnn9 libnccl libcusparselt0 libxml2-devel libxslt-devel && \
-    ${DNF_COMMAND} clean all
+    ${BUILDER_DNF_COMMAND} clean all
 
 # Hermetic: install build toolchain and dev libs for compiling sdists.
 RUN if [ -f /cachi2/cachi2.env ]; then \
-    ${DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
+    ${BUILDER_DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
     gcc cmake cargo rust swig autoconf automake libtool \
     libpq-devel libxml2-devel libxslt-devel \
     zlib-devel openssl-devel && \
-    ${DNF_COMMAND} clean all; \
+    ${BUILDER_DNF_COMMAND} clean all; \
     fi
 
 # Install uv package manager
@@ -51,11 +51,13 @@ ENV UV_COMPILE_BYTECODE=0 \
 ARG TARGETARCH
 RUN if [ -f /cachi2/cachi2.env ]; then \
     . /cachi2/cachi2.env && \
-    uv venv --seed --no-index --find-links ${PIP_FIND_LINKS} && \
+    python3.12 -c "import os,re;d=os.environ['PIP_FIND_LINKS'];fs=os.listdir(d);rp={re.split(r'-\d+-(?:cp|py|pp)',f)[0] for f in fs if f.endswith('.whl') and re.search(r'-\d+-(?:cp|py|pp)',f)};[os.remove(os.path.join(d,f)) for f in fs if f.endswith('.whl') and not re.search(r'-\d+-(?:cp|py|pp)',f) and f.rsplit('-',3)[0] in rp]" && \
+    uv venv --python python3.12 && \
     . .venv/bin/activate && \
-    pip install --no-cache-dir --ignore-installed --no-index --find-links ${PIP_FIND_LINKS} --no-deps -r requirements.hashes.wheel.cuda.txt -r requirements.hashes.source.cuda.txt -r requirements.hashes.wheel.pypi.cuda.txt && \
-    pip install --no-cache-dir --no-deps . && \
-    ( pip check >/tmp/pipcheck.txt 2>&1; rc=$?; cat /tmp/pipcheck.txt; if [ "$rc" -ne 0 ]; then grep "which is not installed" /tmp/pipcheck.txt | grep -v hf-xet | grep -q . && exit 1; fi; exit 0 ); \
+    sed -i '/^--index-url/d' requirements.hashes.wheel.cuda.txt requirements.hashes.source.cuda.txt requirements.hashes.wheel.pypi.cuda.txt && \
+    uv pip install --no-cache --reinstall --no-index --find-links ${PIP_FIND_LINKS} --no-deps -r requirements.hashes.wheel.cuda.txt -r requirements.hashes.source.cuda.txt -r requirements.hashes.wheel.pypi.cuda.txt && \
+    uv pip install --no-cache --no-index --find-links ${PIP_FIND_LINKS} --no-deps . && \
+    ( uv pip check >/tmp/pipcheck.txt 2>&1; rc=$?; cat /tmp/pipcheck.txt; if [ "$rc" -ne 0 ]; then grep -v hf-xet /tmp/pipcheck.txt | grep -q . && exit 1; fi; exit 0 ); \
     else \
     uv venv && uv pip install tomlkit && \
     uv run python ./scripts/remove_pytorch_cpu_pyproject.py pyproject.toml && \
@@ -66,16 +68,16 @@ RUN if [ -f /cachi2/cachi2.env ]; then \
 # Stage 2: Runtime — clean image with only runtime dependencies.
 ARG RUNTIME_BASE_IMAGE
 FROM ${RUNTIME_BASE_IMAGE}
-ARG DNF_COMMAND=dnf
+ARG RUNTIME_DNF_COMMAND=dnf
 USER root
 
-RUN ${DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
+RUN ${RUNTIME_DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
     python3.12 python3.12-pip git \
     skopeo \
     libpq libxml2 libxslt libjpeg-turbo libtiff freetype libwebp \
     rubygems rubygem-bundler \
     libcudnn9 libnccl libcusparselt0 && \
-    ${DNF_COMMAND} clean all
+    ${RUNTIME_DNF_COMMAND} clean all
 
 WORKDIR /rag-content
 

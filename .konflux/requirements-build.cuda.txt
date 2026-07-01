@@ -38,9 +38,9 @@ pluggy==1.6.0
     # via hatchling
 semantic-version==2.10.0
     # via setuptools-rust
-setuptools-rust==1.12.1
+setuptools-rust==1.13.0
     # via maturin
-setuptools-scm==10.1.1
+setuptools-scm==10.2.0
     # via
     #   llama-stack
     #   llama-stack-api
@@ -48,9 +48,9 @@ setuptools-scm==10.1.1
     #   setuptools-rust
 trove-classifiers==2026.6.1.19
     # via hatchling
-uv-build==0.11.23
+uv-build==0.11.26
     # via python-frontmatter
-vcs-versioning==2.0.1
+vcs-versioning==2.2.2
     # via setuptools-scm
 wheel==0.47.0
     # via oci
