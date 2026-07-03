@@ -3,25 +3,19 @@ ARG RUNTIME_BASE_IMAGE=registry.access.redhat.com/ubi9/ubi-minimal
 
 # Stage 1: Builder — install build tools, compile Python deps from sdist, then discard.
 FROM ${BUILDER_BASE_IMAGE} AS builder
-ARG DNF_COMMAND=microdnf
+ARG BUILDER_DNF_COMMAND=microdnf
 ARG TARGETARCH
 USER root
 
-# Install Python and git (always needed).
-RUN ${DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
-    python3.12 python3.12-devel python3.12-pip git \
+# Install Python and build tools.
+RUN ${BUILDER_DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
+    python3.12 python3.12-devel python3.12-pip \
     rubygems rubygem-bundler && \
-    ${DNF_COMMAND} clean all
+    ${BUILDER_DNF_COMMAND} clean all
 
-# Hermetic: install build toolchain and dev libs for compiling sdists.
-RUN if [ -f /cachi2/cachi2.env ]; then \
-    ${DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
-    gcc cmake git libpq-devel swig autoconf automake libtool libxml2-devel libxslt-devel && \
-    ${DNF_COMMAND} clean all; \
-    fi
 
 # Install uv package manager
-RUN pip3.12 install uv>=0.7.20
+RUN pip3.12 install "uv>=0.7.20"
 
 WORKDIR /rag-content
 
@@ -50,30 +44,31 @@ COPY src ./src
 
 RUN if [ -f /cachi2/cachi2.env ]; then \
     . /cachi2/cachi2.env && \
-    uv venv --seed --no-index --find-links ${PIP_FIND_LINKS} && \
+    python3.12 -c "import os,re;d=os.environ['PIP_FIND_LINKS'];fs=os.listdir(d);rp={re.split(r'-\d+-(?:cp|py|pp)',f)[0] for f in fs if f.endswith('.whl') and re.search(r'-\d+-(?:cp|py|pp)',f)};[os.remove(os.path.join(d,f)) for f in fs if f.endswith('.whl') and not re.search(r'-\d+-(?:cp|py|pp)',f) and f.rsplit('-',3)[0] in rp]" && \
+    uv venv --python python3.12 && \
     . .venv/bin/activate && \
-    case "${TARGETARCH:-amd64}" in amd64) CPU_WHEEL_ARCH=x86_64 ;; arm64) CPU_WHEEL_ARCH=aarch64 ;; *) CPU_WHEEL_ARCH=x86_64 ;; esac && \
-    pip install --no-cache-dir --ignore-installed --no-index --find-links ${PIP_FIND_LINKS} --no-deps \
+    sed -i '/^--index-url/d' requirements.hashes.wheel.txt requirements.hashes.wheel.pypi.txt requirements.hashes.source.txt && \
+    uv pip install --no-cache --reinstall --no-index --find-links ${PIP_FIND_LINKS} --no-deps \
       -r requirements.hashes.wheel.txt \
       -r requirements.hashes.wheel.pypi.txt \
       -r requirements.hashes.source.txt && \
-    pip install --no-cache-dir --no-deps . && \
-    pip check; \
+    uv pip check; \
     else \
     uv sync --locked --no-dev; \
     fi
 
 # Stage 2: Runtime — clean image with only runtime dependencies.
 FROM ${RUNTIME_BASE_IMAGE}
-ARG DNF_COMMAND=microdnf
+ARG RUNTIME_DNF_COMMAND=microdnf
 USER root
 
-RUN ${DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
-    python3.12 python3.12-pip git \
+RUN ${RUNTIME_DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
+    python3.12 python3.12-pip \
     libpq libxml2 libxslt libjpeg-turbo libtiff freetype libwebp \
     rubygems rubygem-bundler \
     skopeo && \
-    ${DNF_COMMAND} clean all
+    ${RUNTIME_DNF_COMMAND} update -y --nodocs && \
+    ${RUNTIME_DNF_COMMAND} clean all
 
 WORKDIR /rag-content
 
@@ -90,7 +85,8 @@ COPY LICENSE /licenses/LICENSE
 # Install Ruby Gems
 RUN BUNDLE_PATH__SYSTEM=true bundle install
 
-ENV PATH="/rag-content/.venv/bin:$PATH"
+ENV PATH="/rag-content/.venv/bin:$PATH" \
+    PYTHONPATH="/rag-content/src"
 
 # Download embeddings model
 # In hermetic build, the model is already downloaded and mounted to the container.

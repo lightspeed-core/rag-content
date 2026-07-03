@@ -16,9 +16,7 @@ hatchling==1.30.1
     #   llama-index-vector-stores-faiss
     #   llama-index-vector-stores-postgres
     #   opentelemetry-distro
-maturin==1.14.1
-    # via uv-build
-packaging==26.2
+packaging==25.0
     # via
     #   hatchling
     #   setuptools-scm
@@ -27,29 +25,19 @@ pathspec==1.1.1
     # via hatchling
 pluggy==1.6.0
     # via hatchling
-semantic-version==2.10.0
-    # via setuptools-rust
-setuptools-rust==1.12.1
-    # via maturin
-setuptools-scm==10.1.1
-    # via
-    #   pluggy
-    #   setuptools-rust
+setuptools-scm==10.2.0
+    # via pluggy
 trove-classifiers==2026.6.1.19
     # via hatchling
-uv-build==0.11.23
-    # via python-frontmatter
-vcs-versioning==2.0.1
+vcs-versioning==2.2.2
     # via setuptools-scm
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==82.0.1
+setuptools==80.10.2
     # via
     #   calver
-    #   maturin
     #   pathspec
     #   pluggy
-    #   setuptools-rust
     #   setuptools-scm
     #   trove-classifiers
     #   vcs-versioning

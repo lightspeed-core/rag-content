@@ -1179,11 +1179,14 @@ def _write_hashed_file_via_uv(
             )
             write_hashed_requirements(packages, output_path, index_url)
             return
-        # Strip any --extra-index-url lines uv might add
+        # Strip comment headers and --extra-index-url lines uv might add;
+        # Hermeto requires a clean file starting with --index-url.
         lines = [
             line + "\n"
             for line in result.stdout.splitlines()
-            if not line.strip().startswith("--extra-index-url")
+            if not line.strip().startswith("#")
+            and not line.strip().startswith("--extra-index-url")
+            and line.strip()  # skip blank lines
         ]
         with open(output_path, "w") as f:
             f.writelines(lines)
@@ -1222,6 +1225,7 @@ def main() -> None:
     suffix = config.get("output_suffix", "")
     tekton_files = config.get("tekton_files", [])
     bootstrap_packages = config.get("bootstrap_packages", [])
+    force_sdist_packages = {normalize_name(p) for p in config.get("force_sdist_packages", [])}
 
     # Determine uv binary path
     uv = UV_BINARY if os.path.isfile(UV_BINARY) else "uv"
@@ -1257,6 +1261,11 @@ def main() -> None:
 
     # Step 3: Classify into buckets
     buckets = classify_packages(resolved, wheel_only)
+
+    # Reclassify force_sdist_packages from RHOAI wheel to PyPI sdist
+    for pkg_name in force_sdist_packages:
+        if pkg_name in buckets["rhoai_wheel"]:
+            buckets["pypi_sdist"][pkg_name] = buckets["rhoai_wheel"].pop(pkg_name)
 
     # Step 4: Write hashed requirements files via uv pip compile --generate-hashes
     _write_hashed_file_via_uv(
