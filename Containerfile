@@ -8,7 +8,8 @@ ARG TARGETARCH
 USER root
 
 # Install Python and build tools.
-RUN ${BUILDER_DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
+RUN ${BUILDER_DNF_COMMAND} -y module enable ruby:3.3 && \
+    ${BUILDER_DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
     python3.12 python3.12-devel python3.12-pip \
     rubygems rubygem-bundler && \
     ${BUILDER_DNF_COMMAND} clean all
@@ -62,7 +63,8 @@ FROM ${RUNTIME_BASE_IMAGE}
 ARG RUNTIME_DNF_COMMAND=microdnf
 USER root
 
-RUN ${RUNTIME_DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
+RUN ${RUNTIME_DNF_COMMAND} -y module enable ruby:3.3 && \
+    ${RUNTIME_DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
     python3.12 python3.12-pip \
     libpq libxml2 libxslt libjpeg-turbo libtiff freetype libwebp \
     rubygems rubygem-bundler \
