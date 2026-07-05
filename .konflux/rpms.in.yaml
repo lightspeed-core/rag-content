@@ -20,6 +20,8 @@ packages:
     openexr-libs,
     skopeo,
   ]
+moduleEnable:
+  - "ruby:3.3"
 contentOrigin:
   repofiles: ["./redhat.repo"]
 arches: [x86_64, aarch64]
