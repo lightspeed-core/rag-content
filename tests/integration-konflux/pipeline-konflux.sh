@@ -3,11 +3,11 @@
 # Runs locally with Podman or inside a Tekton step.
 #
 # Required env vars:
-#   RAG_CONTENT_IMAGE   — just-built rag-content image (from SNAPSHOT or local build)
-#   OPENAI_API_KEY      — OpenAI API key for gpt-4o-mini inference
+#   RAG_CONTENT_IMAGE      — just-built rag-content image (from SNAPSHOT)
+#   LIGHTSPEED_STACK_IMAGE — lightspeed-stack image (from SNAPSHOT)
+#   OPENAI_API_KEY         — OpenAI API key for gpt-4o-mini inference
 #
 # Optional:
-#   LIGHTSPEED_STACK_IMAGE — defaults to pinned release image
 #   GPU_ENABLED            — set to "true" to enable GPU device passthrough and
 #                            verify CUDA is available before DB generation
 set -euo pipefail
@@ -17,7 +17,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 CONFIG_DIR="$SCRIPT_DIR/config"
 CORPUS_DIR="$SCRIPT_DIR/corpus"
 
-LIGHTSPEED_STACK_IMAGE="${LIGHTSPEED_STACK_IMAGE:-quay.io/lightspeed-core/lightspeed-stack:dev-latest}"
+LIGHTSPEED_STACK_IMAGE="${LIGHTSPEED_STACK_IMAGE:?ERROR: LIGHTSPEED_STACK_IMAGE not set}"
 
 RAG_OUTPUT_DIR=$(mktemp -d /tmp/rag-integration-output.XXXXXX)
 MODEL_DIR=$(mktemp -d /tmp/rag-integration-model.XXXXXX)
