@@ -8,7 +8,8 @@ USER root
 # Install Python and system packages.
 # In hermetic (Konflux) builds the RHAI base image already ships Python 3.12
 # and CUDA libs; we only need the extra tooling packages.
-RUN ${BUILDER_DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
+RUN ${BUILDER_DNF_COMMAND} -y module enable ruby:3.3 && \
+    ${BUILDER_DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
     python3.12 python3.12-devel python3.12-pip \
     skopeo \
     rubygems rubygem-bundler \
@@ -68,7 +69,8 @@ FROM ${RUNTIME_BASE_IMAGE}
 ARG RUNTIME_DNF_COMMAND=dnf
 USER root
 
-RUN ${RUNTIME_DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
+RUN ${RUNTIME_DNF_COMMAND} -y module enable ruby:3.3 && \
+    ${RUNTIME_DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
     python3.12 python3.12-pip \
     skopeo \
     libpq libxml2 libxslt libjpeg-turbo libtiff freetype libwebp \
