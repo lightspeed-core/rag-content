@@ -45,16 +45,16 @@ spec:
       [
          {
            "type": "generic",
-           "path": ".",
+           "path": ".konflux",
            "lockfile": "artifacts.lock.yaml"
          },
          {
            "type": "rpm",
-           "path": "."
+           "path": ".konflux"
          },
          {
            "type": "pip",
-           "path": ".",
+           "path": ".konflux",
            "requirements_files": [
              "requirements.hashes.wheel.txt",
              "requirements.hashes.wheel.pypi.txt",
@@ -63,21 +63,20 @@ spec:
            ],
            "requirements_build_files": ["requirements-build.txt"],
            "binary": {
-             "packages": "aiohappyeyeballs,aiohttp,aiosignal,aiosqlite,annotated-doc,annotated-types,anyio,asyncpg,beautifulsoup4,cffi,click,colorama,cryptography,dataclasses-json,defusedxml,distro,docling-parse,et-xmlfile,faiss-cpu,filetype,fire,frozenlist,greenlet,h11,hf-xet,httpcore,httpx,httpx-sse,idna,jinja2,jiter,joblib,jsonlines,jsonref,jsonschema-specifications,lxml,markdown-it-py,markupsafe,mdurl,mpire,mpmath,mypy-extensions,nest-asyncio,networkx,numpy,openpyxl,packaging,pandas,pillow,pluggy,prompt-toolkit,propcache,psycopg2-binary,pydantic,pydantic-core,pylatexenc,pypdfium2,python-dateutil,python-docx,python-pptx,pyyaml,referencing,rpds-py,rtree,safetensors,scikit-learn,scipy,setuptools,shapely,shellingham,six,sniffio,sympy,threadpoolctl,tiktoken,tokenizers,torch,torchvision,transformers,triton,typing-extensions,typing-inspect,typing-inspection,tzdata,xlsxwriter,zipp,uv-build,uv,pip,maturin,opencv-python,omegaconf,rapidocr,griffe,griffecli,griffelib,pyclipper,tree-sitter-typescript",
+             "packages": "accelerate,aiohappyeyeballs,aiohttp,aiosignal,aiosqlite,annotated-doc,annotated-types,antlr4-python3-runtime,anyio,asyncpg,attrs,banks,beautifulsoup4,certifi,cffi,chardet,charset-normalizer,circuitbreaker,click,colorama,colorlog,cryptography,dataclasses-json,defusedxml,deprecated,dill,dirtyjson,distro,docling,docling-core,docling-ibm-models,docling-parse,docling-slim,einops,et-xmlfile,faiss-cpu,faker,fastapi,filelock,filetype,fire,frozenlist,fsspec,googleapis-common-protos,greenlet,griffe,griffecli,griffelib,h11,hf-xet,httpcore,httpx,httpx-sse,huggingface-hub,idna,jinja2,jiter,joblib,jsonlines,jsonref,jsonschema,jsonschema-specifications,latex2mathml,llama-index,llama-index-core,llama-index-embeddings-openai,llama-index-instrumentation,llama-index-llms-openai,llama-index-readers-file,llama-index-workflows,llama-stack,llama-stack-client,lxml,markdown-it-py,marko,markupsafe,marshmallow,mcp,mdurl,mpire,mpmath,multidict,multiprocess,mypy-extensions,nest-asyncio,networkx,nltk,numpy,oci,omegaconf,openai,opencv-python,openpyxl,opentelemetry-api,opentelemetry-exporter-otlp-proto-common,opentelemetry-exporter-otlp-proto-http,opentelemetry-proto,opentelemetry-sdk,opentelemetry-semantic-conventions,oracledb,pandas,pgvector,pillow,platformdirs,polyfactory,prompt-toolkit,propcache,protobuf,psutil,psycopg2-binary,pyaml,pyclipper,pycparser,pydantic,pydantic-core,pydantic-settings,pygments,pyjwt,pylatexenc,pyopenssl,pypdf,pypdfium2,python-dateutil,python-docx,python-dotenv,python-multipart,python-pptx,pytz,pyyaml,rapidocr,referencing,regex,requests,rich,rpds-py,rtree,safetensors,scikit-learn,scipy,semchunk,sentence-transformers,shapely,shellingham,six,sniffio,soupsieve,sqlalchemy,sse-starlette,starlette,striprtf,sympy,tabulate,tenacity,termcolor,threadpoolctl,tiktoken,tinytag,tokenizers,tomlkit,torch,torchvision,tornado,tqdm,transformers,tree-sitter,tree-sitter-c,tree-sitter-javascript,tree-sitter-python,tree-sitter-typescript,triton,typer,typing-extensions,typing-inspect,typing-inspection,tzdata,urllib3,uvicorn,wcwidth,websockets,wrapt,xlsxwriter,yarl",
              "os": "linux",
              "arch": "x86_64,aarch64",
              "py_version": 312
            }
          },
          {
-           "type": "bundler",
-           "allow_binary": "true"
+           "type": "bundler"
          }
        ]
   - name: hermetic
     value: 'true'
   - name: build-args-file
-    value: build-args-konflux.conf
+    value: .konflux/build-args-konflux.conf
   pipelineSpec:
     description: |
       This pipeline is ideal for building multi-arch container images from a Containerfile while maintaining trust after pipeline customization.

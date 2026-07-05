@@ -1,15 +1,19 @@
 packages:
   [
-    gcc,
-    cmake,
-    cargo,
+    ruby,
+    ruby-libs,
     rubygems,
+    rubygem-bundler,
+    rubygem-io-console,
+    rubygem-psych,
     python3.12,
     python3.12-devel,
+    python3.12-libs,
     python3.12-pip,
-    git,
     skopeo,
   ]
+moduleEnable:
+  - "ruby:3.3"
 contentOrigin:
   repofiles: ["./redhat.repo"]
 arches: [x86_64, aarch64]
