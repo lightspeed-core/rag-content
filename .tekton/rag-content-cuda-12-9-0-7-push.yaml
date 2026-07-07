@@ -9,6 +9,7 @@ metadata:
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch
       == "main"
+  creationTimestamp: null
   labels:
     appstudio.openshift.io/application: lightspeed-core-0-7
     appstudio.openshift.io/component: rag-content-cuda-12-9-0-7
@@ -26,10 +27,50 @@ spec:
   - name: build-platforms
     value:
     - linux/x86_64
+    - linux-d160-m2xlarge/arm64
   - name: dockerfile
-    value: Containerfile.cuda-12.9
+    value: Containerfile-cuda
   - name: path-context
     value: .
+  - name: build-source-image
+    value: 'true'
+  - name: prefetch-input
+    value: |
+      [
+         {
+           "type": "generic",
+           "path": ".konflux",
+           "lockfile": "artifacts.lock.yaml"
+         },
+         {
+           "type": "rpm",
+           "path": ".konflux/cuda"
+         },
+         {
+           "type": "pip",
+           "path": ".konflux",
+           "requirements_files": [
+            "requirements.hashes.wheel.cuda.txt",
+            "requirements.hashes.wheel.pypi.cuda.txt",
+            "requirements.hashes.source.cuda.txt",
+            "requirements.hermetic.txt"
+           ],
+           "requirements_build_files": ["requirements-build.cuda.txt"],
+           "binary": {
+             "packages": "accelerate,aiohappyeyeballs,aiohttp,aiosignal,aiosqlite,annotated-doc,annotated-types,antlr4-python3-runtime,anyio,asyncpg,attrs,banks,beautifulsoup4,certifi,cffi,chardet,charset-normalizer,click,colorama,colorlog,cryptography,dataclasses-json,defusedxml,deprecated,dill,dirtyjson,distro,docling,docling-core,docling-ibm-models,docling-parse,docling-slim,einops,et-xmlfile,faiss-cpu,faker,fastapi,filelock,filetype,fire,frozenlist,fsspec,googleapis-common-protos,greenlet,griffe,griffecli,griffelib,h11,hf-xet,httpcore,httpx,httpx-sse,huggingface-hub,idna,importlib-metadata,jinja2,jiter,joblib,jsonlines,jsonref,jsonschema,jsonschema-specifications,latex2mathml,llama-index,llama-index-core,llama-index-embeddings-openai,llama-index-instrumentation,llama-index-llms-openai,llama-index-readers-file,llama-index-workflows,lxml,markdown-it-py,marko,markupsafe,marshmallow,mcp,mdurl,mpire,mpmath,multidict,multiprocess,mypy-extensions,nest-asyncio,networkx,nltk,numpy,omegaconf,openai,opencv-python,openpyxl,opentelemetry-api,opentelemetry-exporter-otlp-proto-common,opentelemetry-exporter-otlp-proto-http,opentelemetry-instrumentation,opentelemetry-proto,opentelemetry-sdk,opentelemetry-semantic-conventions,oracledb,pandas,pgvector,pillow,platformdirs,polyfactory,prompt-toolkit,propcache,protobuf,psutil,pyaml,pyclipper,pycparser,pydantic,pydantic-core,pydantic-settings,pygments,pyjwt,pylatexenc,pypdf,pypdfium2,python-dateutil,python-docx,python-dotenv,python-multipart,python-pptx,pytz,pyyaml,rapidocr,referencing,regex,requests,rich,rpds-py,rtree,safetensors,scikit-learn,scipy,semchunk,sentence-transformers,shapely,shellingham,six,sniffio,soupsieve,sqlalchemy,sse-starlette,starlette,striprtf,sympy,tabulate,tenacity,termcolor,threadpoolctl,tiktoken,tinytag,tokenizers,tomlkit,torch,torchvision,tornado,tqdm,transformers,tree-sitter,tree-sitter-c,tree-sitter-javascript,tree-sitter-python,tree-sitter-typescript,triton,typer,typing-extensions,typing-inspect,typing-inspection,tzdata,urllib3,uvicorn,wcwidth,websockets,wrapt,xlsxwriter,yarl,zipp",
+             "os": "linux",
+             "arch": "x86_64,aarch64",
+             "py_version": 312
+           }
+         },
+         {
+           "type": "bundler"
+         }
+       ]
+  - name: hermetic
+    value: 'true'
+  - name: build-args-file
+    value: .konflux/cuda/build-args-konflux.conf
   pipelineSpec:
     description: |
       This pipeline is ideal for building multi-arch container images from a Containerfile while maintaining trust after pipeline customization.
@@ -90,14 +131,6 @@ spec:
     - default: "false"
       description: Enable cache proxy configuration
       name: enable-cache-proxy
-    - default: "true"
-      description: Use the package registry proxy when prefetching dependencies
-      name: enable-package-registry-proxy
-    - default: .
-      description: Target directories in component's source code to scan with SAST
-        tools. Multiple values should be separated with commas.
-      name: sast-target-dirs
-      type: string
     - default: []
       description: Array of --build-arg values ("arg=value" strings) for buildah
       name: build-args
@@ -117,6 +150,14 @@ spec:
         set of values is determined by the configuration of the multi-platform-controller.
       name: build-platforms
       type: array
+    - name: enable-package-registry-proxy
+      default: 'true'
+      description: Use the package registry proxy when prefetching dependencies
+      type: string
+    - name: sast-target-dirs
+      type: string
+      default: .
+      description: Target directories to scan with SAST tools. Multiple values should be separated with commas.
     results:
     - description: ""
       name: IMAGE_URL
@@ -140,7 +181,7 @@ spec:
         - name: name
           value: init
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-init:0.4.2@sha256:421003a5c077ecb820460e71637125ec9093d2101c749a32ede28e190283e9db
+          value: quay.io/konflux-ci/tekton-catalog/task-init:0.4@sha256:5a423246792ac501ea279229b42ee57da9927da441c04b5c9ff86817b0856b08
         - name: kind
           value: task
         resolver: bundles
@@ -172,14 +213,14 @@ spec:
       params:
       - name: input
         value: $(params.prefetch-input)
-      - name: enable-package-registry-proxy
-        value: $(params.enable-package-registry-proxy)
       - name: SOURCE_ARTIFACT
         value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
       - name: ociStorage
         value: $(params.output-image).prefetch
       - name: ociArtifactExpiresAfter
         value: $(params.image-expires-after)
+      - name: enable-package-registry-proxy
+        value: $(params.enable-package-registry-proxy)
       runAfter:
       - clone-repository
       taskRef:
@@ -187,7 +228,7 @@ spec:
         - name: name
           value: prefetch-dependencies-oci-ta
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies-oci-ta:0.3.2@sha256:389aea03a065e8118d36b7acb85b05cd13f6750e7e10ff8a85f270ee65b0167b
+          value: quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies-oci-ta:0.3@sha256:92956e75cd4714286f9c0c043f5301d1c0df1d750884edeceee87e0a91cc1975
         - name: kind
           value: task
         resolver: bundles
@@ -337,7 +378,7 @@ spec:
         - name: name
           value: clair-scan
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-clair-scan:0.3@sha256:8fad4c2e2f470f82ee43d6b2ac72327b4d9c6e9cb514a678911c1c9359c29894
+          value: quay.io/konflux-ci/tekton-catalog/task-clair-scan:0.3@sha256:9ff424d913dd7681031a93d8bdbed622cd5536633f8ed0dbb4a9021055cf9d21
         - name: kind
           value: task
         resolver: bundles
@@ -377,12 +418,12 @@ spec:
         value: $(tasks.build-image-index.results.IMAGE_DIGEST)
       - name: image-url
         value: $(tasks.build-image-index.results.IMAGE_URL)
-      - name: TARGET_DIRS
-        value: $(params.sast-target-dirs)
       - name: SOURCE_ARTIFACT
         value: $(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT)
       - name: CACHI2_ARTIFACT
         value: $(tasks.prefetch-dependencies.results.CACHI2_ARTIFACT)
+      - name: TARGET_DIRS
+        value: $(params.sast-target-dirs)
       runAfter:
       - build-image-index
       taskRef:
@@ -390,7 +431,7 @@ spec:
         - name: name
           value: sast-snyk-check-oci-ta
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-sast-snyk-check-oci-ta:0.5@sha256:bdd187c336ee2e9e83e7a98b3e405635f3d3caf5d56c7780212469a3f3809c5c
+          value: quay.io/konflux-ci/tekton-catalog/task-sast-snyk-check-oci-ta:0.5@sha256:fda2e510511f5588de3882612f53eb06ea833889bc47da3d60ef7273555067bc
         - name: kind
           value: task
         resolver: bundles
@@ -417,7 +458,7 @@ spec:
         - name: name
           value: clamav-scan
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-clamav-scan:0.3@sha256:567cb66bd2e1f4b58b9d4d756f3317fc62479e0b40aa0de66094b1f12d296cfc
+          value: quay.io/konflux-ci/tekton-catalog/task-clamav-scan:0.3@sha256:53a02326bfb930ca5ef6bfa7a33acca833d57752f34f3cb79255fe2e25e7d217
         - name: kind
           value: task
         resolver: bundles
@@ -432,12 +473,12 @@ spec:
         value: $(tasks.build-image-index.results.IMAGE_DIGEST)
       - name: image-url
         value: $(tasks.build-image-index.results.IMAGE_URL)
-      - name: TARGET_DIRS
-        value: $(params.sast-target-dirs)
       - name: SOURCE_ARTIFACT
         value: $(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT)
       - name: CACHI2_ARTIFACT
         value: $(tasks.prefetch-dependencies.results.CACHI2_ARTIFACT)
+      - name: TARGET_DIRS
+        value: $(params.sast-target-dirs)
       runAfter:
       - build-image-index
       taskRef:
@@ -445,7 +486,7 @@ spec:
         - name: name
           value: sast-shell-check-oci-ta
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-sast-shell-check-oci-ta:0.1@sha256:c4ef47e3b4e0508572d266fb745be7e374c29dc02580328cbe9f4d472a8aca57
+          value: quay.io/konflux-ci/tekton-catalog/task-sast-shell-check-oci-ta:0.1@sha256:fc685d6f7dfb7c9ab2f2db38bbe2c8d383407847350ccd8b96352322c487b13c
         - name: kind
           value: task
         resolver: bundles
@@ -460,12 +501,12 @@ spec:
         value: $(tasks.build-image-index.results.IMAGE_DIGEST)
       - name: image-url
         value: $(tasks.build-image-index.results.IMAGE_URL)
-      - name: TARGET_DIRS
-        value: $(params.sast-target-dirs)
       - name: SOURCE_ARTIFACT
         value: $(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT)
       - name: CACHI2_ARTIFACT
         value: $(tasks.prefetch-dependencies.results.CACHI2_ARTIFACT)
+      - name: TARGET_DIRS
+        value: $(params.sast-target-dirs)
       runAfter:
       - build-image-index
       taskRef:
@@ -473,7 +514,7 @@ spec:
         - name: name
           value: sast-unicode-check-oci-ta
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-sast-unicode-check-oci-ta:0.4@sha256:90efa582de7770d55102b74014a765cd16a25a56f2cf644b56a788c70c4dc749
+          value: quay.io/konflux-ci/tekton-catalog/task-sast-unicode-check-oci-ta:0.4@sha256:5807ffe3a0cca5cf970076bbc7a404642cc6e3eebe64e9e5e6a4f20da740bf73
         - name: kind
           value: task
         resolver: bundles
@@ -518,7 +559,7 @@ spec:
         - name: name
           value: push-dockerfile-oci-ta
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-push-dockerfile-oci-ta:0.3.1@sha256:5a6cbebd89e5bc163b38231859767f7f6a0dd66cf1333699574379f062731183
+          value: quay.io/konflux-ci/tekton-catalog/task-push-dockerfile-oci-ta:0.3@sha256:f3e97e6eaf09d6585e915c3e7b82d110d97e34202bf591a2d990127ba5bb362d
         - name: kind
           value: task
         resolver: bundles
@@ -555,4 +596,7 @@ spec:
   - name: git-auth
     secret:
       secretName: '{{ git_auth_secret }}'
+  timeouts:
+    pipeline: 4h0m0s
+    tasks: 4h0m0s
 status: {}
