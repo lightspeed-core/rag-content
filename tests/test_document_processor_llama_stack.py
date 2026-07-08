@@ -27,10 +27,12 @@ FAISS_EXPECTED = """version: 2
 image_name: starter
 
 apis:
+- agents
 - files
+- inference
+- safety
 - tool_runtime
 - vector_io
-- inference
 
 server:
   port: 8321
@@ -48,6 +50,17 @@ providers:
       storage_dir: /tmp/files
     provider_id: meta-reference-files
     provider_type: inline::localfs
+  agents:
+  - config:
+      persistence:
+        agent_state:
+          namespace: agents_state
+          backend: kv_default
+        responses:
+          table_name: agents_responses
+          backend: sql_default
+    provider_id: meta-reference
+    provider_type: inline::meta-reference
   tool_runtime:
   - config: {{}}
     provider_id: rag-runtime
@@ -200,6 +213,61 @@ class TestDocumentProcessorLlamaStack:
             model_name=llama_stack_processor["model_name"],
             model_name_or_dir=llama_stack_processor["model_name"],
         )
+
+    def test_write_lcs_config_faiss(self, mocker, llama_stack_processor):
+        """Test lightspeed-stack.yaml generation for FAISS backend."""
+        mock_open = mocker.patch("builtins.open", new_callable=mocker.mock_open)
+        doc = document_processor._LlamaStackDB(llama_stack_processor["config"])
+
+        doc.write_lcs_config("my-index", "lcs.yaml", "vs_abc123", "/data/faiss_store.db")
+
+        mock_open.assert_called_once_with("lcs.yaml", "w", encoding="utf-8")
+        data = mock_open.return_value.write.mock_calls[0].args[0]
+        assert "name: Lightspeed Core Stack (LCS)" in data
+        assert "service:" in data
+        assert "llama_stack:" in data
+        assert "authentication:" in data
+        assert "byok_rag:" in data
+        assert "rag_type: inline::faiss" in data
+        assert "rag_id: my-index" in data
+        assert "vector_db_id: vs_abc123" in data
+        assert "${env.RAG_DB_PATH:=/data/faiss_store.db}" in data
+        assert "embedding_dimension: 768" in data
+        assert f"embedding_model: {llama_stack_processor['model_name']}" in data
+        assert "rag:" in data
+        assert "tool:" in data
+        assert "- my-index" in data
+
+    def test_write_lcs_config_pgvector(self, mocker, llama_stack_processor):
+        """Test lightspeed-stack.yaml generation for pgvector backend."""
+        mock_open = mocker.patch("builtins.open", new_callable=mocker.mock_open)
+        config = llama_stack_processor["config"]
+        config.vector_store_type = "llamastack-pgvector"
+        doc = document_processor._LlamaStackDB(config)
+
+        doc.write_lcs_config("pg-index", "lcs.yaml", "vs_pg123", "/data/pg_store.db")
+
+        mock_open.assert_called_once_with("lcs.yaml", "w", encoding="utf-8")
+        data = mock_open.return_value.write.mock_calls[0].args[0]
+        assert "name: Lightspeed Core Stack (LCS)" in data
+        assert "service:" in data
+        assert "llama_stack:" in data
+        assert "authentication:" in data
+        assert "byok_rag:" in data
+        assert "rag_type: remote::pgvector" in data
+        assert "rag_id: pg-index" in data
+        assert "vector_db_id: vs_pg123" in data
+        byok_section = data[data.index("byok_rag:") :]
+        assert "db_path" not in byok_section
+        assert f"embedding_model: {llama_stack_processor['model_name']}" in data
+        assert "${env.POSTGRES_HOST}" in data
+        assert "${env.POSTGRES_PORT}" in data
+        assert "${env.POSTGRES_DATABASE}" in data
+        assert "${env.POSTGRES_USER}" in data
+        assert "${env.POSTGRES_PASSWORD}" in data
+        assert "rag:" in data
+        assert "tool:" in data
+        assert "- pg-index" in data
 
     def test_run_llama_stack(self, mocker, llama_stack_processor):
         """Test running with llama-stack client lifecycle management."""
@@ -372,6 +440,7 @@ class TestDocumentProcessorLlamaStack:
 
         write_cfg = mocker.patch.object(doc, "write_yaml_config")
         update_yaml = mocker.patch.object(doc, "_update_yaml_config")
+        write_lcs = mocker.patch.object(doc, "write_lcs_config")
 
         # Mock client_class to support async context manager
         client_instance = mocker.Mock()
@@ -426,6 +495,12 @@ class TestDocumentProcessorLlamaStack:
             "out_dir/llama-stack.yaml",
             mock.sentinel.index,
             "vs_123",
+        )
+        write_lcs.assert_called_once_with(
+            mock.sentinel.index,
+            "out_dir/lightspeed-stack.yaml",
+            "vs_123",
+            "/cwd/out_dir/faiss_store.db",
         )
         # Verify client lifecycle (async context manager)
         client_class_mock.return_value.__aenter__.assert_awaited_once()

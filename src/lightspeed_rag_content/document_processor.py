@@ -36,6 +36,7 @@ from llama_index.vector_stores.faiss import FaissVectorStore
 from llama_index.vector_stores.postgres import PGVectorStore
 from sentence_transformers import SentenceTransformer
 
+from lightspeed_rag_content import config_templates
 from lightspeed_rag_content.metadata_processor import MetadataProcessor
 
 if TYPE_CHECKING:
@@ -301,99 +302,15 @@ class _LlamaIndexDB(_BaseDB):
 
 class _LlamaStackDB(_BaseDB):
     # Lllama-stack faiss vector-db uses IndexFlatL2 (it's hardcoded for now)
-    TEMPLATE = """version: 2
-image_name: starter
-
-apis:
-- files
-- tool_runtime
-- vector_io
-- inference
-
-server:
-  port: 8321
-
-providers:
-  inference:
-  - config: {{}}
-    provider_id: sentence-transformers
-    provider_type: inline::sentence-transformers
-  files:
-  - config:
-      metadata_store:
-        table_name: files_metadata
-        backend: sql_default
-      storage_dir: /tmp/files
-    provider_id: meta-reference-files
-    provider_type: inline::localfs
-  tool_runtime:
-  - config: {{}}
-    provider_id: rag-runtime
-    provider_type: inline::rag-runtime
-  vector_io:
-  - config:
-      {vector_io_cfg}
-    provider_id: {index_id}
-    provider_type: {provider_type_prefix}::{provider_type}
-storage:
-  backends:
-    kv_rag:
-      type: kv_sqlite
-      db_path: {kv_db_path}
-    kv_default:
-      type: kv_sqlite
-      db_path: /tmp/kv_store.db
-    sql_default:
-      type: sql_sqlite
-      db_path: /tmp/sql_store.db
-  stores:
-    metadata:
-      namespace: registry
-      backend: kv_default
-    inference:
-      table_name: inference_store
-      backend: sql_default
-    conversations:
-      table_name: openai_conversations
-      backend: sql_default
-registered_resources:
-  models:
-  - metadata:
-      embedding_dimension: {dimension}
-    model_id: {model_name}
-    provider_id: sentence-transformers
-    provider_model_id: {model_name_or_dir}
-    model_type: embedding
-  vector_stores: []
-  shields: []
-  datasets: []
-  scoring_fns: []
-  benchmarks: []
-  tool_groups:
-  - toolgroup_id: builtin::rag
-    provider_id: rag-runtime
-"""
-    # Template for vector_stores section, added after vector store is created
-    VECTOR_STORES_TEMPLATE = """vector_stores:
-  - embedding_dimension: {dimension}
-    embedding_model: sentence-transformers/{model_name_or_dir}
-    provider_id: {vector_io_provider_id}
-    vector_store_id: {vector_store_id}"""
-
-    # Template for vector_io/config section
-    VECTOR_IO_CONFIG_TEMPLATE_FOR_SQLITE = """persistence:
-        namespace: vector_io::{provider_type}
-        backend: kv_rag"""
-    VECTOR_IO_CONFIG_TEMPLATE_FOR_PGVECTOR = """persistence:
-        namespace: vector_io::{provider_type}
-        backend: kv_default
-      host: ${{env.POSTGRES_HOST}}
-      port: ${{env.POSTGRES_PORT}}
-      db: ${{env.POSTGRES_DATABASE}}
-      user: ${{env.POSTGRES_USER}}
-      password: ${{env.POSTGRES_PASSWORD}}"""
-
-    CFG_FILENAME = "llama-stack.yaml"
+    TEMPLATE = config_templates.LLAMA_STACK_TEMPLATE
+    VECTOR_STORES_TEMPLATE = config_templates.LLAMA_STACK_VECTOR_STORES_TEMPLATE
+    VECTOR_IO_CONFIG_TEMPLATE_FOR_SQLITE = config_templates.LLAMA_STACK_VECTOR_IO_CONFIG_SQLITE
+    VECTOR_IO_CONFIG_TEMPLATE_FOR_PGVECTOR = config_templates.LLAMA_STACK_VECTOR_IO_CONFIG_PGVECTOR
+    CFG_FILENAME = config_templates.LLAMA_STACK_CFG_FILENAME
+    LCS_CFG_FILENAME = config_templates.LCS_CFG_FILENAME
+    LCS_BASE_TEMPLATE = config_templates.LCS_BASE_TEMPLATE
+    LCS_FAISS_BYOK_TEMPLATE = config_templates.LCS_FAISS_BYOK_TEMPLATE
+    LCS_PGVECTOR_BYOK_TEMPLATE = config_templates.LCS_PGVECTOR_BYOK_TEMPLATE
 
     def __init__(self, config: _Config):
         """Initialize the llama-stack Vector IO database.
@@ -783,6 +700,28 @@ registered_resources:
         LOG.info("All files processed successfully")
         return str(vector_store.id)
 
+    def write_lcs_config(
+        self, index: str, filename: str, vector_store_id: str, db_file: str
+    ) -> None:
+        """Write a lightspeed-stack.yaml configuration file."""
+        if self.provider_type == "pgvector":
+            byok_template = self.LCS_PGVECTOR_BYOK_TEMPLATE
+        else:
+            byok_template = self.LCS_FAISS_BYOK_TEMPLATE
+
+        base = self.LCS_BASE_TEMPLATE.format(
+            llama_stack_config_path=self.CFG_FILENAME,
+        )
+        data = base + byok_template.format(
+            index_id=index,
+            model_name=self.config.model_name,
+            dimension=self.config.embedding_dimension,
+            vector_store_id=vector_store_id,
+            db_path=db_file,
+        )
+        with open(filename, "w", encoding="utf-8") as fd:
+            fd.write(data)
+
     def _update_yaml_config(self, cfg_file: str, index: str, vector_store_id: str) -> None:
         """Update the config file with the created vector_store_id."""
         vector_stores_section = self.VECTOR_STORES_TEMPLATE.format(
@@ -817,6 +756,8 @@ registered_resources:
         except Exception as exc:
             LOG.error("Failed to insert document: %s", exc)
             raise
+        lcs_file = os.path.join(output_dir, self.LCS_CFG_FILENAME)
+        self.write_lcs_config(index, lcs_file, vector_store_id, db_file)
         return vector_store_id
 
 

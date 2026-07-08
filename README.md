@@ -428,22 +428,50 @@ podman run --rm \
 ```
 
 Once the command is done, you can find the vector database (embedded with the registry metadata) at
-`./vector_db/custom_docs/0.1` with the name `faiss_store.db` as well as a
-barebones llama-stack configuration file named `llama-stack.yaml` for
-reference, since it's not necessary for the final deployment.
+`./vector_db/custom_docs/0.1` with the name `faiss_store.db`, a
+`lightspeed-stack.yaml` configuration file for use with Lightspeed Core Stack,
+and a `llama-stack.yaml` for reference.
 
-The vector-io will be named `custom-docs-0_1`:
+The generated `lightspeed-stack.yaml` will look like:
 
 ```yaml
-providers:
- vector_io:
-   - provider_id: custom-docs-0_1
-     provider_type: inline::faiss
-     config:
-       kvstore:
-         type: sqlite
-         namespace: null
-         db_path: /home/<user>/rag-content/vector_db/custom_docs/0.1/faiss_store.db
+name: Lightspeed Core Stack (LCS)
+service:
+  host: 0.0.0.0
+  port: 8080
+  base_url: http://localhost:8080
+  auth_enabled: false
+  workers: 1
+  color_log: true
+  access_log: true
+llama_stack:
+  use_as_library_client: true
+  library_client_config_path: llama-stack.yaml
+user_data_collection:
+  feedback_enabled: true
+  feedback_storage: "/tmp/data/feedback"
+  transcripts_enabled: true
+  transcripts_storage: "/tmp/data/transcripts"
+conversation_cache:
+  type: "sqlite"
+  sqlite:
+    db_path: "/tmp/data/conversation-cache.db"
+authentication:
+  module: "noop"
+
+byok_rag:
+  - rag_id: custom-docs-0_1
+    rag_type: inline::faiss
+    embedding_model: sentence-transformers/all-mpnet-base-v2
+    embedding_dimension: 768
+    vector_db_id: <generated-vector-store-id>
+    db_path: /home/<user>/rag-content/vector_db/custom_docs/0.1/faiss_store.db
+
+rag:
+  # inline:
+  #   - custom-docs-0_1
+  tool:
+    - custom-docs-0_1
 ```
 
 Once we have a database we can use script `query_rag.py` to check some results:
