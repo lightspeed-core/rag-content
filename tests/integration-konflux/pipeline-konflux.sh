@@ -83,26 +83,19 @@ progress "Embedding model copied. Files:"
 ls -la "$MODEL_DIR"
 
 #========================================
-# Phase 3: Extract vector store ID
+# Phase 3: Augment generated LCS config
 #========================================
-progress "Phase 3/6: Extracting FAISS vector store ID..."
-FAISS_VECTOR_STORE_ID=$(python3 -c "
-import sqlite3, re, sys
-conn = sqlite3.connect('$RAG_OUTPUT_DIR/faiss_store.db')
-cursor = conn.cursor()
-cursor.execute(\"SELECT key FROM kvstore WHERE key LIKE '%vector_stores:v%::%' LIMIT 1\")
-row = cursor.fetchone()
-if row:
-    match = re.search(r'(vs_[a-f0-9-]+)', row[0])
-    if match:
-        print(match.group(1))
-        sys.exit(0)
-print('ERROR: no vector store found', file=sys.stderr)
-sys.exit(1)
-")
+progress "Phase 3/6: Augmenting generated lightspeed-stack.yaml with inference config..."
+LCS_CONFIG="$RAG_OUTPUT_DIR/lightspeed-stack.yaml"
 
-[[ -n "$FAISS_VECTOR_STORE_ID" ]] || { echo "ERROR: Failed to extract FAISS_VECTOR_STORE_ID"; exit 1; }
-progress "FAISS_VECTOR_STORE_ID=$FAISS_VECTOR_STORE_ID"
+cat >> "$LCS_CONFIG" <<'AUGMENT'
+inference:
+  default_provider: openai
+  default_model: gpt-4o-mini
+AUGMENT
+
+progress "Augmented config:"
+cat "$LCS_CONFIG"
 
 #========================================
 # Phase 4: Start lightspeed-stack
@@ -114,10 +107,10 @@ podman run -d --name lightspeed-stack-e2e \
   --security-opt label=disable \
   -v "$RAG_OUTPUT_DIR":/opt/app-root/src/.llama/storage/rag \
   -v "$MODEL_DIR":/embeddings \
-  -v "$CONFIG_DIR/lightspeed-stack.yaml":/app-root/lightspeed-stack.yaml:ro \
-  -v "$CONFIG_DIR/run.yaml":/app-root/run.yaml:ro \
+  -v "$LCS_CONFIG":/app-root/lightspeed-stack.yaml:ro \
+  -v "$CONFIG_DIR/run.yaml":/app-root/llama-stack.yaml:ro \
   -e OPENAI_API_KEY="$OPENAI_API_KEY" \
-  -e FAISS_VECTOR_STORE_ID="$FAISS_VECTOR_STORE_ID" \
+  -e RAG_DB_PATH=/opt/app-root/src/.llama/storage/rag/faiss_store.db \
   -e HF_HOME=/embeddings \
   ${HF_TOKEN:+-e HF_TOKEN="$HF_TOKEN"} \
   "$LIGHTSPEED_STACK_IMAGE"
