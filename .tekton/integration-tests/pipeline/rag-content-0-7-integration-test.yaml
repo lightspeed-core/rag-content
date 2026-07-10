@@ -2,7 +2,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: rag-content-integration-tests-pipeline
+  name: rag-content-0-7-integration-tests-pipeline
 spec:
   description: |
     Integration test: validates that rag-content images (CPU and CUDA) can
@@ -11,12 +11,12 @@ spec:
     multi-platform controller. Tests all combinations: 2 images × 2 arches.
   params:
     - name: SNAPSHOT
-      description: 'JSON string with the application snapshot (contains rag-tool and rag-tool-cuda components).'
+      description: 'JSON string with the application snapshot (contains rag-content-cpu-0-7, rag-content-cuda-12-9-0-7, and lightspeed-stack-0-7 components).'
       default: '{"components": [{"name":"rag-tool", "containerImage": "quay.io/example/rag-content:latest"}]}'
       type: string
     - name: test-name
       description: 'The name of the test corresponding to a defined Konflux integration test.'
-      default: 'rag-content-e2e-tests'
+      default: 'rag-content-0-7-e2e-tests'
     - name: platforms
       description: VM platforms on which to run the integration test
       type: array
@@ -37,6 +37,9 @@ spec:
           - name: cuda-image
             description: CUDA (rag-tool-cuda) container image
             value: "$(steps.extract.results.cuda-image)"
+          - name: lightspeed-stack-image
+            description: lightspeed-stack container image
+            value: "$(steps.extract.results.lightspeed-stack-image)"
           - name: commit
             value: "$(steps.extract.results.commit)"
           - name: repo-url
@@ -54,24 +57,29 @@ spec:
                 type: string
               - name: cuda-image
                 type: string
+              - name: lightspeed-stack-image
+                type: string
               - name: commit
                 type: string
               - name: repo-url
                 type: string
             script: |
               dnf -y install jq
-              echo -n "$(jq -r '.components[] | select(.name == "rag-tool") | .containerImage // ""' <<< "$SNAPSHOT")" \
+              echo -n "$(jq -r '.components[] | select(.name == "rag-content-cpu-0-7") | .containerImage // ""' <<< "$SNAPSHOT")" \
                 > $(step.results.cpu-image.path)
-              echo -n "$(jq -r '.components[] | select(.name == "rag-tool-cuda") | .containerImage // ""' <<< "$SNAPSHOT")" \
+              echo -n "$(jq -r '.components[] | select(.name == "rag-content-cuda-12-9-0-7") | .containerImage // ""' <<< "$SNAPSHOT")" \
                 > $(step.results.cuda-image.path)
+              echo -n "$(jq -r '.components[] | select(.name == "lightspeed-stack-0-7") | .containerImage // ""' <<< "$SNAPSHOT")" \
+                > $(step.results.lightspeed-stack-image.path)
               echo -n "$(jq -r '.components[0].source.git.revision // "main"' <<< "$SNAPSHOT")" \
                 > $(step.results.commit.path)
               echo -n "$(jq -r '.components[0].source.git.url // "https://github.com/lightspeed-core/rag-content.git"' <<< "$SNAPSHOT")" \
                 > $(step.results.repo-url.path)
-              echo "CPU image:  $(cat $(step.results.cpu-image.path))"
-              echo "CUDA image: $(cat $(step.results.cuda-image.path))"
-              echo "Commit:     $(cat $(step.results.commit.path))"
-              echo "Repo:       $(cat $(step.results.repo-url.path))"
+              echo "CPU image:              $(cat $(step.results.cpu-image.path))"
+              echo "CUDA image:             $(cat $(step.results.cuda-image.path))"
+              echo "lightspeed-stack image: $(cat $(step.results.lightspeed-stack-image.path))"
+              echo "Commit:                 $(cat $(step.results.commit.path))"
+              echo "Repo:                   $(cat $(step.results.repo-url.path))"
 
     - name: echo-integration-params
       description: Log test parameters for debugging before matrix fan-out
@@ -82,6 +90,8 @@ spec:
           value: $(tasks.init-snapshot.results.cpu-image)
         - name: cuda-image
           value: $(tasks.init-snapshot.results.cuda-image)
+        - name: lightspeed-stack-image
+          value: $(tasks.init-snapshot.results.lightspeed-stack-image)
         - name: commit
           value: $(tasks.init-snapshot.results.commit)
         - name: repourl
@@ -90,6 +100,7 @@ spec:
         params:
           - name: cpu-image
           - name: cuda-image
+          - name: lightspeed-stack-image
           - name: commit
           - name: repourl
         steps:
@@ -100,6 +111,8 @@ spec:
                 value: $(params.cpu-image)
               - name: CUDA_IMAGE
                 value: $(params.cuda-image)
+              - name: LIGHTSPEED_STACK_IMAGE
+                value: $(params.lightspeed-stack-image)
               - name: COMMIT
                 value: $(params.commit)
               - name: REPO_URL
@@ -108,6 +121,7 @@ spec:
               echo "========== Integration test parameters =========="
               echo "CPU_IMAGE=$CPU_IMAGE"
               echo "CUDA_IMAGE=$CUDA_IMAGE"
+              echo "LIGHTSPEED_STACK_IMAGE=$LIGHTSPEED_STACK_IMAGE"
               echo "COMMIT=$COMMIT"
               echo "REPO_URL=$REPO_URL"
               echo "========== End parameters =========="
@@ -134,6 +148,7 @@ spec:
           value:
             - REPO_URL=$(tasks.init-snapshot.results.repo-url)
             - REPO_REV=$(tasks.init-snapshot.results.commit)
+            - LIGHTSPEED_STACK_IMAGE=$(tasks.init-snapshot.results.lightspeed-stack-image)
       taskSpec:
         params:
           - name: PLATFORM
@@ -327,6 +342,7 @@ spec:
             - REPO_URL=$(tasks.init-snapshot.results.repo-url)
             - REPO_REV=$(tasks.init-snapshot.results.commit)
             - GPU_ENABLED=true
+            - LIGHTSPEED_STACK_IMAGE=$(tasks.init-snapshot.results.lightspeed-stack-image)
       taskSpec:
         params:
           - name: PLATFORM
