@@ -1,0 +1,97 @@
+version: 2
+image_name: starter
+
+apis:
+- agents
+- files
+- inference
+- safety
+- tool_runtime
+- vector_io
+
+providers:
+  inference:
+  - provider_id: openai
+    provider_type: remote::openai
+    config:
+      api_key: ${env.OPENAI_API_KEY}
+      allowed_models: ["gpt-4o-mini"]
+  - config: {}
+    provider_id: sentence-transformers
+    provider_type: inline::sentence-transformers
+  files:
+  - config:
+      metadata_store:
+        table_name: files_metadata
+        backend: sql_default
+      storage_dir: /tmp/files
+    provider_id: meta-reference-files
+    provider_type: inline::localfs
+  safety:
+  - config:
+      excluded_categories: []
+    provider_id: llama-guard
+    provider_type: inline::llama-guard
+  agents:
+  - config:
+      persistence:
+        agent_state:
+          namespace: agents_state
+          backend: kv_default
+        responses:
+          table_name: agents_responses
+          backend: sql_default
+    provider_id: meta-reference
+    provider_type: inline::meta-reference
+  tool_runtime:
+  - config: {}
+    provider_id: rag-runtime
+    provider_type: inline::rag-runtime
+  vector_io: []
+
+server:
+  port: 8321
+
+storage:
+  backends:
+    kv_default:
+      type: kv_sqlite
+      db_path: /tmp/kv_store.db
+    sql_default:
+      type: sql_sqlite
+      db_path: /tmp/sql_store.db
+  stores:
+    metadata:
+      namespace: registry
+      backend: kv_default
+    inference:
+      table_name: inference_store
+      backend: sql_default
+    conversations:
+      table_name: openai_conversations
+      backend: sql_default
+
+registered_resources:
+  models:
+  - model_id: all-mpnet-base-v2
+    model_type: embedding
+    provider_id: sentence-transformers
+    provider_model_id: /embeddings
+    metadata:
+      embedding_dimension: 768
+  shields:
+  - shield_id: llama-guard
+    provider_id: llama-guard
+    provider_shield_id: openai/gpt-4o-mini
+  vector_stores: []
+  tool_groups:
+  - toolgroup_id: builtin::rag
+    provider_id: rag-runtime
+
+safety:
+  default_shield_id: llama-guard
+vector_stores:
+  default_provider_id: faiss
+  default_embedding_model:
+    provider_id: sentence-transformers
+    model_id: all-mpnet-base-v2
