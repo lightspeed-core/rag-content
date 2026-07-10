@@ -1,0 +1,150 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: test-vm-cmd
+spec:
+  description: Run a command on a multi-platform VM provisioned by the Konflux multi-platform controller.
+  params:
+    - name: PLATFORM
+      description: The platform of the VM to provision
+    - name: image
+      description: The container image to run the test command in on the VM
+    - name: cmd
+      description: The command to run inside the container on the VM
+    - name: envs
+      description: List of environment variables (NAME=VALUE) to pass to the container
+      type: array
+      default: []
+  results:
+    - name: TEST_OUTPUT
+      description: Test result in JSON format (Konflux standard)
+  volumes:
+    - name: workdir
+      emptyDir: {}
+    - name: ssh
+      secret:
+        secretName: multi-platform-ssh-$(context.taskRun.name)
+    - name: openai-api-key
+      secret:
+        secretName: openai-api-key
+  steps:
+    - name: run-in-vm
+      image: registry.access.redhat.com/ubi9/ubi:latest
+      volumeMounts:
+        - mountPath: /var/workdir
+          name: workdir
+        - mountPath: /ssh
+          name: ssh
+        - mountPath: /var/run/openai
+          name: openai-api-key
+      workingDir: /var/workdir
+      env:
+        - name: TEST_IMAGE
+          value: $(params.image)
+        - name: TEST_CMD
+          value: $(params.cmd)
+        - name: RESULTS_TEST_OUTPUT_PATH
+          value: $(results.TEST_OUTPUT.path)
+      args:
+        - $(params.envs[*])
+      script: |
+        #!/bin/bash -ex
+        log() { echo "[$(date -uIns)]" "$@"; }
+
+        write_failure_result() {
+          if [ ! -s "$RESULTS_TEST_OUTPUT_PATH" ]; then
+            echo -n '{"result":"FAILURE","timestamp":"'$(date -u --iso-8601=seconds 2>/dev/null || echo unknown)'","failures":1,"successes":0,"warnings":0}' \
+              > "$RESULTS_TEST_OUTPUT_PATH" 2>/dev/null || true
+          fi
+        }
+        trap write_failure_result EXIT
+
+        log "Reading secrets"
+        if [ -r /var/run/openai/openai-api-key ]; then
+          OPENAI_API_KEY="$(cat /var/run/openai/openai-api-key)"
+          export OPENAI_API_KEY
+        fi
+
+        log "Install packages"
+        dnf -y install openssh-clients rsync jq
+
+        log "Prepare connection"
+        if [ -e "/ssh/error" ]; then
+          log "Error provisioning VM"
+          cat /ssh/error
+          exit 1
+        fi
+        export SSH_HOST=$(cat /ssh/host)
+
+        mkdir -p ~/.ssh
+        if [ "$SSH_HOST" == "localhost" ]; then
+          IS_LOCALHOST=true
+          log "Localhost detected, running in cluster"
+        elif [ -s "/ssh/otp" ]; then
+          log "Fetching OTP token"
+          curl --cacert /ssh/otp-ca -d @/ssh/otp "$(cat /ssh/otp-server)" > ~/.ssh/id_rsa
+          echo >> ~/.ssh/id_rsa
+          chmod 0400 ~/.ssh/id_rsa
+        elif [ -s "/ssh/id_rsa" ]; then
+          log "Copying ssh key"
+          cp /ssh/id_rsa ~/.ssh
+          chmod 0400 ~/.ssh/id_rsa
+        else
+          log "No authentication mechanism found"
+          exit 1
+        fi
+
+        mkdir -p scripts
+
+        # Build podman env flags from params.envs
+        PODMAN_ENV=()
+        while [ $# -ne 0 ]; do
+          PODMAN_ENV+=("-e" "$1")
+          shift
+        done
+        # Add secret as env var (never echoed — not in set -x scope)
+        if [ -n "${OPENAI_API_KEY:-}" ]; then
+          PODMAN_ENV+=("-e" "OPENAI_API_KEY=$OPENAI_API_KEY")
+        fi
+
+        cat > scripts/test.sh <<SCRIPTEOF
+        #!/bin/bash -e
+        podman pull \$TEST_IMAGE
+        TEMP_DIR=\$(mktemp -d -p \$PWD e2e-test.XXXXXX)
+        podman run \\
+          --security-opt label=disable \\
+          -v \$TEMP_DIR:/tmp \\
+          ${PODMAN_ENV[*]} \\
+          -e TEST_CMD \\
+          \$TEST_IMAGE \\
+          bash -c "\$TEST_CMD"
+        SCRIPTEOF
+        chmod +x scripts/test.sh
+
+        EXIT_CODE=0
+        if ! [[ $IS_LOCALHOST ]]; then
+          log "VM exec"
+          export BUILD_DIR=$(cat /ssh/user-dir)
+          export SSH_ARGS="-o StrictHostKeyChecking=no -o ServerAliveInterval=60 -o ServerAliveCountMax=10"
+          ssh $SSH_ARGS "$SSH_HOST" "uname -a"
+          rsync -ra scripts "$SSH_HOST:$BUILD_DIR"
+          ssh $SSH_ARGS "$SSH_HOST" \
+            "TEST_IMAGE='$TEST_IMAGE' TEST_CMD='$TEST_CMD' $BUILD_DIR/scripts/test.sh" \
+            || EXIT_CODE=$?
+          log "End VM exec (exit code: $EXIT_CODE)"
+        else
+          log "Local exec"
+          scripts/test.sh || EXIT_CODE=$?
+          log "End local exec (exit code: $EXIT_CODE)"
+        fi
+
+        if [ "$EXIT_CODE" -eq 0 ]; then
+          RESULT="SUCCESS"
+        else
+          RESULT="FAILURE"
+        fi
+        jq -jnc --arg r "$RESULT" --arg d "$(date -u --iso-8601=seconds)" \
+          '{result: $r, timestamp: $d, failures: (if $r == "SUCCESS" then 0 else 1 end), successes: (if $r == "SUCCESS" then 1 else 0 end), warnings: 0}' \
+          | tee "$RESULTS_TEST_OUTPUT_PATH"
+        echo
+        exit $EXIT_CODE

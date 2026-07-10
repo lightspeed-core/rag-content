@@ -1,0 +1,309 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: rag-content-0-5-integration-tests-pipeline
+spec:
+  description: |
+    Integration test: validates that rag-content CPU image can generate a
+    FAISS vector DB that lightspeed-stack can serve end-to-end.
+    Runs on multiple architectures (x86_64 and arm64) using the Konflux
+    multi-platform controller.
+  params:
+    - name: SNAPSHOT
+      description: 'JSON string with the application snapshot (contains rag-content-cpu-0-5 and lightspeed-stack-0-5 components).'
+      default: '{"components": [{"name":"rag-content-cpu-0-5", "containerImage": "quay.io/example/rag-content-cpu-0-5:latest"}]}'
+      type: string
+    - name: test-name
+      description: 'The name of the test corresponding to a defined Konflux integration test.'
+      default: 'rag-content-0-5-e2e-tests'
+    - name: platforms
+      description: VM platforms on which to run the integration test
+      type: array
+      default:
+        - linux-mlarge/amd64
+        - linux-mlarge/arm64
+  tasks:
+    - name: init-snapshot
+      description: Extract component images, commit, and repo URL from SNAPSHOT
+      params:
+        - name: SNAPSHOT
+          value: $(params.SNAPSHOT)
+      taskSpec:
+        results:
+          - name: cpu-image
+            description: CPU rag-content container image
+            value: "$(steps.extract.results.cpu-image)"
+          - name: lightspeed-stack-image
+            description: lightspeed-stack container image
+            value: "$(steps.extract.results.lightspeed-stack-image)"
+          - name: commit
+            value: "$(steps.extract.results.commit)"
+          - name: repo-url
+            value: "$(steps.extract.results.repo-url)"
+        params:
+          - name: SNAPSHOT
+        steps:
+          - name: extract
+            image: registry.redhat.io/openshift4/ose-cli:latest
+            env:
+              - name: SNAPSHOT
+                value: $(params.SNAPSHOT)
+            results:
+              - name: cpu-image
+                type: string
+              - name: lightspeed-stack-image
+                type: string
+              - name: commit
+                type: string
+              - name: repo-url
+                type: string
+            script: |
+              dnf -y install jq
+              echo -n "$(jq -r '.components[] | select(.name == "rag-content-cpu-0-5") | .containerImage // ""' <<< "$SNAPSHOT")" \
+                > $(step.results.cpu-image.path)
+              echo -n "$(jq -r '.components[] | select(.name == "lightspeed-stack-0-5") | .containerImage // ""' <<< "$SNAPSHOT")" \
+                > $(step.results.lightspeed-stack-image.path)
+              echo -n "$(jq -r '.components[0].source.git.revision // "release/0.5"' <<< "$SNAPSHOT")" \
+                > $(step.results.commit.path)
+              echo -n "$(jq -r '.components[0].source.git.url // "https://github.com/lightspeed-core/rag-content.git"' <<< "$SNAPSHOT")" \
+                > $(step.results.repo-url.path)
+              echo "CPU image:              $(cat $(step.results.cpu-image.path))"
+              echo "lightspeed-stack image: $(cat $(step.results.lightspeed-stack-image.path))"
+              echo "Commit:                 $(cat $(step.results.commit.path))"
+              echo "Repo:                   $(cat $(step.results.repo-url.path))"
+
+    - name: echo-integration-params
+      description: Log test parameters for debugging before matrix fan-out
+      runAfter:
+        - init-snapshot
+      params:
+        - name: cpu-image
+          value: $(tasks.init-snapshot.results.cpu-image)
+        - name: lightspeed-stack-image
+          value: $(tasks.init-snapshot.results.lightspeed-stack-image)
+        - name: commit
+          value: $(tasks.init-snapshot.results.commit)
+        - name: repourl
+          value: $(tasks.init-snapshot.results.repo-url)
+      taskSpec:
+        params:
+          - name: cpu-image
+          - name: lightspeed-stack-image
+          - name: commit
+          - name: repourl
+        steps:
+          - name: echo-params
+            image: registry.access.redhat.com/ubi9/ubi-minimal
+            env:
+              - name: CPU_IMAGE
+                value: $(params.cpu-image)
+              - name: LIGHTSPEED_STACK_IMAGE
+                value: $(params.lightspeed-stack-image)
+              - name: COMMIT
+                value: $(params.commit)
+              - name: REPO_URL
+                value: $(params.repourl)
+            script: |
+              echo "========== Integration test parameters =========="
+              echo "CPU_IMAGE=$CPU_IMAGE"
+              echo "LIGHTSPEED_STACK_IMAGE=$LIGHTSPEED_STACK_IMAGE"
+              echo "COMMIT=$COMMIT"
+              echo "REPO_URL=$REPO_URL"
+              echo "========== End parameters =========="
+
+    - name: run-integration-test
+      description: Run rag-content → lightspeed-stack E2E validation (platforms × CPU image)
+      runAfter:
+        - echo-integration-params
+      matrix:
+        params:
+          - name: PLATFORM
+            value:
+              - $(params.platforms)
+      params:
+        - name: RAG_CONTENT_IMAGE
+          value: $(tasks.init-snapshot.results.cpu-image)
+        - name: cmd
+          value: |
+            cd tests/integration-konflux
+            ./pipeline-konflux.sh
+        - name: envs
+          value:
+            - REPO_URL=$(tasks.init-snapshot.results.repo-url)
+            - REPO_REV=$(tasks.init-snapshot.results.commit)
+            - LIGHTSPEED_STACK_IMAGE=$(tasks.init-snapshot.results.lightspeed-stack-image)
+      taskSpec:
+        params:
+          - name: PLATFORM
+            description: The platform of the VM to provision
+          - name: RAG_CONTENT_IMAGE
+            description: The rag-content container image to test
+          - name: cmd
+            description: The command to run on the VM
+          - name: envs
+            description: List of environment variables (NAME=VALUE)
+            type: array
+            default: []
+        results:
+          - name: TEST_OUTPUT
+            description: Test result in JSON format (Konflux standard)
+        volumes:
+          - name: workdir
+            emptyDir: {}
+          - name: ssh
+            secret:
+              secretName: multi-platform-ssh-$(context.taskRun.name)
+          - name: openai-api-key
+            secret:
+              secretName: openai-api-key
+          - name: huggingface-token
+            secret:
+              secretName: huggingface-token
+        steps:
+          - name: run-in-vm
+            image: registry.access.redhat.com/ubi9/ubi:latest
+            volumeMounts:
+              - mountPath: /var/workdir
+                name: workdir
+              - mountPath: /ssh
+                name: ssh
+              - mountPath: /var/run/openai
+                name: openai-api-key
+              - mountPath: /var/run/huggingface
+                name: huggingface-token
+            workingDir: /var/workdir
+            env:
+              - name: RAG_CONTENT_IMAGE
+                value: $(params.RAG_CONTENT_IMAGE)
+              - name: TEST_CMD
+                value: $(params.cmd)
+              - name: RESULTS_TEST_OUTPUT_PATH
+                value: $(results.TEST_OUTPUT.path)
+            args:
+              - $(params.envs[*])
+            script: |
+              #!/bin/bash -ex
+              log() { echo "[$(date -uIns)]" "$@"; }
+
+              write_failure_result() {
+                if [ ! -s "$RESULTS_TEST_OUTPUT_PATH" ]; then
+                  echo -n '{"result":"FAILURE","timestamp":"'$(date -u --iso-8601=seconds 2>/dev/null || echo unknown)'","failures":1,"successes":0,"warnings":0}' \
+                    > "$RESULTS_TEST_OUTPUT_PATH" 2>/dev/null || true
+                fi
+              }
+              trap write_failure_result EXIT
+
+              set +x
+              if [ -r /var/run/openai/openai-api-key ]; then
+                OPENAI_API_KEY="$(cat /var/run/openai/openai-api-key)"
+                export OPENAI_API_KEY
+                log "OPENAI_API_KEY read (${#OPENAI_API_KEY} chars)"
+              fi
+              if [ -r /var/run/huggingface/hf-token-ces-lcore-test ]; then
+                HF_TOKEN="$(cat /var/run/huggingface/hf-token-ces-lcore-test)"
+                export HF_TOKEN
+                log "HF_TOKEN read (${#HF_TOKEN} chars)"
+              fi
+              set -x
+
+              log "Install packages"
+              dnf -y install openssh-clients rsync jq git
+
+              log "Prepare connection"
+              if [ -e "/ssh/error" ]; then
+                log "Error provisioning VM"
+                cat /ssh/error
+                exit 1
+              fi
+              export SSH_HOST=$(cat /ssh/host)
+
+              mkdir -p ~/.ssh
+              if [ "$SSH_HOST" == "localhost" ]; then
+                IS_LOCALHOST=true
+                log "Localhost detected, running in cluster"
+              elif [ -s "/ssh/otp" ]; then
+                log "Fetching OTP token"
+                curl --cacert /ssh/otp-ca -d @/ssh/otp "$(cat /ssh/otp-server)" > ~/.ssh/id_rsa
+                echo >> ~/.ssh/id_rsa
+                chmod 0400 ~/.ssh/id_rsa
+              elif [ -s "/ssh/id_rsa" ]; then
+                log "Copying ssh key"
+                cp /ssh/id_rsa ~/.ssh
+                chmod 0400 ~/.ssh/id_rsa
+              else
+                log "No authentication mechanism found"
+                exit 1
+              fi
+
+              # Clone repo in Tekton step (VM may not have git)
+              log "Cloning repo"
+              REPO_URL=""
+              REPO_REV=""
+              for arg in "$@"; do
+                case "$arg" in REPO_URL=*) REPO_URL="${arg#*=}";; REPO_REV=*) REPO_REV="${arg#*=}";; esac
+              done
+              git clone -q "${REPO_URL:-https://github.com/lightspeed-core/rag-content.git}" repo
+              (cd repo && git fetch origin "${REPO_REV:-release/0.5}" && git checkout -q "${REPO_REV:-release/0.5}")
+              mkdir -p scripts
+
+              # Build podman env flags (RAG_CONTENT_IMAGE comes from task param, not envs)
+              PODMAN_ENV=("-e" "RAG_CONTENT_IMAGE=$RAG_CONTENT_IMAGE")
+              while [ $# -ne 0 ]; do
+                PODMAN_ENV+=("-e" "$1")
+                shift
+              done
+              set +x
+              if [ -n "${OPENAI_API_KEY:-}" ]; then
+                PODMAN_ENV+=("-e" "OPENAI_API_KEY=$OPENAI_API_KEY")
+              fi
+              if [ -n "${HF_TOKEN:-}" ]; then
+                PODMAN_ENV+=("-e" "HF_TOKEN=$HF_TOKEN")
+              fi
+              set -x
+
+              cat > scripts/test.sh <<SCRIPTEOF
+              #!/bin/bash -e
+              WORK_DIR=\$(mktemp -d -p \$HOME e2e-work.XXXXXX)
+              podman run \\
+                --privileged \\
+                --network=host \\
+                --security-opt label=disable \\
+                --security-opt seccomp=unconfined \\
+                -v \$HOME/rag-content:/rag-content \\
+                -v \$WORK_DIR:/tmp \\
+                -w /rag-content \\
+                -e STORAGE_DRIVER=vfs \\
+                ${PODMAN_ENV[*]} \\
+                registry.access.redhat.com/ubi9/ubi:latest \\
+                bash -c "dnf -y install podman fuse-overlayfs python3 curl-minimal jq && $TEST_CMD"
+              SCRIPTEOF
+              chmod +x scripts/test.sh
+
+              EXIT_CODE=0
+              if ! [[ $IS_LOCALHOST ]]; then
+                log "VM exec"
+                export BUILD_DIR=$(cat /ssh/user-dir)
+                export SSH_ARGS="-o StrictHostKeyChecking=no -o ServerAliveInterval=60 -o ServerAliveCountMax=10"
+                ssh $SSH_ARGS "$SSH_HOST" "uname -a"
+                rsync -ra scripts/ "$SSH_HOST:$BUILD_DIR/scripts/"
+                rsync -ra repo/ "$SSH_HOST:$BUILD_DIR/rag-content/"
+                ssh $SSH_ARGS "$SSH_HOST" "$BUILD_DIR/scripts/test.sh" || EXIT_CODE=$?
+                log "End VM exec (exit code: $EXIT_CODE)"
+              else
+                log "Local exec"
+                ln -sf "$(pwd)/repo" "$HOME/rag-content"
+                scripts/test.sh || EXIT_CODE=$?
+                log "End local exec (exit code: $EXIT_CODE)"
+              fi
+
+              if [ "$EXIT_CODE" -eq 0 ]; then
+                RESULT="SUCCESS"
+              else
+                RESULT="FAILURE"
+              fi
+              jq -jnc --arg r "$RESULT" --arg d "$(date -u --iso-8601=seconds)" \
+                '{result: $r, timestamp: $d, failures: (if $r == "SUCCESS" then 0 else 1 end), successes: (if $r == "SUCCESS" then 1 else 0 end), warnings: 0}' \
+                | tee "$RESULTS_TEST_OUTPUT_PATH"
+              echo
+              exit $EXIT_CODE
