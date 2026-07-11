@@ -71,9 +71,9 @@ spec:
                 > $(step.results.cuda-image.path)
               echo -n "$(jq -r '.components[] | select(.name == "lightspeed-stack-0-7") | .containerImage // ""' <<< "$SNAPSHOT")" \
                 > $(step.results.lightspeed-stack-image.path)
-              echo -n "$(jq -r '.components[0].source.git.revision // "main"' <<< "$SNAPSHOT")" \
+              echo -n "$(jq -r '.components[] | select(.name == "rag-content-cpu-0-7") | .source.git.revision // "main"' <<< "$SNAPSHOT")" \
                 > $(step.results.commit.path)
-              echo -n "$(jq -r '.components[0].source.git.url // "https://github.com/lightspeed-core/rag-content.git"' <<< "$SNAPSHOT")" \
+              echo -n "$(jq -r '.components[] | select(.name == "rag-content-cpu-0-7") | .source.git.url // "https://github.com/lightspeed-core/rag-content.git"' <<< "$SNAPSHOT")" \
                 > $(step.results.repo-url.path)
               echo "CPU image:              $(cat $(step.results.cpu-image.path))"
               echo "CUDA image:             $(cat $(step.results.cuda-image.path))"
