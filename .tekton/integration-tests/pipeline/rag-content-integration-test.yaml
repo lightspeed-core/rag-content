@@ -64,9 +64,9 @@ spec:
                 > $(step.results.cpu-image.path)
               echo -n "$(jq -r '.components[] | select(.name == "lightspeed-stack-0-5") | .containerImage // ""' <<< "$SNAPSHOT")" \
                 > $(step.results.lightspeed-stack-image.path)
-              echo -n "$(jq -r '.components[0].source.git.revision // "release/0.5"' <<< "$SNAPSHOT")" \
+              echo -n "$(jq -r '.components[] | select(.name == "rag-content-cpu-0-5") | .source.git.revision // "release/0.5"' <<< "$SNAPSHOT")" \
                 > $(step.results.commit.path)
-              echo -n "$(jq -r '.components[0].source.git.url // "https://github.com/lightspeed-core/rag-content.git"' <<< "$SNAPSHOT")" \
+              echo -n "$(jq -r '.components[] | select(.name == "rag-content-cpu-0-5") | .source.git.url // "https://github.com/lightspeed-core/rag-content.git"' <<< "$SNAPSHOT")" \
                 > $(step.results.repo-url.path)
               echo "CPU image:              $(cat $(step.results.cpu-image.path))"
               echo "lightspeed-stack image: $(cat $(step.results.lightspeed-stack-image.path))"
