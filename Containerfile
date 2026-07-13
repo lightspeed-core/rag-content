@@ -8,10 +8,8 @@ ARG TARGETARCH
 USER root
 
 # Install Python and build tools.
-RUN ${BUILDER_DNF_COMMAND} -y module enable ruby:3.3 && \
-    ${BUILDER_DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
-    python3.12 python3.12-devel python3.12-pip \
-    rubygems rubygem-bundler && \
+RUN ${BUILDER_DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
+    python3.12 python3.12-devel python3.12-pip && \
     ${BUILDER_DNF_COMMAND} clean all
 
 
@@ -19,16 +17,6 @@ RUN ${BUILDER_DNF_COMMAND} -y module enable ruby:3.3 && \
 RUN pip3.12 install "uv>=0.7.20"
 
 WORKDIR /rag-content
-
-COPY Makefile pyproject.toml uv.lock README.md Gemfile Gemfile.lock .konflux/requirements.hashes.wheel.txt .konflux/requirements.hashes.wheel.pypi.txt .konflux/requirements.hashes.source.txt .konflux/requirements-build.txt ./
-COPY src ./src
-COPY tests ./tests
-COPY scripts ./scripts
-COPY embeddings_model ./embeddings_model
-COPY LICENSE /licenses/LICENSE
-
-# Install Ruby Gems
-RUN BUNDLE_PATH__SYSTEM=true bundle install
 
 # Configure UV environment variables for optimal performance
 # Pytorch backend - cpu. `uv` contains convenient way to specify the backend.
@@ -38,10 +26,9 @@ ENV UV_COMPILE_BYTECODE=0 \
     UV_PYTHON_DOWNLOADS=0 \
     MATURIN_NO_INSTALL_RUST=1
 
-WORKDIR /rag-content
-
 COPY pyproject.toml uv.lock README.md .konflux/requirements.hashes.wheel.txt .konflux/requirements.hashes.wheel.pypi.txt .konflux/requirements.hashes.source.txt .konflux/requirements-build.txt ./
 COPY src ./src
+COPY LICENSE /licenses/LICENSE
 
 RUN if [ -f /cachi2/cachi2.env ]; then \
     . /cachi2/cachi2.env && \
@@ -65,7 +52,7 @@ USER root
 
 RUN ${RUNTIME_DNF_COMMAND} -y module enable ruby:3.3 && \
     ${RUNTIME_DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
-    python3.12 python3.12-pip \
+    python3.12 \
     libpq libxml2 libxslt libjpeg-turbo libtiff freetype libwebp \
     rubygems rubygem-bundler \
     skopeo && \
@@ -77,15 +64,15 @@ WORKDIR /rag-content
 # Copy the built venv from the builder stage.
 COPY --from=builder --chown=1000:1000 /rag-content/.venv .venv
 
-COPY Makefile pyproject.toml uv.lock README.md Gemfile Gemfile.lock ./
+# Install asciidoctor gem (for .adoc preprocessing)
+COPY Gemfile Gemfile.lock ./
+RUN if [ -f /cachi2/cachi2.env ]; then . /cachi2/cachi2.env; fi && \
+    BUNDLE_PATH__SYSTEM=true bundle install
+
 COPY src ./src
-COPY tests ./tests
-COPY scripts ./scripts
+COPY scripts/generate_embeddings.py scripts/download_embeddings_model.py ./scripts/
 COPY embeddings_model ./embeddings_model
 COPY LICENSE /licenses/LICENSE
-
-# Install Ruby Gems
-RUN BUNDLE_PATH__SYSTEM=true bundle install
 
 ENV PATH="/rag-content/.venv/bin:$PATH" \
     PYTHONPATH="/rag-content/src"
@@ -116,7 +103,7 @@ ENTRYPOINT []
 LABEL vendor="Red Hat, Inc." \
     name="lightspeed-core/rag-tool-cpu-rhel9" \
     com.redhat.component="lightspeed-core/rag-tool-cpu-rhel9" \
-    cpe="cpe:/a:redhat:lightspeed_core:0.6::el9" \
+    cpe="cpe:/a:redhat:lightspeed_core:0.7::el9" \
     io.k8s.display-name="Lightspeed RAG Tool (CPU)" \
     summary="RAG tool (CPU) containing embedding model and dependencies needed to generate a vector database." \
     description="RAG Tool (CPU) provides a shared codebase for generating vector databases. It serves as the core framework for Lightspeed-related projects (e.g., OpenShift Lightspeed, OpenStack Lightspeed, etc.) to generate their own vector databases that can be used for RAG." \
