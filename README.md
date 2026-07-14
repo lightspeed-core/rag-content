@@ -459,19 +459,22 @@ conversation_cache:
 authentication:
   module: "noop"
 
-byok_rag:
-  - rag_id: custom-docs-0_1
-    rag_type: inline::faiss
-    embedding_model: sentence-transformers/all-mpnet-base-v2
-    embedding_dimension: 768
-    vector_db_id: <generated-vector-store-id>
-    db_path: /home/<user>/rag-content/vector_db/custom_docs/0.1/faiss_store.db
-
 rag:
-  # inline:
-  #   - custom-docs-0_1
-  tool:
-    - custom-docs-0_1
+  byok:
+    stores:
+      - rag_id: custom-docs-0_1
+        backend: faiss
+        embedding_model: sentence-transformers/all-mpnet-base-v2
+        embedding_dimension: 768
+        vector_db_id: <generated-vector-store-id>
+        db_path: /home/<user>/rag-content/vector_db/custom_docs/0.1/faiss_store.db
+  retrieval:
+    # inline:
+    #   sources:
+    #     - custom-docs-0_1
+    tool:
+      sources:
+        - custom-docs-0_1
 ```
 
 Once we have a database we can use script `query_rag.py` to check some results:
