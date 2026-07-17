@@ -160,37 +160,43 @@ authentication:
 """
 
 LCS_FAISS_BYOK_TEMPLATE = """\
-byok_rag:
-  - rag_id: {index_id}
-    rag_type: inline::faiss
-    embedding_model: {model_name}
-    embedding_dimension: {dimension}
-    vector_db_id: {vector_store_id}
-    db_path: ${{env.RAG_DB_PATH:={db_path}}}
-
 rag:
-  # inline:
-  #   - {index_id}
-  tool:
-    - {index_id}
+  byok:
+    stores:
+      - rag_id: {index_id}
+        backend: faiss
+        embedding_model: {model_name}
+        embedding_dimension: {dimension}
+        vector_db_id: {vector_store_id}
+        db_path: ${{env.RAG_DB_PATH:={db_path}}}
+  retrieval:
+    # inline:
+    #   sources:
+    #     - {index_id}
+    tool:
+      sources:
+        - {index_id}
 """
 
 LCS_PGVECTOR_BYOK_TEMPLATE = """\
-byok_rag:
-  - rag_id: {index_id}
-    rag_type: remote::pgvector
-    embedding_model: {model_name}
-    embedding_dimension: {dimension}
-    vector_db_id: {vector_store_id}
-    host: ${{env.POSTGRES_HOST}}
-    port: ${{env.POSTGRES_PORT}}
-    db: ${{env.POSTGRES_DATABASE}}
-    user: ${{env.POSTGRES_USER}}
-    password: ${{env.POSTGRES_PASSWORD}}
-
 rag:
-  # inline:
-  #   - {index_id}
-  tool:
-    - {index_id}
+  byok:
+    stores:
+      - rag_id: {index_id}
+        backend: pgvector
+        embedding_model: {model_name}
+        embedding_dimension: {dimension}
+        vector_db_id: {vector_store_id}
+        host: ${{env.POSTGRES_HOST}}
+        port: ${{env.POSTGRES_PORT}}
+        db: ${{env.POSTGRES_DATABASE}}
+        user: ${{env.POSTGRES_USER}}
+        password: ${{env.POSTGRES_PASSWORD}}
+  retrieval:
+    # inline:
+    #   sources:
+    #     - {index_id}
+    tool:
+      sources:
+        - {index_id}
 """

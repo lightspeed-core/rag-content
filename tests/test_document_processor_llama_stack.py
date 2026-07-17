@@ -227,15 +227,17 @@ class TestDocumentProcessorLlamaStack:
         assert "service:" in data
         assert "llama_stack:" in data
         assert "authentication:" in data
-        assert "byok_rag:" in data
-        assert "rag_type: inline::faiss" in data
+        assert "byok:" in data
+        assert "stores:" in data
+        assert "backend: faiss" in data
         assert "rag_id: my-index" in data
         assert "vector_db_id: vs_abc123" in data
         assert "${env.RAG_DB_PATH:=/data/faiss_store.db}" in data
         assert "embedding_dimension: 768" in data
         assert f"embedding_model: {llama_stack_processor['model_name']}" in data
-        assert "rag:" in data
+        assert "retrieval:" in data
         assert "tool:" in data
+        assert "sources:" in data
         assert "- my-index" in data
 
     def test_write_lcs_config_pgvector(self, mocker, llama_stack_processor):
@@ -253,11 +255,12 @@ class TestDocumentProcessorLlamaStack:
         assert "service:" in data
         assert "llama_stack:" in data
         assert "authentication:" in data
-        assert "byok_rag:" in data
-        assert "rag_type: remote::pgvector" in data
+        assert "byok:" in data
+        assert "stores:" in data
+        assert "backend: pgvector" in data
         assert "rag_id: pg-index" in data
         assert "vector_db_id: vs_pg123" in data
-        byok_section = data[data.index("byok_rag:") :]
+        byok_section = data[data.index("byok:") :]
         assert "db_path" not in byok_section
         assert f"embedding_model: {llama_stack_processor['model_name']}" in data
         assert "${env.POSTGRES_HOST}" in data
@@ -265,8 +268,9 @@ class TestDocumentProcessorLlamaStack:
         assert "${env.POSTGRES_DATABASE}" in data
         assert "${env.POSTGRES_USER}" in data
         assert "${env.POSTGRES_PASSWORD}" in data
-        assert "rag:" in data
+        assert "retrieval:" in data
         assert "tool:" in data
+        assert "sources:" in data
         assert "- pg-index" in data
 
     def test_run_llama_stack(self, mocker, llama_stack_processor):
