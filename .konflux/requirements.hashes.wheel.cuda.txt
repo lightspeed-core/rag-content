@@ -220,9 +220,9 @@ pandas==2.3.3 \
     --hash=sha256:b7aa3271f1ced1b50bc9f3b414bc2750a126c5891f18f7f1b1b8c72e832d1f39
 pgvector==0.4.2 \
     --hash=sha256:f78d70c250360c3cff597bf6c731a510bfb33aae1c03fb2cced31497513d2c2f
-pillow==12.2.0 \
-    --hash=sha256:46f1841dee2614c20788a6593ef1f0ae2d992df6544650dd942b2c09fe6a11f9 \
-    --hash=sha256:557d6766d56d4ba182dd70bb0f1b889ec90e5f5849cd7397a73d4c7ab7f5b326
+pillow==12.3.0 \
+    --hash=sha256:4eeda898c5e2606f04eb743e6e9804ababb27c8f4fb2f36931e8de573a644e7b \
+    --hash=sha256:9c559c19c83f1d522637df78adefd7906c628879a3bf0e4ffa3d6ec96404f2b1
 platformdirs==4.9.6 \
     --hash=sha256:6b85999c61d3bae6fca4ab03332a0731c3f17a4ecfb6e0d689786daedd1f43b9
 polyfactory==3.3.0 \
