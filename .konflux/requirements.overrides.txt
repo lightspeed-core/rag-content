@@ -2,3 +2,6 @@
 # https://packages.redhat.com/api/pypi/public-rhai/rhoai/3.4/cpu-ubi9/simple
 packaging<26
 python-frontmatter<1.3
+# huggingface-hub 1.19.0 requires hf-xet>=1.5.1 which is not on the RHOAI wheel index for x86_64/aarch64
+# hf-xet 1.4.3 is the latest on RHOAI with full arch coverage; huggingface-hub 1.13.0 is compatible with it
+huggingface-hub<1.19.0
