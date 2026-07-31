@@ -116,7 +116,7 @@ class _BaseDB:
 
 class _LlamaIndexDB(_BaseDB):
     def __init__(self, config: _Config):
-        vector_store: None | BasePydanticVectorStore = None
+        vector_store: BasePydanticVectorStore | None = None
 
         assert config.vector_store_type in ("faiss", "postgres")  # noqa: S101
         super().__init__(config)
