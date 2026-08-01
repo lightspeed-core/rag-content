@@ -2,6 +2,7 @@ packages:
   [
     ruby,
     ruby-libs,
+    ruby-default-gems,
     rubygems,
     rubygem-bundler,
     rubygem-io-console,
@@ -22,6 +23,12 @@ packages:
   ]
 moduleEnable:
   - "ruby:3.3"
+upgradePackages:
+  [
+    openexr-libs,
+    libxslt,
+    libtiff,
+  ]
 contentOrigin:
   repofiles: ["./redhat.repo"]
 arches: [x86_64, aarch64]
