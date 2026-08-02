@@ -292,7 +292,7 @@ spec:
                 -e STORAGE_DRIVER=vfs \\
                 ${PODMAN_ENV[*]} \\
                 registry.access.redhat.com/ubi9/ubi:latest \\
-                bash -c "dnf -y install podman fuse-overlayfs python3 curl-minimal jq && $TEST_CMD"
+                bash -c "dnf -y install podman fuse-overlayfs python3 curl-minimal jq diffutils && $TEST_CMD"
               SCRIPTEOF
               chmod +x scripts/test.sh
 
@@ -467,7 +467,7 @@ spec:
                 nvidia-ctk cdi list || true
               fi
               # Install any missing deps (best effort)
-              sudo dnf -y install python3 curl-minimal jq 2>/dev/null || true
+              sudo dnf -y install python3 curl-minimal jq diffutils 2>/dev/null || true
               cd $HOME/rag-content
               SCRIPTEOF
               # Inject env vars

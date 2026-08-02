@@ -21,6 +21,7 @@ LIGHTSPEED_STACK_IMAGE="${LIGHTSPEED_STACK_IMAGE:-quay.io/lightspeed-core/lights
 
 RAG_OUTPUT_DIR=$(mktemp -d /tmp/rag-integration-output.XXXXXX)
 MODEL_DIR=$(mktemp -d /tmp/rag-integration-model.XXXXXX)
+ADOC_OUTPUT_DIR=$(mktemp -d /tmp/rag-adoc-test.XXXXXX)
 
 progress() { echo "[rag-e2e] $*"; }
 
@@ -28,7 +29,7 @@ cleanup() {
   progress "Cleaning up..."
   podman stop lightspeed-stack-e2e 2>/dev/null || true
   podman rm lightspeed-stack-e2e 2>/dev/null || true
-  podman unshare rm -rf "$RAG_OUTPUT_DIR" "$MODEL_DIR" 2>/dev/null || rm -rf "$RAG_OUTPUT_DIR" "$MODEL_DIR" 2>/dev/null || true
+  podman unshare rm -rf "$RAG_OUTPUT_DIR" "$MODEL_DIR" "$ADOC_OUTPUT_DIR" 2>/dev/null || rm -rf "$RAG_OUTPUT_DIR" "$MODEL_DIR" "$ADOC_OUTPUT_DIR" 2>/dev/null || true
 }
 trap cleanup EXIT
 
@@ -51,9 +52,28 @@ if [ "${GPU_ENABLED:-}" = "true" ]; then
 fi
 
 #========================================
-# Phase 1: Generate FAISS DB
+# Phase 1/7: AsciiDoc → Markdown conversion
 #========================================
-progress "Phase 1/6: Generating FAISS vector DB from test corpus..."
+progress "Phase 1/7: Testing AsciiDoc → Markdown conversion..."
+ADOC_TEST_DIR="$REPO_ROOT/tests/asciidoc"
+podman run --rm --network=host "${GPU_FLAGS[@]}" \
+  -v "$ADOC_TEST_DIR":/test-data:ro \
+  -v "$ADOC_OUTPUT_DIR":/output:U \
+  "$RAG_CONTENT_IMAGE" \
+  python -m lightspeed_rag_content.asciidoc convert \
+    -i /test-data/fixture.adoc \
+    -o /output/converted.md
+if diff -u "$ADOC_TEST_DIR/fixture.md" "$ADOC_OUTPUT_DIR/converted.md"; then
+  progress "AsciiDoc conversion test passed"
+else
+  progress "FAILURE: AsciiDoc conversion output differs from reference"
+  exit 1
+fi
+
+#========================================
+# Phase 2/7: Generate FAISS DB
+#========================================
+progress "Phase 2/7: Generating FAISS vector DB from test corpus..."
 chmod 777 "$RAG_OUTPUT_DIR"
 podman run --rm --network=host "${GPU_FLAGS[@]}" \
   -v "$CORPUS_DIR":/input:ro \
@@ -69,9 +89,9 @@ progress "DB generation complete. Output files:"
 ls -la "$RAG_OUTPUT_DIR"
 
 #========================================
-# Phase 2: Copy embedding model
+# Phase 3/7: Copy embedding model
 #========================================
-progress "Phase 2/6: Copying embedding model from rag-content image..."
+progress "Phase 3/7: Copying embedding model from rag-content image..."
 chmod 777 "$MODEL_DIR"
 podman run --rm --network=host "${GPU_FLAGS[@]}" \
   -v "$MODEL_DIR":/out \
@@ -83,9 +103,9 @@ progress "Embedding model copied. Files:"
 ls -la "$MODEL_DIR"
 
 #========================================
-# Phase 3: Augment generated LCS config
+# Phase 4/7: Augment generated LCS config
 #========================================
-progress "Phase 3/6: Augmenting generated lightspeed-stack.yaml with inference config..."
+progress "Phase 4/7: Augmenting generated lightspeed-stack.yaml with inference config..."
 LCS_CONFIG="$RAG_OUTPUT_DIR/lightspeed-stack.yaml"
 
 cat >> "$LCS_CONFIG" <<'AUGMENT'
@@ -98,9 +118,9 @@ progress "Augmented config:"
 cat "$LCS_CONFIG"
 
 #========================================
-# Phase 4: Start lightspeed-stack
+# Phase 5/7: Start lightspeed-stack
 #========================================
-progress "Phase 4/6: Starting lightspeed-stack (library mode)..."
+progress "Phase 5/7: Starting lightspeed-stack (library mode)..."
 chmod -R a+r "$CONFIG_DIR"
 podman run -d --name lightspeed-stack-e2e \
   --network=host \
@@ -116,9 +136,9 @@ podman run -d --name lightspeed-stack-e2e \
   "$LIGHTSPEED_STACK_IMAGE"
 
 #========================================
-# Phase 5: Wait for healthy
+# Phase 6/7: Wait for healthy
 #========================================
-progress "Phase 5/6: Waiting for lightspeed-stack to become healthy..."
+progress "Phase 6/7: Waiting for lightspeed-stack to become healthy..."
 for i in $(seq 1 60); do
   if ! podman ps --format '{{.Names}}' | grep -q lightspeed-stack-e2e; then
     progress "ERROR: Container exited unexpectedly"
@@ -141,9 +161,9 @@ for i in $(seq 1 60); do
 done
 
 #========================================
-# Phase 6: Query and assert
+# Phase 7/7: Query and assert
 #========================================
-progress "Phase 6/6: Sending query and validating RAG response..."
+progress "Phase 7/7: Sending query and validating RAG response..."
 progress "Lightspeed-stack logs before query:"
 podman logs lightspeed-stack-e2e 2>&1 | tail -30
 QUERY_START=$(date +%s)
