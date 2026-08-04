@@ -164,7 +164,7 @@ markupsafe==3.0.3 \
 marshmallow==3.26.2 \
     --hash=sha256:15e2f420e0a2acf8eaa6cc1db8521fd859a8474072ae1cb2cf3aa7743b137fe3
 mcp==1.28.1 \
-    --hash=sha256:22047b1f1ce414cd2dc71f08b00e271db2caa0d8ef0b02672467de7d39ccab66
+    --hash=sha256:2726bca5e7193f61c5dde8b12500a6de2d9acf6d1a1c0be9e8c2e706437991df
 mdurl==0.1.2 \
     --hash=sha256:994896ac435f16a670f35fe10069d820810983ddda3f7f7e70b56acae859e2de
 mpire==2.10.2 \
