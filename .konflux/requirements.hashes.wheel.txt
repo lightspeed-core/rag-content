@@ -322,8 +322,8 @@ pylatexenc==2.10 \
     --hash=sha256:48bb2faca66253dd9a59d640189bb5bdb94ff923e844a844f04e06246d8bf3c5
 pyopenssl==26.2.0 \
     --hash=sha256:61a6c16147a7d1fe5bc678a5bfe4e94dd86cd2a2cbceb9dce744df27badcd3ff
-pypdf==6.13.3 \
-    --hash=sha256:f2a7b2d4b660907903290c21e1ef0c206f4e87f684970bf07b6ffc0cd6b394a2
+pypdf==6.14.2 \
+    --hash=sha256:7b032878a14da8bf538651ccf25ae76684ffc0edeec2342b3647a63db94a6829
 pypdfium2==5.9.0 \
     --hash=sha256:a39834088bb267208d681b281d0376d9b6ec4ad4dcce60559fe5e675be21cef1
 python-dateutil==2.9.0.post0 \
