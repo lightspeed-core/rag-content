@@ -26,10 +26,50 @@ spec:
   - name: build-platforms
     value:
     - linux/x86_64
+    - linux-d160-m2xlarge/arm64
   - name: dockerfile
-    value: Containerfile.cuda-12.9
+    value: Containerfile-cuda
   - name: path-context
     value: .
+  - name: build-source-image
+    value: 'true'
+  - name: prefetch-input
+    value: |
+      [
+         {
+           "type": "generic",
+           "path": ".konflux",
+           "lockfile": "artifacts.lock.yaml"
+         },
+         {
+           "type": "rpm",
+           "path": ".konflux/cuda"
+         },
+         {
+           "type": "pip",
+           "path": ".konflux",
+           "requirements_files": [
+            "requirements.hashes.wheel.cuda.txt",
+            "requirements.hashes.wheel.pypi.cuda.txt",
+            "requirements.hashes.source.cuda.txt",
+            "requirements.hermetic.txt"
+           ],
+           "requirements_build_files": ["requirements-build.cuda.txt"],
+           "binary": {
+             "packages": "accelerate,aiohappyeyeballs,aiohttp,aiosignal,aiosqlite,annotated-doc,annotated-types,antlr4-python3-runtime,anyio,asyncpg,attrs,banks,beautifulsoup4,certifi,cffi,chardet,charset-normalizer,click,colorama,colorlog,cryptography,dataclasses-json,defusedxml,deprecated,dill,dirtyjson,distro,docling,docling-core,docling-ibm-models,docling-parse,docling-slim,einops,et-xmlfile,faiss-cpu,faker,fastapi,filelock,filetype,fire,frozenlist,fsspec,googleapis-common-protos,greenlet,griffe,griffecli,griffelib,h11,hf-xet,httpcore,httpx,httpx-sse,huggingface-hub,idna,importlib-metadata,jinja2,jiter,joblib,jsonlines,jsonref,jsonschema,jsonschema-specifications,latex2mathml,llama-index,llama-index-core,llama-index-embeddings-openai,llama-index-instrumentation,llama-index-llms-openai,llama-index-readers-file,llama-index-workflows,lxml,markdown-it-py,marko,markupsafe,marshmallow,mcp,mdurl,mpire,mpmath,multidict,multiprocess,mypy-extensions,nest-asyncio,networkx,nltk,numpy,omegaconf,openai,opencv-python,openpyxl,opentelemetry-api,opentelemetry-exporter-otlp-proto-common,opentelemetry-exporter-otlp-proto-http,opentelemetry-instrumentation,opentelemetry-proto,opentelemetry-sdk,opentelemetry-semantic-conventions,oracledb,pandas,pgvector,pillow,platformdirs,polyfactory,prompt-toolkit,propcache,protobuf,psutil,pyaml,pyclipper,pycparser,pydantic,pydantic-core,pydantic-settings,pygments,pyjwt,pylatexenc,pypdf,pypdfium2,python-dateutil,python-docx,python-dotenv,python-multipart,python-pptx,pytz,pyyaml,rapidocr,referencing,regex,requests,rich,rpds-py,rtree,safetensors,scikit-learn,scipy,semchunk,sentence-transformers,shapely,shellingham,six,sniffio,soupsieve,sqlalchemy,sse-starlette,starlette,striprtf,sympy,tabulate,tenacity,termcolor,threadpoolctl,tiktoken,tinytag,tokenizers,tomlkit,torch,torchvision,tornado,tqdm,transformers,tree-sitter,tree-sitter-c,tree-sitter-javascript,tree-sitter-python,tree-sitter-typescript,triton,typer,typing-extensions,typing-inspect,typing-inspection,tzdata,urllib3,uvicorn,wcwidth,websockets,wrapt,xlsxwriter,yarl,zipp",
+             "os": "linux",
+             "arch": "x86_64,aarch64",
+             "py_version": 312
+           }
+         },
+         {
+           "type": "bundler"
+         }
+       ]
+  - name: hermetic
+    value: 'true'
+  - name: build-args-file
+    value: .konflux/cuda/build-args-konflux.conf
   pipelineSpec:
     description: |
       This pipeline is ideal for building multi-arch container images from a Containerfile while maintaining trust after pipeline customization.
@@ -156,7 +196,7 @@ spec:
         - name: name
           value: init
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-init:0.4.2@sha256:421003a5c077ecb820460e71637125ec9093d2101c749a32ede28e190283e9db
+          value: quay.io/konflux-ci/tekton-catalog/task-init:0.4.3@sha256:b8465d543589b1238f6911626657f5766e279a0f33a5f70de68073401e031184
         - name: kind
           value: task
         resolver: bundles
@@ -177,7 +217,7 @@ spec:
         - name: name
           value: git-clone-oci-ta
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-git-clone-oci-ta:0.2.4@sha256:df3c42d78223f07b40a84dd29e5c8860d14777ffdf150ea08c738770f51216dc
+          value: quay.io/konflux-ci/tekton-catalog/task-git-clone-oci-ta:0.2.5@sha256:510daad5648d37936b9b2c599a35c8e59b7389de8e1a4e58f6c6d079957d730d
         - name: kind
           value: task
         resolver: bundles
@@ -203,7 +243,7 @@ spec:
         - name: name
           value: prefetch-dependencies-oci-ta
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies-oci-ta:0.3.2@sha256:389aea03a065e8118d36b7acb85b05cd13f6750e7e10ff8a85f270ee65b0167b
+          value: quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies-oci-ta:0.6.0@sha256:01158b939522c276ba36804c2cc7ef641a572fb6c27f001819ea287dd708cd13
         - name: kind
           value: task
         resolver: bundles
@@ -267,7 +307,7 @@ spec:
         - name: name
           value: buildah-remote-oci-ta
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-buildah-remote-oci-ta:0.10.5@sha256:eb277ec7b44443f0506a60ac940a2e52178d60f17cb0f51a6966daed5b3755de
+          value: quay.io/konflux-ci/tekton-catalog/task-buildah-remote-oci-ta:0.10.7@sha256:94f129a97242995d647b1d23a5d53e7022e0c3dc00aff764a4da4be263263cbf
         - name: kind
           value: task
         resolver: bundles
@@ -289,7 +329,7 @@ spec:
         - name: name
           value: build-image-index
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-build-image-index:0.3.1@sha256:cc75f64deecccb1b59e96ac1182665a5342d79c9e22eebff63d26b0f00a4319c
+          value: quay.io/konflux-ci/tekton-catalog/task-build-image-index:0.3.1@sha256:a355355b7fcd0ba8de4ba85a162a2e6893f53236b943f79cb03ae0ae9c5ef53c
         - name: kind
           value: task
         resolver: bundles
@@ -310,7 +350,7 @@ spec:
         - name: name
           value: source-build-oci-ta
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-source-build-oci-ta:0.3@sha256:7c5575ac8e292f27f57716c021ab0324460dc958e73946724c588c5228e5f372
+          value: quay.io/konflux-ci/tekton-catalog/task-source-build-oci-ta:0.3@sha256:6081c4167e87a9167f7db4cda9ff0110607b7b9fc404c3daa076247475a4affa
         - name: kind
           value: task
         resolver: bundles
@@ -359,7 +399,7 @@ spec:
         - name: name
           value: clair-scan
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-clair-scan:0.3@sha256:f5b4415db9ac1fba3e11d993a617e0b275d1f0ed2fc669b12c400ed848c39174
+          value: quay.io/konflux-ci/tekton-catalog/task-clair-scan:0.3.2@sha256:f5b4415db9ac1fba3e11d993a617e0b275d1f0ed2fc669b12c400ed848c39174
         - name: kind
           value: task
         resolver: bundles
@@ -384,7 +424,7 @@ spec:
         - name: name
           value: ecosystem-cert-preflight-checks
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-ecosystem-cert-preflight-checks:0.2@sha256:e438f3104d706f73812994953d3d0a9c62ac8e4a372d86337ff26bbca9902709
+          value: quay.io/konflux-ci/tekton-catalog/task-ecosystem-cert-preflight-checks:0.2@sha256:27c9760ad11c74ad010d9615ee15348e3674843166acb7686929b3ef6840416c
         - name: kind
           value: task
         resolver: bundles
@@ -439,7 +479,7 @@ spec:
         - name: name
           value: clamav-scan
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-clamav-scan:0.3@sha256:53a02326bfb930ca5ef6bfa7a33acca833d57752f34f3cb79255fe2e25e7d217
+          value: quay.io/konflux-ci/tekton-catalog/task-clamav-scan:0.3.1@sha256:53a02326bfb930ca5ef6bfa7a33acca833d57752f34f3cb79255fe2e25e7d217
         - name: kind
           value: task
         resolver: bundles
@@ -517,7 +557,7 @@ spec:
         - name: name
           value: apply-tags
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-apply-tags:0.3@sha256:3ab844157eccd68e95e4852adc06c3c4ea674edb7865a474b0a898227f2893d6
+          value: quay.io/konflux-ci/tekton-catalog/task-apply-tags:0.3@sha256:6387614ae4f9efa8abb7c4175db0ce5d958bc2b90665b4704880e46fbe0535bf
         - name: kind
           value: task
         resolver: bundles
@@ -540,7 +580,7 @@ spec:
         - name: name
           value: push-dockerfile-oci-ta
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-push-dockerfile-oci-ta:0.3.1@sha256:5a6cbebd89e5bc163b38231859767f7f6a0dd66cf1333699574379f062731183
+          value: quay.io/konflux-ci/tekton-catalog/task-push-dockerfile-oci-ta:0.3.1@sha256:5393bada94051f02aa971ff773b130928e01ac595b9ce3bbbd69899751ed8222
         - name: kind
           value: task
         resolver: bundles
@@ -557,7 +597,7 @@ spec:
         - name: name
           value: rpms-signature-scan
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-rpms-signature-scan:0.2@sha256:ccb77d1bf7627fc6241a59ed42bb6e5707a8682754fe8ae18f2cfdddbcf29275
+          value: quay.io/konflux-ci/tekton-catalog/task-rpms-signature-scan:0.2.1@sha256:ccb77d1bf7627fc6241a59ed42bb6e5707a8682754fe8ae18f2cfdddbcf29275
         - name: kind
           value: task
         resolver: bundles
@@ -577,4 +617,7 @@ spec:
   - name: git-auth
     secret:
       secretName: '{{ git_auth_secret }}'
+  timeouts:
+    pipeline: 4h0m0s
+    tasks: 4h0m0s
 status: {}
