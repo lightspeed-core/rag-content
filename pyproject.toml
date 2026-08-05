@@ -79,6 +79,7 @@ dependencies = [
     "Pillow>=12.3.0",          # CVE-2026-59205: heap corruption in ImageCms.ImageCmsTransform.apply
     "nltk>=3.10.0",            # CVE-2026-54293: URL-encoded path traversal in nltk.data.load()
     "pypdf>=6.14.2",           # CVE-2026-59935/59936/59937/59938: infinite loops, memory exhaustion
+    "mcp>=1.28.1",             # CVE-2026-52869/52870/59950: HTTP session hijack, task access, WebSocket origin bypass
 ]
 requires-python = "==3.12.*"
 dynamic = ["license", "readme"]
