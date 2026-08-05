@@ -5,21 +5,17 @@ bootstrap_packages = []
 force_sdist_packages = ["setuptools", "packaging", "pluggy"]
 
 [profiles.cpu]
-rhoai_index_url = "https://packages.redhat.com/api/pypi/public-rhai/rhoai/3.4/cpu-ubi9/simple/"
+rhoai_index_url = "https://packages.redhat.com/api/pypi/public-rhai/rhoai/3.5/cpu-ubi9/simple/"
 output_suffix = ""
 tekton_files = [
-    ".tekton/rag-tool-pull-request.yaml",
-    ".tekton/rag-tool-push.yaml",
-    ".tekton/rag-content-cpu-0-6-pull-request.yaml",
-    ".tekton/rag-content-cpu-0-6-push.yaml",
+    ".tekton/rag-content-cpu-0-7-pull-request.yaml",
+    ".tekton/rag-content-cpu-0-7-push.yaml",
 ]
 
 [profiles.cuda]
-rhoai_index_url = "https://packages.redhat.com/api/pypi/public-rhai/rhoai/3.4/cuda12.9-ubi9/simple/"
+rhoai_index_url = "https://packages.redhat.com/api/pypi/public-rhai/rhoai/3.5/cuda12.9-ubi9/simple/"
 output_suffix = ".cuda"
 tekton_files = [
-    ".tekton/rag-tool-cuda-pull-request.yaml",
-    ".tekton/rag-tool-cuda-push.yaml",
-    ".tekton/rag-content-cuda-12-9-0-6-pull-request.yaml",
-    ".tekton/rag-content-cuda-12-9-0-6-push.yaml",
+    ".tekton/rag-content-cuda-12-9-0-7-pull-request.yaml",
+    ".tekton/rag-content-cuda-12-9-0-7-push.yaml",
 ]

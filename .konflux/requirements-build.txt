@@ -7,35 +7,58 @@
 calver==2025.10.20
     # via trove-classifiers
 flit-core==3.12.0
+    # via wheel
+flit-core==4.0.2
     # via
     #   packaging
     #   pathspec
+hatch-fancy-pypi-readme==25.1.0
+    # via llama-stack-client
+hatch-vcs==0.5.0
+    # via chardet
+hatchling==1.26.3
+    # via
+    #   hatch-fancy-pypi-readme
+    #   llama-stack-client
 hatchling==1.31.0
     # via
-    #   llama-index-embeddings-huggingface
-    #   llama-index-vector-stores-faiss
+    #   chardet
+    #   hatch-fancy-pypi-readme
+    #   hatch-vcs
+    #   llama-index-readers-file
     #   llama-index-vector-stores-postgres
-    #   opentelemetry-distro
 packaging==25.0
     # via
     #   hatchling
     #   setuptools-scm
     #   vcs-versioning
+    #   wheel
 pathspec==1.1.1
     # via hatchling
 pluggy==1.6.0
     # via hatchling
 setuptools-scm==10.2.1
-    # via pluggy
+    # via
+    #   hatch-vcs
+    #   llama-stack
+    #   llama-stack-api
+    #   pluggy
 trove-classifiers==2026.6.1.19
     # via hatchling
 vcs-versioning==2.2.2
     # via setuptools-scm
+wheel==0.47.0
+    # via oci
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==80.10.2
+setuptools==78.1.1
+    # via oci
+setuptools==81.0.0
     # via
     #   calver
+    #   crc32c
+    #   llama-stack
+    #   llama-stack-api
     #   pathspec
     #   pluggy
     #   setuptools-scm
