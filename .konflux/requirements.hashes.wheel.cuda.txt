@@ -187,6 +187,8 @@ nltk==3.10.0 \
 numpy==2.5.1 \
     --hash=sha256:91df8060a66b2672ada98ab4609b933458e47b4757c78cf3b2b6f485b6a567ce \
     --hash=sha256:f7b61597601b75f83c274484e1e72fe50e89ca757dec0fcc21296d3fd910ccfa
+ogx-client==1.0.2 \
+    --hash=sha256:c5c871a6e661fdb5dcfe5b8bd36d647ccb9a42e7430319b487185bb9cd5994a8
 omegaconf==2.3.1 \
     --hash=sha256:8aa022fb6f20b30f0ff89b12349d6adfebc0d7243bec9521acea1e331637c117
 openai==2.45.0 \
@@ -212,9 +214,6 @@ opentelemetry-sdk==1.44.0 \
     --hash=sha256:45c849de5f19f11356d65ee580c09078bec0cacc17d2a56f920c41786b3efee3
 opentelemetry-semantic-conventions==0.65b0 \
     --hash=sha256:02e3436b8794f42f08e847aa5c1aeee89a894f5e244a5d1d6dd03a42be2512bd
-oracledb==4.0.2 \
-    --hash=sha256:b48c2787a5fde85c40ee476104bb05078dd96427a7c83fa0728fae8518ab60d1 \
-    --hash=sha256:d0084d3c839354aefdf4293c3d8024799b1056d34bb8b4d6755611bdb3e21473
 pandas==2.3.3 \
     --hash=sha256:066f811cfa07d227f0f077bbc553afd9967ca20b78845b4636e807d22d8df8b9 \
     --hash=sha256:8e50fb020191deb5f2d233f5d5a9ff53a8f78f028f3141aca335bfde69da3281 \
@@ -262,8 +261,6 @@ pyjwt==2.13.0 \
     --hash=sha256:7d3c3a93fafbedeb9d516ef84350e1a02936cd6ccce8f8bf32bff629dcbc589b
 pylatexenc==2.10 \
     --hash=sha256:0853ee1974dd93f446bf1c4ef0adccba94f0261fb6cfc07e9305393e460f191b
-pyopenssl==26.3.0 \
-    --hash=sha256:3cb4b6bddfc2d7f412a71d88b85d1e12b1a16afb26217cbd3765e7cfdd8a8b61
 pypdf==6.14.2 \
     --hash=sha256:cad68396602e9143e6b608a15e8df0d9d74431566ffcfac335af73cd8e303a41
 pypdfium2==5.11.0 \
@@ -331,6 +328,8 @@ sse-starlette==3.4.5 \
     --hash=sha256:f47d0f4dd4d7d6321debab558fcfafed7ab5a63b1226063fe355592b7cf424c0
 starlette==1.3.1 \
     --hash=sha256:7d4399ec172a46fbb1f51dd0639c7033d0f8fa45cca7bdb9ee3ac36ec7bf4512
+structlog==26.1.0 \
+    --hash=sha256:fda3283d16c03f24c327a877b01357bb534a6c042dab14a39f59fce1250648f2
 sympy==1.14.0 \
     --hash=sha256:3497887acc64abcff0c1358e98fda5d95d82d9c2b803011d9a5f4c4c338d3a70
 tabulate==0.10.0 \
@@ -363,9 +362,6 @@ torchvision==0.26.0 \
     --hash=sha256:754ec43e70d638734c7a1c017dea77c708325a47fef7a76c495cc247ae027548 \
     --hash=sha256:c2495716a755c935fff79647a8eb417d038d4dee58dddf0f2a306cc268f5cb86 \
     --hash=sha256:e4de29063cc7476d870502b088c1f8f4158114d30ee41e5923a76e10595edc93
-tornado==6.5.7 \
-    --hash=sha256:2b900747823e275d118db485ab296f9e56326e3a989dcd08224ccbd5cbcb3777 \
-    --hash=sha256:c0776f64700aed3651384e1e45acb5f9304f0507141ee4d2c4d3c6b8fe9dcea9
 tqdm==4.68.4 \
     --hash=sha256:a349b8bdf8293ae4cbc3bf0685e360d4e6730e991a900ea234a279d9c719e67e
 transformers==5.14.1 \
@@ -417,3 +413,6 @@ yarl==1.24.2 \
     --hash=sha256:88c7af860ac250a92159d6a68548df7b3dc1c79fcb4f28acec86d5244275dda7 \
     --hash=sha256:9d283787b9a922c6ce3b062e522bb40a2c0fdc97e585dae9822de7995500bdd4 \
     --hash=sha256:b79196d4a52c3274212a8cde31690ce9f3619dc4afac6d4f60edbfbec420b8b0
+zstandard==0.25.0 \
+    --hash=sha256:181aaccd3ea519128e4251dd9674fb6838b6b4a997ee8eee98a936961298fd6d \
+    --hash=sha256:f4d98bb472645175e334ada5bd6f839def46c7a72f0c226791bf9b5aad218379
