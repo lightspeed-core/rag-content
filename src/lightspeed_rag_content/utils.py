@@ -128,7 +128,7 @@ def get_common_arg_parser() -> argparse.ArgumentParser:
         action="store_false",
         default=True,
         dest="manual_chunking",
-        help="How to do the chunking for llama-stack, manually like in "
+        help="How to do the chunking for OGX, manually like in "
         "llama-index or automatically using the RAG runtime tool.",
     )
     parser.add_argument(

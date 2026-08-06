@@ -13,11 +13,11 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-"""Configuration templates for llama-stack and Lightspeed Core Stack output."""
+"""Configuration templates for OGX and Lightspeed Core Stack output."""
 
-# llama-stack configuration templates
+# OGX configuration templates
 
-LLAMA_STACK_TEMPLATE = """version: 2
+OGX_TEMPLATE = """version: 2
 image_name: starter
 
 apis:
@@ -103,17 +103,17 @@ registered_resources:
     provider_id: rag-runtime
 """
 
-LLAMA_STACK_VECTOR_STORES_TEMPLATE = """vector_stores:
+OGX_VECTOR_STORES_TEMPLATE = """vector_stores:
   - embedding_dimension: {dimension}
     embedding_model: sentence-transformers/{model_name_or_dir}
     provider_id: {vector_io_provider_id}
     vector_store_id: {vector_store_id}"""
 
-LLAMA_STACK_VECTOR_IO_CONFIG_SQLITE = """persistence:
+OGX_VECTOR_IO_CONFIG_SQLITE = """persistence:
         namespace: vector_io::{provider_type}
         backend: kv_rag"""
 
-LLAMA_STACK_VECTOR_IO_CONFIG_PGVECTOR = """persistence:
+OGX_VECTOR_IO_CONFIG_PGVECTOR = """persistence:
         namespace: vector_io::{provider_type}
         backend: kv_default
       host: ${{env.POSTGRES_HOST}}
@@ -122,7 +122,7 @@ LLAMA_STACK_VECTOR_IO_CONFIG_PGVECTOR = """persistence:
       user: ${{env.POSTGRES_USER}}
       password: ${{env.POSTGRES_PASSWORD}}"""
 
-LLAMA_STACK_CFG_FILENAME = "llama-stack.yaml"
+OGX_CFG_FILENAME = "llama-stack.yaml"
 
 # Lightspeed Core Stack configuration templates
 
@@ -141,8 +141,8 @@ service:
 llama_stack:
   use_as_library_client: true
   library_client_config_path: {llama_stack_config_path}
-  # api_key: custom-key  # Uncomment if your llama-stack requires authentication
-  # To use a remote llama-stack service instead of library mode, set:
+  # api_key: custom-key  # Uncomment if your OGX instance requires authentication
+  # To use a remote OGX service instead of library mode, set:
   # use_as_library_client: false
   # url: http://localhost:8321
 user_data_collection:
