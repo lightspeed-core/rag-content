@@ -21,10 +21,8 @@ OGX_TEMPLATE = """version: 2
 image_name: starter
 
 apis:
-- agents
 - files
 - inference
-- safety
 - tool_runtime
 - vector_io
 
@@ -44,17 +42,6 @@ providers:
       storage_dir: /tmp/files
     provider_id: meta-reference-files
     provider_type: inline::localfs
-  agents:
-  - config:
-      persistence:
-        agent_state:
-          namespace: agents_state
-          backend: kv_default
-        responses:
-          table_name: agents_responses
-          backend: sql_default
-    provider_id: meta-reference
-    provider_type: inline::meta-reference
   tool_runtime:
   - config: {{}}
     provider_id: rag-runtime
