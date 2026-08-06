@@ -6,7 +6,7 @@
 
 **Architecture:** Tekton Pipeline with 2×2 matrix fan-out across platforms and images. The `init-snapshot` task extracts separate `cpu-image` and `cuda-image` from the SNAPSHOT JSON. The multi-platform controller provisions VMs for each arch. The task spec is inlined in the pipeline YAML — it SSHs into each VM, clones the repo in the Tekton step, rsyncs to the VM, then runs `pipeline-konflux.sh` inside a privileged container (`--privileged --network=host --security-opt label=disable --security-opt seccomp=unconfined -e STORAGE_DRIVER=vfs`). The script uses Podman to run the built rag-content image (DB generation) and `quay.io/lightspeed-core/lightspeed-stack:dev-latest` (library mode, serving), then queries and asserts RAG context from a synthetic corpus. `test-vm-cmd.yaml` exists as a standalone reference but is not used by the pipeline.
 
-**Tech Stack:** Tekton/Konflux pipelines, Konflux multi-platform controller, Podman, Bash, lightspeed-stack (library mode), OpenAI API, FAISS/llama-stack
+**Tech Stack:** Tekton/Konflux pipelines, Konflux multi-platform controller, Podman, Bash, lightspeed-stack (library mode), OpenAI API, FAISS/OGX
 
 **Spec:** `docs/superpowers/specs/2026-06-02-konflux-integration-test-design.md`
 
@@ -21,7 +21,7 @@
 | `.tekton/integration-tests/tasks/test-vm-cmd.yaml` | Standalone reference Tekton Task (not used by pipeline — task spec is inlined) |
 | `tests/integration-konflux/pipeline-konflux.sh` | Main orchestration — DB generation, serving, query, assertion, teardown |
 | `tests/integration-konflux/config/lightspeed-stack.yaml` | Lightspeed-stack config — library mode, byok_rag, noop auth |
-| `tests/integration-konflux/config/run.yaml` | Llama-stack config — OpenAI, sentence-transformers, safety, agents, RAG |
+| `tests/integration-konflux/config/run.yaml` | OGX config — OpenAI, sentence-transformers, safety, agents, RAG |
 | `tests/integration-konflux/corpus/manual.md` | Synthetic test corpus — fictional product manual with YAML frontmatter |
 
 ---
@@ -44,7 +44,7 @@ Library mode config adapted from `lightspeed-stack/docker-compose-library.yaml`:
 - `byok_rag` with `db_path` pointing to the standard llama storage path
 - `authentication: noop`
 
-### Task 3: Create the llama-stack run.yaml
+### Task 3: Create the OGX run.yaml
 
 **Files:** `tests/integration-konflux/config/run.yaml`
 
@@ -67,7 +67,7 @@ required by the `/v1/query` endpoint:
 - `--network=host` on all `podman run` calls for reliable localhost access
 - No `:Z` SELinux labels on volume mounts (removed for nested podman compatibility)
 - DB mounted at `/opt/app-root/src/.llama/storage/rag` (standard llama path from docker-compose)
-- DB volume read-write (llama-stack writes during vector store registration)
+- DB volume read-write (OGX writes during vector store registration)
 - Health check at `/liveness` (not `/v1/liveness` or `/v1/models`)
 - `curl --max-time 120` for the query request
 - Query captures HTTP code separately to avoid `set -e` abort
@@ -105,7 +105,7 @@ Issues found and fixed during testing:
 - Directory permissions for non-root container users
 - Config mount paths (`/app-root/` workdir, relative `run.yaml` path)
 - Required `user_data_collection` field
-- DB volume must be read-write for llama-stack registration
+- DB volume must be read-write for OGX registration
 - `--network=host` needed for rootless podman
 - Health check endpoint is `/liveness`
 - Query response capture without `set -e` abort

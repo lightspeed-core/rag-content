@@ -113,7 +113,7 @@ registered_resources:
 
 
 @pytest.fixture
-def llama_stack_processor(mocker):
+def ogx_processor(mocker):
     """Fixture for _LlamaStackDB tests."""
     mocker.patch.object(document_processor, "HuggingFaceEmbedding", new=RagMockEmbedding)
     st = mocker.patch.object(document_processor, "SentenceTransformer")
@@ -148,34 +148,34 @@ def llama_stack_processor(mocker):
     return {"config": config, "model_name": model_name}
 
 
-class TestDocumentProcessorLlamaStack:
+class TestDocumentProcessorOGX:
     """Test cases for the _LlamaStackDB document processor class."""
 
-    def test_init(self, mocker, llama_stack_processor):
+    def test_init(self, mocker, ogx_processor):
         """Test basic initialization of _LlamaStackDB with default settings."""
         temp_dir = mocker.patch.object(document_processor.tempfile, "TemporaryDirectory")
         temp_dir.return_value.name = "temp_dir"
-        doc = document_processor._LlamaStackDB(llama_stack_processor["config"])
+        doc = document_processor._LlamaStackDB(ogx_processor["config"])
 
-        assert doc.config == llama_stack_processor["config"]
-        assert doc.model_name_or_dir == llama_stack_processor["model_name"]
+        assert doc.config == ogx_processor["config"]
+        assert doc.model_name_or_dir == ogx_processor["model_name"]
         assert doc.config.embedding_dimension == 768
         assert doc.db_filename == "faiss_store.db"
         assert doc.document_class.__name__ == "RAGDocument"
-        assert doc.client_class.__name__ == "AsyncLlamaStackAsLibraryClient"
+        assert doc.client_class.__name__ == "AsyncOGXAsLibraryClient"
         assert doc.documents == []
         temp_dir.assert_called_once_with(prefix="ls-rag-")
         assert doc.tmp_dir is temp_dir.return_value
         assert os.environ["LLAMA_STACK_CONFIG_DIR"] == temp_dir.return_value.name
 
-    def test_init_model_path(self, mocker, llama_stack_processor):
+    def test_init_model_path(self, mocker, ogx_processor):
         """Test initialization when embeddings_model_dir exists as a local path."""
         temp_dir = mocker.patch.object(document_processor.tempfile, "TemporaryDirectory")
         temp_dir.return_value.name = "temp_dir"
         exists_mock = mocker.patch("os.path.exists", return_value=True)
         realpath_mock = mocker.patch("os.path.realpath")
 
-        config = llama_stack_processor["config"]
+        config = ogx_processor["config"]
         config.embeddings_model_dir = "embeddings_model"
         doc = document_processor._LlamaStackDB(config)
 
@@ -186,16 +186,16 @@ class TestDocumentProcessorLlamaStack:
         assert doc.config.embedding_dimension == 768
         assert doc.db_filename == "faiss_store.db"
         assert doc.document_class.__name__ == "RAGDocument"
-        assert doc.client_class.__name__ == "AsyncLlamaStackAsLibraryClient"
+        assert doc.client_class.__name__ == "AsyncOGXAsLibraryClient"
         assert doc.documents == []
         temp_dir.assert_called_once_with(prefix="ls-rag-")
         assert doc.tmp_dir is temp_dir.return_value
         assert os.environ["LLAMA_STACK_CONFIG_DIR"] == temp_dir.return_value.name
 
-    def test_write_yaml_config_faiss(self, mocker, llama_stack_processor):
+    def test_write_yaml_config_faiss(self, mocker, ogx_processor):
         """Test YAML configuration generation for FAISS vector store backend."""
         mock_open = mocker.patch("builtins.open", new_callable=mocker.mock_open)
-        doc = document_processor._LlamaStackDB(llama_stack_processor["config"])
+        doc = document_processor._LlamaStackDB(ogx_processor["config"])
 
         index_id = "my_index_id"
         yaml_file = "yaml_file"
@@ -210,14 +210,14 @@ class TestDocumentProcessorLlamaStack:
             index_id=index_id,
             kv_db_path=db_file,
             dimension=768,
-            model_name=llama_stack_processor["model_name"],
-            model_name_or_dir=llama_stack_processor["model_name"],
+            model_name=ogx_processor["model_name"],
+            model_name_or_dir=ogx_processor["model_name"],
         )
 
-    def test_write_lcs_config_faiss(self, mocker, llama_stack_processor):
+    def test_write_lcs_config_faiss(self, mocker, ogx_processor):
         """Test lightspeed-stack.yaml generation for FAISS backend."""
         mock_open = mocker.patch("builtins.open", new_callable=mocker.mock_open)
-        doc = document_processor._LlamaStackDB(llama_stack_processor["config"])
+        doc = document_processor._LlamaStackDB(ogx_processor["config"])
 
         doc.write_lcs_config("my-index", "lcs.yaml", "vs_abc123", "/data/faiss_store.db")
 
@@ -233,15 +233,15 @@ class TestDocumentProcessorLlamaStack:
         assert "vector_db_id: vs_abc123" in data
         assert "${env.RAG_DB_PATH:=/data/faiss_store.db}" in data
         assert "embedding_dimension: 768" in data
-        assert f"embedding_model: {llama_stack_processor['model_name']}" in data
+        assert f"embedding_model: {ogx_processor['model_name']}" in data
         assert "rag:" in data
         assert "tool:" in data
         assert "- my-index" in data
 
-    def test_write_lcs_config_pgvector(self, mocker, llama_stack_processor):
+    def test_write_lcs_config_pgvector(self, mocker, ogx_processor):
         """Test lightspeed-stack.yaml generation for pgvector backend."""
         mock_open = mocker.patch("builtins.open", new_callable=mocker.mock_open)
-        config = llama_stack_processor["config"]
+        config = ogx_processor["config"]
         config.vector_store_type = "llamastack-pgvector"
         doc = document_processor._LlamaStackDB(config)
 
@@ -259,7 +259,7 @@ class TestDocumentProcessorLlamaStack:
         assert "vector_db_id: vs_pg123" in data
         byok_section = data[data.index("byok_rag:") :]
         assert "db_path" not in byok_section
-        assert f"embedding_model: {llama_stack_processor['model_name']}" in data
+        assert f"embedding_model: {ogx_processor['model_name']}" in data
         assert "${env.POSTGRES_HOST}" in data
         assert "${env.POSTGRES_PORT}" in data
         assert "${env.POSTGRES_DATABASE}" in data
@@ -269,13 +269,13 @@ class TestDocumentProcessorLlamaStack:
         assert "tool:" in data
         assert "- pg-index" in data
 
-    def test_run_llama_stack(self, mocker, llama_stack_processor):
-        """Test running with llama-stack client lifecycle management."""
+    def test_run_ogx(self, mocker, ogx_processor):
+        """Test running with OGX client lifecycle management."""
         import asyncio
 
         temp_dir = mocker.patch.object(document_processor.tempfile, "TemporaryDirectory")
         temp_dir.return_value.name = "tempdir"
-        doc = document_processor._LlamaStackDB(llama_stack_processor["config"])
+        doc = document_processor._LlamaStackDB(ogx_processor["config"])
         yaml_file = "yaml_file"
 
         # Mock the client class to support async context manager
@@ -289,7 +289,7 @@ class TestDocumentProcessorLlamaStack:
             doc, "_insert_prechunked_documents", new=AsyncMock(return_value="vs_123")
         )
 
-        res = asyncio.run(doc._run_llama_stack(yaml_file, "test-index"))
+        res = asyncio.run(doc._run_ogx(yaml_file, "test-index"))
         assert res == "vs_123"
         client_mock.assert_called_once_with(yaml_file)
         client_mock.return_value.__aenter__.assert_awaited_once()
@@ -299,9 +299,9 @@ class TestDocumentProcessorLlamaStack:
         temp_dir.assert_called_once_with(prefix="ls-rag-")
         assert os.environ["LLAMA_STACK_CONFIG_DIR"] == temp_dir.return_value.name
 
-    def test_add_docs_manual_chunking(self, mocker, llama_stack_processor):
+    def test_add_docs_manual_chunking(self, mocker, ogx_processor):
         """Test adding documents with manual chunking enabled."""
-        doc = document_processor._LlamaStackDB(llama_stack_processor["config"])
+        doc = document_processor._LlamaStackDB(ogx_processor["config"])
         nodes = [
             mocker.Mock(
                 spec=TextNode,
@@ -350,9 +350,9 @@ class TestDocumentProcessorLlamaStack:
         ]
         assert doc.documents == expect
 
-    def test_add_docs_auto_chunking(self, mocker, llama_stack_processor):
+    def test_add_docs_auto_chunking(self, mocker, ogx_processor):
         """Test adding documents with automatic chunking enabled."""
-        config = llama_stack_processor["config"]
+        config = ogx_processor["config"]
         config.manual_chunking = False
         doc = document_processor._LlamaStackDB(config)
 
@@ -508,9 +508,9 @@ class TestDocumentProcessorLlamaStack:
 
         return client_instance
 
-    def test_save_manual_chunking(self, mocker, llama_stack_processor):
+    def test_save_manual_chunking(self, mocker, ogx_processor):
         """Test saving documents with manual chunking workflow."""
-        client = self._test_save(mocker, llama_stack_processor["config"])
+        client = self._test_save(mocker, ogx_processor["config"])
         # Verify vector_io.insert was called once with the right vector_store_id
         # Documents are modified during processing, so we just check it was called
         assert client.vector_io.insert.await_count == 1
@@ -525,9 +525,9 @@ class TestDocumentProcessorLlamaStack:
             assert "title" in chunk["metadata"]
             assert "docs_url" in chunk["metadata"]
 
-    def test_save_auto_chunking(self, mocker, llama_stack_processor):
+    def test_save_auto_chunking(self, mocker, ogx_processor):
         """Test saving documents with automatic chunking workflow."""
-        config = llama_stack_processor["config"]
+        config = ogx_processor["config"]
         config.manual_chunking = False
         client = self._test_save(mocker, config)
         # Verify files.create was called for each document (single file upload)

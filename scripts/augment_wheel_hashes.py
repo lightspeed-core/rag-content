@@ -54,11 +54,9 @@ def load_pypi_release(name: str, version: str) -> dict[str, Any] | None:
     """
     norm = name.replace("_", "-").lower()
     url = f"https://pypi.org/pypi/{norm}/{version}/json"
-    req = urllib.request.Request(  # noqa: S310
-        url, headers={"User-Agent": "augment-wheel-hashes (konflux)"}
-    )
+    req = urllib.request.Request(url, headers={"User-Agent": "augment-wheel-hashes (konflux)"})
     try:
-        with urllib.request.urlopen(req, timeout=120) as r:  # noqa: S310
+        with urllib.request.urlopen(req, timeout=120) as r:
             return cast("dict[str, Any]", json.load(r))
     except urllib.error.HTTPError as e:
         if e.code == 404:

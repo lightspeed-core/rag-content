@@ -301,28 +301,28 @@ class _LlamaIndexDB(_BaseDB):
 
 
 class _LlamaStackDB(_BaseDB):
-    # Lllama-stack faiss vector-db uses IndexFlatL2 (it's hardcoded for now)
-    TEMPLATE = config_templates.LLAMA_STACK_TEMPLATE
-    VECTOR_STORES_TEMPLATE = config_templates.LLAMA_STACK_VECTOR_STORES_TEMPLATE
-    VECTOR_IO_CONFIG_TEMPLATE_FOR_SQLITE = config_templates.LLAMA_STACK_VECTOR_IO_CONFIG_SQLITE
-    VECTOR_IO_CONFIG_TEMPLATE_FOR_PGVECTOR = config_templates.LLAMA_STACK_VECTOR_IO_CONFIG_PGVECTOR
-    CFG_FILENAME = config_templates.LLAMA_STACK_CFG_FILENAME
+    # OGX faiss vector-db uses IndexFlatL2 (it's hardcoded for now)
+    TEMPLATE = config_templates.OGX_TEMPLATE
+    VECTOR_STORES_TEMPLATE = config_templates.OGX_VECTOR_STORES_TEMPLATE
+    VECTOR_IO_CONFIG_TEMPLATE_FOR_SQLITE = config_templates.OGX_VECTOR_IO_CONFIG_SQLITE
+    VECTOR_IO_CONFIG_TEMPLATE_FOR_PGVECTOR = config_templates.OGX_VECTOR_IO_CONFIG_PGVECTOR
+    CFG_FILENAME = config_templates.OGX_CFG_FILENAME
     LCS_CFG_FILENAME = config_templates.LCS_CFG_FILENAME
     LCS_BASE_TEMPLATE = config_templates.LCS_BASE_TEMPLATE
     LCS_FAISS_BYOK_TEMPLATE = config_templates.LCS_FAISS_BYOK_TEMPLATE
     LCS_PGVECTOR_BYOK_TEMPLATE = config_templates.LCS_PGVECTOR_BYOK_TEMPLATE
 
     def __init__(self, config: _Config):
-        """Initialize the llama-stack Vector IO database.
+        """Initialize the OGX Vector IO database.
 
-        We have 2 options, we either create a llama-stack configuration file or
+        We have 2 options, we either create an OGX configuration file or
         we start it with a template and then make a series of calls to create
         the providers: model, inference, vector_io.
 
         We have chosen to create a configuration file which we can then leave
         together with the database for reference.
 
-        Llama-stack is used as a library and this class supports 2 llama-stack
+        OGX is used as a library and this class supports 2 OGX
         Vector IO providers: faiss and pgvector.
 
         Faiss seems to create much larger database files, to the point of
@@ -360,23 +360,23 @@ class _LlamaStackDB(_BaseDB):
         # faiss_store.db
         self.db_filename = config.vector_store_type[11:] + "_store.db"
 
-        # We need to set env var before importing llama_stack
-        # Create temp directory for the llama-stack configuration file and the DB
+        # We need to set env var before importing ogx
+        # Create temp directory for the OGX configuration file and the DB
         self.tmp_dir = tempfile.TemporaryDirectory(prefix="ls-rag-")  # pylint: disable=R1732
-        # Force a default directory to prevent llama-stack from using hosts's
+        # Force a default directory to prevent OGX from using hosts's
         # ~/.llama content
         os.environ["LLAMA_STACK_CONFIG_DIR"] = self.tmp_dir.name
 
         # TODO: This part may need to be changed to support multiple usages
         # Not using importlib to help with typechecking
-        import llama_stack_api  # pylint: disable=C0415
-        from llama_stack.core.library_client import (  # pylint: disable=C0415
-            AsyncLlamaStackAsLibraryClient,
+        import ogx_api  # pylint: disable=C0415
+        from ogx.core.library_client import (  # pylint: disable=C0415
+            AsyncOGXAsLibraryClient,
         )
 
-        self.document_class = llama_stack_api.rag_tool.RAGDocument
-        self.client_class = AsyncLlamaStackAsLibraryClient
-        self.documents: list[dict[str, Any] | llama_stack_api.rag_tool.RAGDocument] = []
+        self.document_class = ogx_api.rag_tool.RAGDocument
+        self.client_class = AsyncOGXAsLibraryClient
+        self.documents: list[dict[str, Any] | ogx_api.rag_tool.RAGDocument] = []
 
     @property
     def provider_type(self) -> str:
@@ -386,7 +386,7 @@ class _LlamaStackDB(_BaseDB):
     def write_yaml_config(
         self, index_id: str, filename: str, db_file: str, files_metadata_db_file: str
     ) -> None:
-        """Write a llama-stack configuration file using class templates."""
+        """Write an OGX configuration file using class templates."""
         if self.config.vector_store_type == "llamastack-pgvector":
             provider_type_prefix = "remote"
             required_vars = [
@@ -422,8 +422,8 @@ class _LlamaStackDB(_BaseDB):
             )
             fd.write(data)
 
-    async def _run_llama_stack(self, cfg_file: str, index: str) -> str:
-        """Run vector store operations with llama-stack client.
+    async def _run_ogx(self, cfg_file: str, index: str) -> str:
+        """Run vector store operations with OGX client.
 
         Call the proper method depending on --auto-chunking flag.
         Uses async context manager for automatic initialization and shutdown.
@@ -440,7 +440,7 @@ class _LlamaStackDB(_BaseDB):
         """Add documents to the list of documents to save."""
         if self.config.manual_chunking:
             for node in self._split_and_filter(docs):
-                # Add document_id to node's metadata because llama-stack needs it
+                # Add document_id to node's metadata because OGX needs it
                 node.metadata["document_id"] = node.ref_doc_id
                 chunk_metadata = {
                     "document_id": node.ref_doc_id,
@@ -473,7 +473,7 @@ class _LlamaStackDB(_BaseDB):
     ) -> str:
         """Manual chunking: Insert pre-chunked documents into the vector store.
 
-        This method uses two new llama-stack APIs (OpenAI compatible):
+        This method uses two new OGX APIs (OpenAI compatible):
         1. vector_stores API: Creates a new vector store
         2. files API: Creates empty placeholder files for citation metadata
            (provides document ID, URL, and title for citations)
@@ -577,7 +577,7 @@ class _LlamaStackDB(_BaseDB):
         """Auto chunking: Upload and process files one at a time.
 
         Called when --auto-chunking flag enabled.
-        File batch processing in llama-stack applies the attributes dict to all files.
+        File batch processing in OGX applies the attributes dict to all files.
         We use single file upload until batch upload allows giving attributes per file.
 
         Returns:
@@ -751,7 +751,7 @@ class _LlamaStackDB(_BaseDB):
         # There's no need to register the DB because the YAML includes it
         self.write_yaml_config(index, cfg_file, db_file, files_metadata_db_file)
         try:
-            vector_store_id = asyncio.run(self._run_llama_stack(cfg_file, index))
+            vector_store_id = asyncio.run(self._run_ogx(cfg_file, index))
             self._update_yaml_config(cfg_file, index, vector_store_id)
         except Exception as exc:
             LOG.error("Failed to insert document: %s", exc)

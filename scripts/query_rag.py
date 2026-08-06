@@ -127,11 +127,11 @@ def _llama_index_query(args: argparse.Namespace) -> None:  # noqa: C901
 
 
 def _get_db_path_dict(vector_type: str, config: dict[str, Any]) -> dict[str, Any]:
-    """Return the dict where db_path key is from our llama-stack config."""
+    """Return the dict where db_path key is from our OGX config."""
     try:
         provider_config: dict[str, Any] = config["providers"]["vector_io"][0]["config"]
 
-        # New llama-stack 0.3.x format
+        # New OGX 0.3.x format
         if "persistence" in provider_config:
             backend_name = provider_config["persistence"]["backend"]
             result: dict[str, Any] = config["storage"]["backends"][backend_name]
@@ -156,7 +156,7 @@ def _get_chunk_text(chunk: Any) -> str:
     return str(chunk)
 
 
-def _llama_stack_query(args: argparse.Namespace) -> None:  # noqa: C901
+def _ogx_query(args: argparse.Namespace) -> None:  # noqa: C901
     tmp_dir = tempfile.TemporaryDirectory(prefix="ls-rag-")
     os.environ["LLAMA_STACK_CONFIG_DIR"] = tmp_dir.name
 
@@ -183,8 +183,8 @@ def _llama_stack_query(args: argparse.Namespace) -> None:  # noqa: C901
     cfg_file = os.path.join(tmp_dir.name, "llama-stack.yaml")
     yaml.safe_dump(cfg, open(cfg_file, "w", encoding="utf-8"))
 
-    lib_client = importlib.import_module("llama_stack.core.library_client")
-    with lib_client.LlamaStackAsLibraryClient(cfg_file) as client:
+    lib_client = importlib.import_module("ogx.core.library_client")
+    with lib_client.OGXAsLibraryClient(cfg_file) as client:
         query_cfg = {
             "max_chunks": args.top_k,
             "mode": "vector",  # "vector", "keyword", or "hybrid". Default "vector"
@@ -318,4 +318,4 @@ if __name__ == "__main__":
     if args.vector_store_type == "faiss":
         _llama_index_query(args)
     else:
-        _llama_stack_query(args)
+        _ogx_query(args)

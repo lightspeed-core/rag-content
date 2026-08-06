@@ -89,13 +89,13 @@ You can generate the vector database either using
 
 1. [Llama-Index Faiss Vector Store](#faiss-vector-store)
 2. [Llama-Index Postgres (PGVector) Vector Store](#postgres-pgvector-vector-store)
-3. [Llama-Stack Faiss Vector-IO](#llama-stack-faiss)
-4. [Llama-Stack Postgres (PGVector) Vector Store](#llama-stack-postgres-pgvector-vector-store)
+3. [OGX Faiss Vector-IO](#ogx-faiss)
+4. [OGX Postgres (PGVector) Vector Store](#ogx-postgres-pgvector-vector-store)
 
 Each section below shows commands for both **local (uv)** and **container image (podman)** workflows. The container image already includes the default embedding model and all dependencies — no local Python setup required.
 
 Llama-Index approaches require you to download the embedding model, and we also
-recommend it for Llama-Stack targets even though it should work even without
+recommend it for OGX targets even though it should work even without
 manually downloading the model, model-download.
 
 All cases require you to prepare documentation in text format that is going to
@@ -361,16 +361,16 @@ commands:
     (1 row)
     ```
 
-### Llama-Stack Vector Stores
+### OGX Vector Stores
 
 #### Important: Embedding Model Path Portability
 
-When using Llama-Stack vector stores (Faiss or Pgvector), the embedding model path
+When using OGX vector stores (Faiss or Pgvector), the embedding model path
 specified via the `-md` (or `--model-dir`) parameter is written into the generated
 `llama-stack.yaml` configuration file as an absolute path. This path is also registered
-in the llama-stack kv_store database.
+in the OGX kv_store database.
 
-When llama-stack later consumes the vector database, it reads the embedding model
+When OGX later consumes the vector database, it reads the embedding model
 location from the kv_store. Therefore, **the embedding model must be available at the
 exact same path** that was specified during database creation.
 
@@ -380,14 +380,14 @@ exact same path** that was specified during database creation.
 - Alternatively, set `-md ''` (empty string) and use only the `-mn` flag with a
   HuggingFace model ID (e.g., `-md "" -mn sentence-transformers/all-mpnet-base-v2`).
   Setting `-md` to empty forces the tool to use the HuggingFace model ID instead of
-  checking for a local directory. This allows llama-stack to download the model from
+  checking for a local directory. This allows OGX to download the model from
   HuggingFace automatically, making the vector database fully portable without path
   dependencies.
 
-### Llama-Stack Faiss
+### OGX Faiss
 
 > [!IMPORTANT]
-> When using the `--auto-chunking` flag, chunking happens within llama-stack using the
+> When using the `--auto-chunking` flag, chunking happens within OGX using the
 > OpenAI-compatible Files API. This makes vector stores significantly larger than manual
 > chunking because the Files API stores a redundant copy of the embeddings. 
 > Manual chunking results in smaller database files.
@@ -485,9 +485,9 @@ uv run python scripts/query_rag.py \
   -q "how can I configure a cinder backend"
 ```
 
-### Llama-Stack Postgres (PGVector) Vector Store
+### OGX Postgres (PGVector) Vector Store
 
-To generate a vector database stored in Postgres (PGVector) for Llama-Stack, run the following
+To generate a vector database stored in Postgres (PGVector) for OGX, run the following
 commands:
 
 1. Start Postgres with the pgvector extension by running:
@@ -497,7 +497,7 @@ commands:
     ```
 
     The `data` folder of Postgres is created at `./postgresql/data`. Note that this command
-    also creates `./output`, which is not used for the Llama-Stack version while it is used for Llama-Index version.
+    also creates `./output`, which is not used for the OGX version while it is used for Llama-Index version.
 
 2. Run:
 
