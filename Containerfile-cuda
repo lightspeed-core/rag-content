@@ -123,7 +123,7 @@ ENTRYPOINT []
 LABEL vendor="Red Hat, Inc." \
     name="lightspeed-core/rag-tool-cuda-12.9-rhel9" \
     com.redhat.component="lightspeed-core/rag-tool-cuda-12.9" \
-    cpe="cpe:/a:redhat:lightspeed_core:0.6::el9" \
+    cpe="cpe:/a:redhat:lightspeed_core:0.7::el9" \
     io.k8s.display-name="Lightspeed RAG Tool (CUDA 12.9)" \
     summary="RAG tool (CUDA 12.9) containing embedding model and dependencies needed to generate a vector database." \
     description="RAG Tool (CUDA 12.9) provides a shared codebase for generating vector databases with CUDA support. It serves as the core framework for Lightspeed-related projects to generate their own vector databases that can be used for RAG." \
