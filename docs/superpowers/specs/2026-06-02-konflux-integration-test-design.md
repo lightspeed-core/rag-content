@@ -24,7 +24,7 @@ CPU (`rag-tool`) and CUDA (`rag-tool-cuda`) image variants.
 |----------|--------|-----------|
 | Infrastructure | Multi-platform VMs via Konflux multi-platform controller; privileged container on VM (`--privileged --network=host --security-opt label=disable --security-opt seccomp=unconfined -e STORAGE_DRIVER=vfs`) | Native multi-arch testing on x86_64 and arm64; nested podman requires privilege escalation |
 | Pipeline pattern | Tekton matrix fan-out (2 platforms × 2 images = 4 runs) → VM SSH → shell script | Mirrors ramalama's multi-arch integration test pattern; locally reproducible |
-| Lightspeed-stack deployment | Library mode (embedded llama-stack) via Podman on VM | Single container; no separate llama-stack service |
+| Lightspeed-stack deployment | Library mode (embedded OGX) via Podman on VM | Single container; no separate OGX service |
 | Lightspeed-stack image | `quay.io/lightspeed-core/lightspeed-stack:dev-latest` | Tracks latest dev build; no manual version bumps |
 | LLM provider | OpenAI (gpt-4o-mini) via Konflux secret | Same pattern as lightspeed-stack E2E |
 | Test corpus | Synthetic fictional product manual with YAML frontmatter | Unique terms impossible in LLM training data; valid URL for lightspeed-stack citations |
@@ -214,7 +214,7 @@ podman run -d --name lightspeed-stack-e2e \
 Key details:
 - `--network=host` for reliable localhost access
 - DB mounted at `/opt/app-root/src/.llama/storage/rag` (standard llama path)
-- DB volume is read-write (llama-stack writes during vector store registration)
+- DB volume is read-write (OGX writes during vector store registration)
 - Configs at `/app-root/` (container workdir, default config path)
 - Model at `/embeddings` (referenced by `run.yaml` `provider_model_id`)
 - No `:Z` SELinux labels on any volume mounts
@@ -356,7 +356,7 @@ The integration test validates the full pipeline from index generation to servin
 2. **Embedding model bundling** — the model at `/rag-content/embeddings_model/`
    is present, loadable, and produces valid embeddings
 3. **FAISS DB format** — the generated `faiss_store.db` schema
-   is compatible with llama-stack's `inline::faiss` provider
+   is compatible with OGX's `inline::faiss` provider
 4. **byok_rag integration** — lightspeed-stack can configure and load the DB via
    `byok_rag` config
 5. **End-to-end RAG retrieval** — a query retrieves context from the test corpus
