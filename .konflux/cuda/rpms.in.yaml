@@ -11,13 +11,10 @@ packages:
     python3.12-devel,
     python3.12-pip,
     libpq-devel,
-    skopeo,
-    libcudnn9,
-    libnccl,
-    libcusparselt0
+    skopeo
   ]
 moduleEnable:
   - "ruby:3.3"
 contentOrigin:
-  repofiles: ["redhat.repo", "cuda.repo"]
+  repofiles: ["redhat.repo"]
 arches: [x86_64, aarch64]

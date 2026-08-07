@@ -207,19 +207,12 @@ arches:
     name: shadow-utils-subid
     evr: 2:4.9-12.el9
     sourcerpm: shadow-utils-4.9-12.el9.src.rpm
-  - url: https://developer.download.nvidia.com/compute/cuda/repos/rhel9/sbsa/libcusparselt0-0.7.1.0-1.aarch64.rpm
-    repoid: external-nvidia-cuda-for-rhel-9-sbsa-rpms
-    size: 284715187
-    checksum: sha256:e9ef8a7f1bdeb6c92f35c6ad75022a92cd4ac7006fcfabca8a44041a53f349fc
-    name: libcusparselt0
-    evr: 0.7.1.0-1
-    sourcerpm: libcusparselt0-0.7.1.0-1.src.rpm
   source: []
   module_metadata:
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/repodata/4bab5e1538aff2839ad02065c7355766b01f11c02cf3e593b70704c17585c7a6-modules.yaml.gz
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/repodata/b8884b8b558c26d5836aa6173c421ed68517fe12fb55fcb8c2ef1ec15c3db9ec-modules.yaml.gz
     repoid: rhel-9-for-aarch64-appstream-eus-rpms__9_DOT_6
     size: 43340
-    checksum: sha256:4bab5e1538aff2839ad02065c7355766b01f11c02cf3e593b70704c17585c7a6
+    checksum: sha256:b8884b8b558c26d5836aa6173c421ed68517fe12fb55fcb8c2ef1ec15c3db9ec
 - arch: x86_64
   packages:
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/c/containers-common-1-117.el9_6.x86_64.rpm
@@ -425,16 +418,9 @@ arches:
     name: shadow-utils-subid
     evr: 2:4.9-12.el9
     sourcerpm: shadow-utils-4.9-12.el9.src.rpm
-  - url: https://developer.download.nvidia.com/compute/cuda/repos/rhel9/x86_64/libcusparselt0-0.7.1.0-1.x86_64.rpm
-    repoid: external-nvidia-cuda-for-rhel-9-x86_64-rpms
-    size: 288121905
-    checksum: sha256:5c10a38471d9f966f023d33eb6c268615383485a2682e3de1a6175c262dff271
-    name: libcusparselt0
-    evr: 0.7.1.0-1
-    sourcerpm: libcusparselt0-0.7.1.0-1.src.rpm
   source: []
   module_metadata:
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/repodata/cebb6aa5c683024b508c67bd1271f95a5bc941cb8380bd88f33ab2f1a3683682-modules.yaml.gz
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/repodata/0658fc83d9337d71e5f907d4a709c5fc3b1b837032474877e36a1039efa15856-modules.yaml.gz
     repoid: rhel-9-for-x86_64-appstream-eus-rpms__9_DOT_6
     size: 41573
-    checksum: sha256:cebb6aa5c683024b508c67bd1271f95a5bc941cb8380bd88f33ab2f1a3683682
+    checksum: sha256:0658fc83d9337d71e5f907d4a709c5fc3b1b837032474877e36a1039efa15856

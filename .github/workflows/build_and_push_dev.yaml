@@ -2,9 +2,9 @@ name: Build CPU image, main branch push quay.io
 
 on:
   push:
-    branches: [ main ]
+    branches: ["release/0.7"]
   pull_request:
-    branches: ["main"]
+    branches: ["release/0.7"]
 
 permissions:
   contents: read
