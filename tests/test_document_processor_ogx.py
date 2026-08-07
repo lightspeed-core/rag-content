@@ -29,6 +29,7 @@ image_name: starter
 apis:
 - files
 - inference
+- responses
 - tool_runtime
 - vector_io
 
@@ -50,8 +51,8 @@ providers:
     provider_type: inline::localfs
   tool_runtime:
   - config: {{}}
-    provider_id: rag-runtime
-    provider_type: inline::rag-runtime
+    provider_id: file-search
+    provider_type: inline::file-search
   vector_io:
   - config:
       persistence:
@@ -94,8 +95,8 @@ registered_resources:
   scoring_fns: []
   benchmarks: []
   tool_groups:
-  - toolgroup_id: builtin::rag
-    provider_id: rag-runtime
+  - toolgroup_id: builtin::file-search
+    provider_id: file-search
 """
 
 

@@ -12,9 +12,17 @@ RUN ${BUILDER_DNF_COMMAND} -y module enable ruby:3.3 && \
     ${BUILDER_DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
     python3.12 python3.12-devel python3.12-pip \
     skopeo \
-    rubygems rubygem-bundler \
-    libcudnn9 libnccl libcusparselt0 && \
+    rubygems rubygem-bundler && \
     ${BUILDER_DNF_COMMAND} clean all
+
+# Non-hermetic only: the upstream NVIDIA base image does not ship CUDA libs,
+# so install them explicitly.  In hermetic (Konflux) builds the RHAI base
+# image already provides these under vendor-specific package names.
+RUN if [ ! -f /cachi2/cachi2.env ]; then \
+    ${BUILDER_DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
+    libcudnn9 libnccl libcusparselt0 && \
+    ${BUILDER_DNF_COMMAND} clean all; \
+    fi
 
 # Hermetic: install build toolchain and dev libs for compiling sdists.
 RUN if [ -f /cachi2/cachi2.env ]; then \
@@ -74,10 +82,17 @@ RUN ${RUNTIME_DNF_COMMAND} -y module enable ruby:3.3 && \
     python3.12 python3.12-pip \
     skopeo \
     libpq libxml2 libxslt libjpeg-turbo libtiff freetype libwebp \
-    rubygems rubygem-bundler \
-    libcudnn9 libnccl libcusparselt0 && \
+    rubygems rubygem-bundler && \
     ${RUNTIME_DNF_COMMAND} update -y --nodocs && \
     ${RUNTIME_DNF_COMMAND} clean all
+
+# Non-hermetic only: install CUDA libs that the upstream NVIDIA base image
+# does not bundle.  The hermetic RHAI base image already ships these.
+RUN if [ ! -f /cachi2/cachi2.env ]; then \
+    ${RUNTIME_DNF_COMMAND} install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
+    libcudnn9 libnccl libcusparselt0 && \
+    ${RUNTIME_DNF_COMMAND} clean all; \
+    fi
 
 WORKDIR /rag-content
 
