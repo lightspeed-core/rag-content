@@ -1,4 +1,4 @@
-name: Build CPU image, main branch push quay.io
+name: Build CPU image, release/0.7 branch push quay.io
 
 on:
   push:

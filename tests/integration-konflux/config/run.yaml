@@ -4,6 +4,7 @@ image_name: starter
 apis:
 - files
 - inference
+- responses
 - tool_runtime
 - vector_io
 
@@ -25,10 +26,18 @@ providers:
       storage_dir: /tmp/files
     provider_id: meta-reference-files
     provider_type: inline::localfs
+  responses:
+  - config:
+      persistence:
+        responses:
+          backend: sql_default
+          table_name: responses
+    provider_id: builtin-responses
+    provider_type: inline::builtin
   tool_runtime:
   - config: {}
-    provider_id: rag-runtime
-    provider_type: inline::rag-runtime
+    provider_id: file-search
+    provider_type: inline::file-search
   vector_io: []
 
 server:
@@ -52,6 +61,9 @@ storage:
     conversations:
       table_name: openai_conversations
       backend: sql_default
+    responses:
+      table_name: responses
+      backend: sql_default
 
 registered_resources:
   models:
@@ -64,8 +76,8 @@ registered_resources:
   shields: []
   vector_stores: []
   tool_groups:
-  - toolgroup_id: builtin::rag
-    provider_id: rag-runtime
+  - toolgroup_id: builtin::file-search
+    provider_id: file-search
 
 vector_stores:
   default_provider_id: faiss

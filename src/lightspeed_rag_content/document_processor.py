@@ -489,7 +489,7 @@ class _LlamaStackDB(_BaseDB):
             name=index,
             extra_body={
                 "provider_id": index,
-                "embedding_model": f"sentence-transformers/{self.model_name_or_dir}",
+                "embedding_model": self.config.model_name,
                 "embedding_dimension": self.config.embedding_dimension,
             },
         )
@@ -543,7 +543,7 @@ class _LlamaStackDB(_BaseDB):
         # Compute embeddings
         LOG.info("Computing embeddings for %d chunks...", len(self.documents))
         chunks_to_insert = []
-        embedding_model = f"sentence-transformers/{self.model_name_or_dir}"
+        embedding_model = self.config.model_name
 
         for idx, doc in enumerate(self.documents):
             if isinstance(doc, dict):
@@ -587,7 +587,7 @@ class _LlamaStackDB(_BaseDB):
             name=index,
             extra_body={
                 "provider_id": index,
-                "embedding_model": f"sentence-transformers/{self.model_name_or_dir}",
+                "embedding_model": self.config.model_name,
                 "embedding_dimension": self.config.embedding_dimension,
             },
         )
@@ -726,7 +726,7 @@ class _LlamaStackDB(_BaseDB):
         """Update the config file with the created vector_store_id."""
         vector_stores_section = self.VECTOR_STORES_TEMPLATE.format(
             dimension=self.config.embedding_dimension,
-            model_name_or_dir=self.model_name_or_dir,
+            model_name=self.config.model_name,
             vector_io_provider_id=index,
             vector_store_id=vector_store_id,
         )

@@ -1,4 +1,4 @@
-name: Build GPU image, main branch push quay.io
+name: Build GPU image, release/0.7 branch push quay.io
 
 on:
   push:

@@ -55,7 +55,7 @@ fi
 #========================================
 progress "Phase 1/6: Generating FAISS vector DB from test corpus..."
 chmod 777 "$RAG_OUTPUT_DIR"
-podman run --rm --network=host "${GPU_FLAGS[@]}" \
+podman run --rm --network=host --security-opt label=disable "${GPU_FLAGS[@]}" \
   -v "$CORPUS_DIR":/input:ro \
   -v "$RAG_OUTPUT_DIR":/output \
   "$RAG_CONTENT_IMAGE" \
@@ -73,7 +73,7 @@ ls -la "$RAG_OUTPUT_DIR"
 #========================================
 progress "Phase 2/6: Copying embedding model from rag-content image..."
 chmod 777 "$MODEL_DIR"
-podman run --rm --network=host "${GPU_FLAGS[@]}" \
+podman run --rm --network=host --security-opt label=disable "${GPU_FLAGS[@]}" \
   -v "$MODEL_DIR":/out \
   "$RAG_CONTENT_IMAGE" \
   bash -c "cp -r /rag-content/embeddings_model/. /out/"
