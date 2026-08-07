@@ -1,8 +1,10 @@
-name: Build GPU image, main branch push quay.io
+name: Build GPU image, release/0.5 branch push quay.io
 
 on:
   push:
-    branches: [ main ]
+    branches: ["release/0.5"]
+  pull_request:
+    branches: ["release/0.5"]
 
 env:
   IMAGE_NAME: rag-content-gpu
