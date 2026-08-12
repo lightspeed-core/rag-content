@@ -20,6 +20,10 @@ packages:
     openexr-libs,
     skopeo,
   ]
+upgradePackages:
+  [
+    libgcrypt,
+  ]
 moduleEnable:
   - "ruby:3.3"
 contentOrigin:

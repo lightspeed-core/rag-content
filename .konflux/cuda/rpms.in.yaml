@@ -13,6 +13,10 @@ packages:
     libpq-devel,
     skopeo
   ]
+upgradePackages:
+  [
+    libgcrypt,
+  ]
 moduleEnable:
   - "ruby:3.3"
 contentOrigin:
