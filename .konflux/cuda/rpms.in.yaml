@@ -16,6 +16,11 @@ packages:
     libnccl,
     libcusparselt0
   ]
+upgradePackages:
+  [
+    libxslt,
+    libgcrypt,
+  ]
 moduleEnable:
   - "ruby:3.3"
 contentOrigin:
