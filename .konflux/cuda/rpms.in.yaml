@@ -16,6 +16,7 @@ packages:
 upgradePackages:
   [
     libgcrypt,
+    thrift,
   ]
 moduleEnable:
   - "ruby:3.3"

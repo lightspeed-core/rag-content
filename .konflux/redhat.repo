@@ -11,7 +11,6 @@ metadata_expire = 86400
 enabled_metadata = 0
 sslclientkey = $SSL_CLIENT_KEY
 sslclientcert = $SSL_CLIENT_CERT
-excludepkgs=*.i686
 
 [rhel-9-for-$basearch-appstream-eus-rpms__9_DOT_6]
 name = Red Hat Enterprise Linux 9 for $basearch - AppStream - Extended Update Support (RPMs)
@@ -26,7 +25,6 @@ metadata_expire = 86400
 enabled_metadata = 0
 sslclientkey = $SSL_CLIENT_KEY
 sslclientcert = $SSL_CLIENT_CERT
-excludepkgs=*.i686
 
 [rhel-9-for-$basearch-baseos-eus-rpms__9_DOT_6]
 name = Red Hat Enterprise Linux 9 for $basearch - BaseOS - Extended Update Support (RPMs)
@@ -41,4 +39,17 @@ metadata_expire = 86400
 enabled_metadata = 0
 sslclientkey = $SSL_CLIENT_KEY
 sslclientcert = $SSL_CLIENT_CERT
-excludepkgs=*.i686
+
+[rhelai-3.5-for-rhel-9-$basearch-rpms]
+name = Red Hat Enterprise Linux AI (3.5) for RHEL 9 $basearch (RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/rhelai/3.5/os
+enabled = 1
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
