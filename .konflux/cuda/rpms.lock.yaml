@@ -202,10 +202,10 @@ arches:
     sourcerpm: shadow-utils-4.9-12.el9.src.rpm
   source: []
   module_metadata:
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/repodata/baafe17b13aae4488f9c1e8f9b474223c42026f160598c05c186945deb91f1c7-modules.yaml.gz
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/repodata/d67d02abee3a0c785fd18fedb73765c0ad472717c8eea814d60d87765bbc8979-modules.yaml.gz
     repoid: rhel-9-for-aarch64-appstream-eus-rpms__9_DOT_6
     size: 44782
-    checksum: sha256:baafe17b13aae4488f9c1e8f9b474223c42026f160598c05c186945deb91f1c7
+    checksum: sha256:d67d02abee3a0c785fd18fedb73765c0ad472717c8eea814d60d87765bbc8979
 - arch: x86_64
   packages:
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/c/containers-common-1-117.el9_6.x86_64.rpm
@@ -406,7 +406,7 @@ arches:
     sourcerpm: shadow-utils-4.9-12.el9.src.rpm
   source: []
   module_metadata:
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/repodata/ea47724085e35131c2c8aca52dd0a74433a23c05c770b05c888c496a882bc9db-modules.yaml.gz
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/repodata/d76c8798ccdc90ff924b9ab1cb4ae74e0f6f2a5e328d1fa9a42660ce1672b4b2-modules.yaml.gz
     repoid: rhel-9-for-x86_64-appstream-eus-rpms__9_DOT_6
     size: 43586
-    checksum: sha256:ea47724085e35131c2c8aca52dd0a74433a23c05c770b05c888c496a882bc9db
+    checksum: sha256:d76c8798ccdc90ff924b9ab1cb4ae74e0f6f2a5e328d1fa9a42660ce1672b4b2
