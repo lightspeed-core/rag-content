@@ -88,76 +88,76 @@ arches:
     name: python3.12-setuptools
     evr: 68.2.2-5.el9_6
     sourcerpm: python3.12-setuptools-68.2.2-5.el9_6.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/r/ruby-3.3.10-6.module+el9.6.0+24475+76cce029.aarch64.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/r/ruby-3.3.12-6.module+el9.6.0+24618+75aeb29f.1.aarch64.rpm
     repoid: rhel-9-for-aarch64-appstream-eus-rpms__9_DOT_6
-    size: 38040
-    checksum: sha256:035e3fef084f67f1c5c7dd33e2af4674fa5a5931788c0810b0f4a2db7e5961da
+    size: 38148
+    checksum: sha256:bb37f5e4946d19ec6d721080e4e3fde6394d5a5beb5ab81bca5123584d783a00
     name: ruby
-    evr: 3.3.10-6.module+el9.6.0+24475+76cce029
-    sourcerpm: ruby-3.3.10-6.module+el9.6.0+24475+76cce029.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/r/ruby-default-gems-3.3.10-5.module+el9.6.0+23780+e40d2335.noarch.rpm
+    evr: 3.3.12-6.module+el9.6.0+24618+75aeb29f.1
+    sourcerpm: ruby-3.3.12-6.module+el9.6.0+24618+75aeb29f.1.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/r/ruby-default-gems-3.3.12-6.module+el9.6.0+24618+75aeb29f.1.noarch.rpm
     repoid: rhel-9-for-aarch64-appstream-eus-rpms__9_DOT_6
-    size: 47183
-    checksum: sha256:3a0a1a788685b688f7f5a9873d6102f5248a2a582e989fa9ea563f61163ec9aa
+    size: 47352
+    checksum: sha256:869c2f0b23f803fd67c5a51c886e283b5eb9940e5e7e2c6762e7f07e850083ff
     name: ruby-default-gems
-    evr: 3.3.10-5.module+el9.6.0+23780+e40d2335
-    sourcerpm: ruby-3.3.10-5.module+el9.6.0+23780+e40d2335.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/r/ruby-libs-3.3.10-6.module+el9.6.0+24475+76cce029.aarch64.rpm
+    evr: 3.3.12-6.module+el9.6.0+24618+75aeb29f.1
+    sourcerpm: ruby-3.3.12-6.module+el9.6.0+24618+75aeb29f.1.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/r/ruby-libs-3.3.12-6.module+el9.6.0+24618+75aeb29f.1.aarch64.rpm
     repoid: rhel-9-for-aarch64-appstream-eus-rpms__9_DOT_6
-    size: 4228014
-    checksum: sha256:b47068a5e664936056200c883e2186be94afcd5c39bd505eaf28224740c1b575
+    size: 4225548
+    checksum: sha256:a215793eaa1e4b3a54ad610273360f2f8490c857b5a4b0a8bdeef56f3ee9839f
     name: ruby-libs
-    evr: 3.3.10-6.module+el9.6.0+24475+76cce029
-    sourcerpm: ruby-3.3.10-6.module+el9.6.0+24475+76cce029.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/r/rubygem-bigdecimal-3.1.5-5.module+el9.6.0+23780+e40d2335.aarch64.rpm
+    evr: 3.3.12-6.module+el9.6.0+24618+75aeb29f.1
+    sourcerpm: ruby-3.3.12-6.module+el9.6.0+24618+75aeb29f.1.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/r/rubygem-bigdecimal-3.1.5-6.module+el9.6.0+24618+75aeb29f.1.aarch64.rpm
     repoid: rhel-9-for-aarch64-appstream-eus-rpms__9_DOT_6
-    size: 65850
-    checksum: sha256:9060c98c184669d8ca26e5a9bbd812210b188900f260cc35c964aae2ac691135
+    size: 65910
+    checksum: sha256:d2b58ea5928c2fbecf40afa7dbc29e46c5bbb3a4b7ec3ea07ff4cce327abbb41
     name: rubygem-bigdecimal
-    evr: 3.1.5-5.module+el9.6.0+23780+e40d2335
-    sourcerpm: ruby-3.3.10-5.module+el9.6.0+23780+e40d2335.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/r/rubygem-bundler-2.5.22-6.module+el9.6.0+24475+76cce029.noarch.rpm
+    evr: 3.1.5-6.module+el9.6.0+24618+75aeb29f.1
+    sourcerpm: ruby-3.3.12-6.module+el9.6.0+24618+75aeb29f.1.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/r/rubygem-bundler-2.5.22-6.module+el9.6.0+24618+75aeb29f.1.noarch.rpm
     repoid: rhel-9-for-aarch64-appstream-eus-rpms__9_DOT_6
-    size: 498102
-    checksum: sha256:a1f3e20d1d5bb3ea483ba4a82863cd95d0a1d1fd964601901bdfcfdb58b5d15d
+    size: 498268
+    checksum: sha256:afb06ce22cd54bf3af6fc8fe86892f8b9ef62193b13bd323f302de61f07e5ea0
     name: rubygem-bundler
-    evr: 2.5.22-6.module+el9.6.0+24475+76cce029
-    sourcerpm: ruby-3.3.10-6.module+el9.6.0+24475+76cce029.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/r/rubygem-io-console-0.7.1-5.module+el9.6.0+23780+e40d2335.aarch64.rpm
+    evr: 2.5.22-6.module+el9.6.0+24618+75aeb29f.1
+    sourcerpm: ruby-3.3.12-6.module+el9.6.0+24618+75aeb29f.1.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/r/rubygem-io-console-0.7.1-6.module+el9.6.0+24618+75aeb29f.1.aarch64.rpm
     repoid: rhel-9-for-aarch64-appstream-eus-rpms__9_DOT_6
-    size: 22189
-    checksum: sha256:d505acdfdc8b53c2f851a0d931ff4d6e225baec5f6243bd560692e1d57004a77
+    size: 22336
+    checksum: sha256:2e6113dab7f472a5b79080af84ab405b7c8f21b0f3324e0f874ea5e60ef8ea82
     name: rubygem-io-console
-    evr: 0.7.1-5.module+el9.6.0+23780+e40d2335
-    sourcerpm: ruby-3.3.10-5.module+el9.6.0+23780+e40d2335.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/r/rubygem-json-2.7.2-5.module+el9.6.0+23780+e40d2335.aarch64.rpm
+    evr: 0.7.1-6.module+el9.6.0+24618+75aeb29f.1
+    sourcerpm: ruby-3.3.12-6.module+el9.6.0+24618+75aeb29f.1.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/r/rubygem-json-2.7.2-6.module+el9.6.0+24618+75aeb29f.1.aarch64.rpm
     repoid: rhel-9-for-aarch64-appstream-eus-rpms__9_DOT_6
-    size: 56788
-    checksum: sha256:cfbc4d3ca8a3ef4de18f4e302eb8535584c467567cf7a50437beeece7d10b04b
+    size: 56565
+    checksum: sha256:bbec41251dbffde83ca401d91e3f15101e477338dfe10f807dcb78672719a308
     name: rubygem-json
-    evr: 2.7.2-5.module+el9.6.0+23780+e40d2335
-    sourcerpm: ruby-3.3.10-5.module+el9.6.0+23780+e40d2335.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/r/rubygem-psych-5.1.2-5.module+el9.6.0+23780+e40d2335.aarch64.rpm
+    evr: 2.7.2-6.module+el9.6.0+24618+75aeb29f.1
+    sourcerpm: ruby-3.3.12-6.module+el9.6.0+24618+75aeb29f.1.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/r/rubygem-psych-5.1.2-6.module+el9.6.0+24618+75aeb29f.1.aarch64.rpm
     repoid: rhel-9-for-aarch64-appstream-eus-rpms__9_DOT_6
-    size: 57714
-    checksum: sha256:1a51c751b29d4b9d69e0de342310351cde3a603decf93da661ab4370f415869c
+    size: 57454
+    checksum: sha256:801ab694e5e1dd3ec721ab433289c2c3d9881e1346a97246e36566b5209c1018
     name: rubygem-psych
-    evr: 5.1.2-5.module+el9.6.0+23780+e40d2335
-    sourcerpm: ruby-3.3.10-5.module+el9.6.0+23780+e40d2335.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/r/rubygem-rdoc-6.6.3.1-5.module+el9.6.0+23780+e40d2335.noarch.rpm
+    evr: 5.1.2-6.module+el9.6.0+24618+75aeb29f.1
+    sourcerpm: ruby-3.3.12-6.module+el9.6.0+24618+75aeb29f.1.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/r/rubygem-rdoc-6.6.3.1-6.module+el9.6.0+24618+75aeb29f.1.noarch.rpm
     repoid: rhel-9-for-aarch64-appstream-eus-rpms__9_DOT_6
-    size: 513983
-    checksum: sha256:b6dd585fab71b9c3dcbed35c84e54778d8efda8bea866722a7a7b2e50e7165d4
+    size: 514212
+    checksum: sha256:67f98e4376a45ed5c3783e27c604f7d98cadaf8d9bff8e8cf71b2c7453a914d3
     name: rubygem-rdoc
-    evr: 6.6.3.1-5.module+el9.6.0+23780+e40d2335
-    sourcerpm: ruby-3.3.10-5.module+el9.6.0+23780+e40d2335.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/r/rubygems-3.5.22-6.module+el9.6.0+24475+76cce029.noarch.rpm
+    evr: 6.6.3.1-6.module+el9.6.0+24618+75aeb29f.1
+    sourcerpm: ruby-3.3.12-6.module+el9.6.0+24618+75aeb29f.1.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/r/rubygems-3.5.22-6.module+el9.6.0+24618+75aeb29f.1.noarch.rpm
     repoid: rhel-9-for-aarch64-appstream-eus-rpms__9_DOT_6
-    size: 430829
-    checksum: sha256:667590f892fc4184b702528d3963c9d462fa09edc59f1e8a07b5190d0e18d1cd
+    size: 430968
+    checksum: sha256:4849d287a572ae216b6efc0748e488695d3cbb1dc32d0356e681eb597406bbe0
     name: rubygems
-    evr: 3.5.22-6.module+el9.6.0+24475+76cce029
-    sourcerpm: ruby-3.3.10-6.module+el9.6.0+24475+76cce029.src.rpm
+    evr: 3.5.22-6.module+el9.6.0+24618+75aeb29f.1
+    sourcerpm: ruby-3.3.12-6.module+el9.6.0+24618+75aeb29f.1.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/Packages/s/skopeo-1.18.1-5.el9_6.1.aarch64.rpm
     repoid: rhel-9-for-aarch64-appstream-eus-rpms__9_DOT_6
     size: 8844438
@@ -209,10 +209,10 @@ arches:
     sourcerpm: shadow-utils-4.9-12.el9.src.rpm
   source: []
   module_metadata:
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/repodata/965027db409f8bf8b42b4d23e8f6e404c61f6ea09c770eca3543b6f0544e3b2e-modules.yaml.gz
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/repodata/d5bffd551225475e0900ac34e8804498e56326d226f4903dd540e0a7c9324e72-modules.yaml.gz
     repoid: rhel-9-for-aarch64-appstream-eus-rpms__9_DOT_6
-    size: 43458
-    checksum: sha256:965027db409f8bf8b42b4d23e8f6e404c61f6ea09c770eca3543b6f0544e3b2e
+    size: 44782
+    checksum: sha256:d5bffd551225475e0900ac34e8804498e56326d226f4903dd540e0a7c9324e72
 - arch: x86_64
   packages:
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/c/containers-common-1-117.el9_6.x86_64.rpm
@@ -299,76 +299,76 @@ arches:
     name: python3.12-setuptools
     evr: 68.2.2-5.el9_6
     sourcerpm: python3.12-setuptools-68.2.2-5.el9_6.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/r/ruby-3.3.10-6.module+el9.6.0+24475+76cce029.x86_64.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/r/ruby-3.3.12-6.module+el9.6.0+24618+75aeb29f.1.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-eus-rpms__9_DOT_6
-    size: 38209
-    checksum: sha256:3447bea4a7a27c2b8c32216471d9104e2411607b76a6c83995bab2c17d541315
+    size: 38305
+    checksum: sha256:844bb41170a577bb3aa6e81a894426278624233127c90e2fb450c68103268243
     name: ruby
-    evr: 3.3.10-6.module+el9.6.0+24475+76cce029
-    sourcerpm: ruby-3.3.10-6.module+el9.6.0+24475+76cce029.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/r/ruby-default-gems-3.3.10-5.module+el9.6.0+23780+e40d2335.noarch.rpm
+    evr: 3.3.12-6.module+el9.6.0+24618+75aeb29f.1
+    sourcerpm: ruby-3.3.12-6.module+el9.6.0+24618+75aeb29f.1.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/r/ruby-default-gems-3.3.12-6.module+el9.6.0+24618+75aeb29f.1.noarch.rpm
     repoid: rhel-9-for-x86_64-appstream-eus-rpms__9_DOT_6
-    size: 47183
-    checksum: sha256:3a0a1a788685b688f7f5a9873d6102f5248a2a582e989fa9ea563f61163ec9aa
+    size: 47352
+    checksum: sha256:869c2f0b23f803fd67c5a51c886e283b5eb9940e5e7e2c6762e7f07e850083ff
     name: ruby-default-gems
-    evr: 3.3.10-5.module+el9.6.0+23780+e40d2335
-    sourcerpm: ruby-3.3.10-5.module+el9.6.0+23780+e40d2335.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/r/ruby-libs-3.3.10-6.module+el9.6.0+24475+76cce029.x86_64.rpm
+    evr: 3.3.12-6.module+el9.6.0+24618+75aeb29f.1
+    sourcerpm: ruby-3.3.12-6.module+el9.6.0+24618+75aeb29f.1.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/r/ruby-libs-3.3.12-6.module+el9.6.0+24618+75aeb29f.1.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-eus-rpms__9_DOT_6
-    size: 4291038
-    checksum: sha256:23780a37324f421ecdedff8adeca27ee25a69573dd11ce00a80b58e58b5a295f
+    size: 4294316
+    checksum: sha256:2329a1958ffdaf864e3e9ec5698498fbd1450899ca05a7d388146e68d714e3cd
     name: ruby-libs
-    evr: 3.3.10-6.module+el9.6.0+24475+76cce029
-    sourcerpm: ruby-3.3.10-6.module+el9.6.0+24475+76cce029.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/r/rubygem-bigdecimal-3.1.5-5.module+el9.6.0+23780+e40d2335.x86_64.rpm
+    evr: 3.3.12-6.module+el9.6.0+24618+75aeb29f.1
+    sourcerpm: ruby-3.3.12-6.module+el9.6.0+24618+75aeb29f.1.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/r/rubygem-bigdecimal-3.1.5-6.module+el9.6.0+24618+75aeb29f.1.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-eus-rpms__9_DOT_6
-    size: 66883
-    checksum: sha256:42712199250bc8a5e0c41693f310d1bd36417c70ca744806587a4c08c7714925
+    size: 66605
+    checksum: sha256:7911ab1b958349749a30910906f1de6905850da94f218d92dca445e023da7bb7
     name: rubygem-bigdecimal
-    evr: 3.1.5-5.module+el9.6.0+23780+e40d2335
-    sourcerpm: ruby-3.3.10-5.module+el9.6.0+23780+e40d2335.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/r/rubygem-bundler-2.5.22-6.module+el9.6.0+24475+76cce029.noarch.rpm
+    evr: 3.1.5-6.module+el9.6.0+24618+75aeb29f.1
+    sourcerpm: ruby-3.3.12-6.module+el9.6.0+24618+75aeb29f.1.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/r/rubygem-bundler-2.5.22-6.module+el9.6.0+24618+75aeb29f.1.noarch.rpm
     repoid: rhel-9-for-x86_64-appstream-eus-rpms__9_DOT_6
-    size: 498102
-    checksum: sha256:a1f3e20d1d5bb3ea483ba4a82863cd95d0a1d1fd964601901bdfcfdb58b5d15d
+    size: 498268
+    checksum: sha256:afb06ce22cd54bf3af6fc8fe86892f8b9ef62193b13bd323f302de61f07e5ea0
     name: rubygem-bundler
-    evr: 2.5.22-6.module+el9.6.0+24475+76cce029
-    sourcerpm: ruby-3.3.10-6.module+el9.6.0+24475+76cce029.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/r/rubygem-io-console-0.7.1-5.module+el9.6.0+23780+e40d2335.x86_64.rpm
+    evr: 2.5.22-6.module+el9.6.0+24618+75aeb29f.1
+    sourcerpm: ruby-3.3.12-6.module+el9.6.0+24618+75aeb29f.1.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/r/rubygem-io-console-0.7.1-6.module+el9.6.0+24618+75aeb29f.1.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-eus-rpms__9_DOT_6
-    size: 22767
-    checksum: sha256:20e8c226bfe77980257bcf77c70ff034169604e013c358536a9402f9a2de79c9
+    size: 22819
+    checksum: sha256:5fffa5462bafb0dbcc6aff9063db1fe0daa8c5b4ab8a10800da2c1ba2e3489b4
     name: rubygem-io-console
-    evr: 0.7.1-5.module+el9.6.0+23780+e40d2335
-    sourcerpm: ruby-3.3.10-5.module+el9.6.0+23780+e40d2335.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/r/rubygem-json-2.7.2-5.module+el9.6.0+23780+e40d2335.x86_64.rpm
+    evr: 0.7.1-6.module+el9.6.0+24618+75aeb29f.1
+    sourcerpm: ruby-3.3.12-6.module+el9.6.0+24618+75aeb29f.1.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/r/rubygem-json-2.7.2-6.module+el9.6.0+24618+75aeb29f.1.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-eus-rpms__9_DOT_6
-    size: 57612
-    checksum: sha256:3dac1a3a7a91d49fd4d7787639183d28a12e19bd5649bd391987003e91aed956
+    size: 57978
+    checksum: sha256:9372220c5180044681c58912a129a74000d9cead064c4729938a956ed0321484
     name: rubygem-json
-    evr: 2.7.2-5.module+el9.6.0+23780+e40d2335
-    sourcerpm: ruby-3.3.10-5.module+el9.6.0+23780+e40d2335.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/r/rubygem-psych-5.1.2-5.module+el9.6.0+23780+e40d2335.x86_64.rpm
+    evr: 2.7.2-6.module+el9.6.0+24618+75aeb29f.1
+    sourcerpm: ruby-3.3.12-6.module+el9.6.0+24618+75aeb29f.1.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/r/rubygem-psych-5.1.2-6.module+el9.6.0+24618+75aeb29f.1.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-eus-rpms__9_DOT_6
-    size: 58280
-    checksum: sha256:16a7ad8dacaabbbb75685a2b661afeb4176eb0b96ebd50928c9b00ea45407813
+    size: 58321
+    checksum: sha256:4c017c5969d08d32ba76c3eb9dbbf9c1a640f2a8a7312e1bedf3aa8b34e3f31a
     name: rubygem-psych
-    evr: 5.1.2-5.module+el9.6.0+23780+e40d2335
-    sourcerpm: ruby-3.3.10-5.module+el9.6.0+23780+e40d2335.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/r/rubygem-rdoc-6.6.3.1-5.module+el9.6.0+23780+e40d2335.noarch.rpm
+    evr: 5.1.2-6.module+el9.6.0+24618+75aeb29f.1
+    sourcerpm: ruby-3.3.12-6.module+el9.6.0+24618+75aeb29f.1.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/r/rubygem-rdoc-6.6.3.1-6.module+el9.6.0+24618+75aeb29f.1.noarch.rpm
     repoid: rhel-9-for-x86_64-appstream-eus-rpms__9_DOT_6
-    size: 513983
-    checksum: sha256:b6dd585fab71b9c3dcbed35c84e54778d8efda8bea866722a7a7b2e50e7165d4
+    size: 514212
+    checksum: sha256:67f98e4376a45ed5c3783e27c604f7d98cadaf8d9bff8e8cf71b2c7453a914d3
     name: rubygem-rdoc
-    evr: 6.6.3.1-5.module+el9.6.0+23780+e40d2335
-    sourcerpm: ruby-3.3.10-5.module+el9.6.0+23780+e40d2335.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/r/rubygems-3.5.22-6.module+el9.6.0+24475+76cce029.noarch.rpm
+    evr: 6.6.3.1-6.module+el9.6.0+24618+75aeb29f.1
+    sourcerpm: ruby-3.3.12-6.module+el9.6.0+24618+75aeb29f.1.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/r/rubygems-3.5.22-6.module+el9.6.0+24618+75aeb29f.1.noarch.rpm
     repoid: rhel-9-for-x86_64-appstream-eus-rpms__9_DOT_6
-    size: 430829
-    checksum: sha256:667590f892fc4184b702528d3963c9d462fa09edc59f1e8a07b5190d0e18d1cd
+    size: 430968
+    checksum: sha256:4849d287a572ae216b6efc0748e488695d3cbb1dc32d0356e681eb597406bbe0
     name: rubygems
-    evr: 3.5.22-6.module+el9.6.0+24475+76cce029
-    sourcerpm: ruby-3.3.10-6.module+el9.6.0+24475+76cce029.src.rpm
+    evr: 3.5.22-6.module+el9.6.0+24618+75aeb29f.1
+    sourcerpm: ruby-3.3.12-6.module+el9.6.0+24618+75aeb29f.1.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/s/skopeo-1.18.1-5.el9_6.1.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-eus-rpms__9_DOT_6
     size: 9785972
@@ -420,7 +420,7 @@ arches:
     sourcerpm: shadow-utils-4.9-12.el9.src.rpm
   source: []
   module_metadata:
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/repodata/47023e0578f85de66af9da84aa35cccaa8ee4babc1cdc0f82e6976d58940b20c-modules.yaml.gz
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/repodata/7de128fdda518554daf65fbc82e2da9800bbaf8b9af102844344250625c55583-modules.yaml.gz
     repoid: rhel-9-for-x86_64-appstream-eus-rpms__9_DOT_6
-    size: 41734
-    checksum: sha256:47023e0578f85de66af9da84aa35cccaa8ee4babc1cdc0f82e6976d58940b20c
+    size: 43586
+    checksum: sha256:7de128fdda518554daf65fbc82e2da9800bbaf8b9af102844344250625c55583
