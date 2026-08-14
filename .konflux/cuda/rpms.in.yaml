@@ -13,6 +13,10 @@ packages:
     libpq-devel,
     skopeo,
   ]
+upgradePackages:
+  [
+    thrift,
+  ]
 moduleEnable:
   - "ruby:3.3"
 contentOrigin:
