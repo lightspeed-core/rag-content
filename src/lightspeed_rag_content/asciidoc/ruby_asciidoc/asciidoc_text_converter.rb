@@ -46,7 +46,7 @@ module Asciidoctor
       result = []
       result << "# " + decode(node.doctitle) if node.header?
       result << node.blocks.map { |child| convert(child) }.join("\n\n")
-      result.join("\n\n")
+      result.join("\n\n") + "\n"
     end
 
     def convert_section(node)
