@@ -466,8 +466,6 @@ spec:
                 echo "CDI devices:"
                 nvidia-ctk cdi list || true
               fi
-              # Install required test deps
-              sudo dnf -y install python3 jq diffutils
               cd $HOME/rag-content
               SCRIPTEOF
               # Inject env vars

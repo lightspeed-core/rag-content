@@ -21,10 +21,9 @@ OGX_TEMPLATE = """version: 2
 image_name: starter
 
 apis:
-- agents
 - files
 - inference
-- safety
+- responses
 - tool_runtime
 - vector_io
 
@@ -44,21 +43,10 @@ providers:
       storage_dir: /tmp/files
     provider_id: meta-reference-files
     provider_type: inline::localfs
-  agents:
-  - config:
-      persistence:
-        agent_state:
-          namespace: agents_state
-          backend: kv_default
-        responses:
-          table_name: agents_responses
-          backend: sql_default
-    provider_id: meta-reference
-    provider_type: inline::meta-reference
   tool_runtime:
   - config: {{}}
-    provider_id: rag-runtime
-    provider_type: inline::rag-runtime
+    provider_id: file-search
+    provider_type: inline::file-search
   vector_io:
   - config:
       {vector_io_cfg}
@@ -99,13 +87,13 @@ registered_resources:
   scoring_fns: []
   benchmarks: []
   tool_groups:
-  - toolgroup_id: builtin::rag
-    provider_id: rag-runtime
+  - toolgroup_id: builtin::file-search
+    provider_id: file-search
 """
 
 OGX_VECTOR_STORES_TEMPLATE = """vector_stores:
   - embedding_dimension: {dimension}
-    embedding_model: sentence-transformers/{model_name_or_dir}
+    embedding_model: {model_name}
     provider_id: {vector_io_provider_id}
     vector_store_id: {vector_store_id}"""
 
@@ -169,8 +157,8 @@ byok_rag:
     db_path: ${{env.RAG_DB_PATH:={db_path}}}
 
 rag:
-  # inline:
-  #   - {index_id}
+  inline:
+    - {index_id}
   tool:
     - {index_id}
 """
@@ -189,8 +177,8 @@ byok_rag:
     password: ${{env.POSTGRES_PASSWORD}}
 
 rag:
-  # inline:
-  #   - {index_id}
+  inline:
+    - {index_id}
   tool:
     - {index_id}
 """
