@@ -98,6 +98,7 @@ podman run -d --name lightspeed-stack-e2e \
   -e OPENAI_API_KEY="$OPENAI_API_KEY" \
   -e RAG_DB_PATH=/opt/app-root/src/.llama/storage/rag/faiss_store.db \
   -e HF_HOME=/embeddings \
+  -e OTEL_SDK_DISABLED=true \
   ${HF_TOKEN:+-e HF_TOKEN="$HF_TOKEN"} \
   "$LIGHTSPEED_STACK_IMAGE"
 
