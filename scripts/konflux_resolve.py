@@ -1302,8 +1302,6 @@ def main() -> None:
                     f.write(f"{name}=={info['version']}\n")
             subprocess.run(
                 [
-                    "uv",
-                    "run",
                     "pybuild-deps",
                     "compile",
                     f"--output-file={build_output}",
