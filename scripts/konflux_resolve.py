@@ -1195,6 +1195,17 @@ def _write_hashed_file_via_uv(
             os.remove(tmp_input)
 
 
+def _configure_logging(*, verbose: bool, quiet: bool) -> None:
+    """Set the process-wide log level from CLI flags."""
+    if verbose:
+        level = logging.DEBUG
+    elif quiet:
+        level = logging.ERROR
+    else:
+        level = logging.INFO
+    logging.basicConfig(level=level)
+
+
 def main() -> None:
     """Resolve dependencies with RHOAI-first policy and write Hermeto output files."""
     parser = argparse.ArgumentParser(
@@ -1205,13 +1216,7 @@ def main() -> None:
     verbosity.add_argument("--verbose", action="store_true", help="Verbose logging")
     verbosity.add_argument("--quiet", action="store_true", help="Errors only")
     args = parser.parse_args()
-
-    if args.verbose:
-        logging.basicConfig(level=logging.DEBUG)
-    elif args.quiet:
-        logging.basicConfig(level=logging.ERROR)
-    else:
-        logging.basicConfig(level=logging.INFO)
+    _configure_logging(verbose=args.verbose, quiet=args.quiet)
 
     profiles_path = os.path.join(KONFLUX_DIR, "profiles.toml")
     config = load_config(profiles_path, args.profile)
@@ -1220,7 +1225,6 @@ def main() -> None:
     wheel_only = load_wheel_only(wheel_only_path)
 
     python_version = config["python_version"]
-    platforms = config["platforms"]
     rhoai_index_url = config["rhoai_index_url"]
     suffix = config.get("output_suffix", "")
     tekton_files = config.get("tekton_files", [])

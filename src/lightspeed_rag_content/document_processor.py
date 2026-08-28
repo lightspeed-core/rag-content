@@ -38,6 +38,11 @@ from sentence_transformers import SentenceTransformer
 
 from lightspeed_rag_content import config_templates
 from lightspeed_rag_content.metadata_processor import MetadataProcessor
+from lightspeed_rag_content.sqlite_faiss import (
+    SqliteFaissDB,
+    manual_chunk_dicts,
+    resolve_model_name_or_dir,
+)
 
 if TYPE_CHECKING:
     from llama_index.core.vector_stores.types import BasePydanticVectorStore
@@ -108,7 +113,10 @@ class _BaseDB:
     def __init__(self, config: _Config):
         self.config = config
 
-        if config.vector_store_type.startswith("llamastack"):
+        if (
+            config.vector_store_type.startswith("llamastack")
+            or config.vector_store_type == "sqlite-faiss"
+        ):
             if config.manual_chunking:
                 Settings.chunk_size = self.config.chunk_size
                 Settings.chunk_overlap = self.config.chunk_overlap
@@ -222,6 +230,21 @@ class _BaseDB:
         nodes = Settings.text_splitter.get_nodes_from_documents(docs)
         valid_nodes = self._filter_out_invalid_nodes(nodes)
         return valid_nodes
+
+    def write_lcs_config(
+        self, index: str, filename: str, vector_store_id: str, db_file: str
+    ) -> None:
+        """Write a FAISS lightspeed-stack.yaml configuration file."""
+        config_templates.write_lcs_config_file(
+            filename,
+            llama_stack_config_path=config_templates.OGX_CFG_FILENAME,
+            byok_template=config_templates.LCS_FAISS_BYOK_TEMPLATE,
+            index_id=index,
+            model_name=self.config.model_name,
+            dimension=self.config.embedding_dimension,
+            vector_store_id=vector_store_id,
+            db_path=db_file,
+        )
 
 
 class _LlamaIndexDB(_BaseDB):
@@ -349,10 +372,9 @@ class _LlamaStackDB(_BaseDB):
 
         # When using a model directory We need to use absolute paths because
         # the configuration file is not in the current directory.
-        if os.path.exists(config.embeddings_model_dir):
-            self.model_name_or_dir = os.path.realpath(config.embeddings_model_dir)
-        else:
-            self.model_name_or_dir = config.model_name
+        self.model_name_or_dir = resolve_model_name_or_dir(
+            self.config.model_name, self.config.embeddings_model_dir
+        )
 
         model = SentenceTransformer(self.model_name_or_dir)
         self.config.embedding_dimension = model.get_sentence_embedding_dimension()
@@ -439,23 +461,8 @@ class _LlamaStackDB(_BaseDB):
     def add_docs(self, docs: list[Document]) -> None:
         """Add documents to the list of documents to save."""
         if self.config.manual_chunking:
-            for node in self._split_and_filter(docs):
-                # Add document_id to node's metadata because OGX needs it
-                node.metadata["document_id"] = node.ref_doc_id
-                chunk_metadata = {
-                    "document_id": node.ref_doc_id,
-                    "chunk_id": node.id_,
-                    "source": node.metadata.get("docs_url", node.metadata["title"]),
-                }
-                self.documents.append(
-                    {
-                        "content": node.text,
-                        # "mime_type": "text/plain",  # Not part of Chunk type schema
-                        "metadata": node.metadata,
-                        "chunk_metadata": chunk_metadata,
-                        "chunk_id": node.id_,
-                    }
-                )
+            # Add document_id to node's metadata because OGX needs it
+            self.documents.extend(manual_chunk_dicts(self._split_and_filter(docs)))
 
         else:
             self.documents.extend(
@@ -709,18 +716,16 @@ class _LlamaStackDB(_BaseDB):
         else:
             byok_template = self.LCS_FAISS_BYOK_TEMPLATE
 
-        base = self.LCS_BASE_TEMPLATE.format(
+        config_templates.write_lcs_config_file(
+            filename,
             llama_stack_config_path=self.CFG_FILENAME,
-        )
-        data = base + byok_template.format(
+            byok_template=byok_template,
             index_id=index,
             model_name=self.config.model_name,
             dimension=self.config.embedding_dimension,
             vector_store_id=vector_store_id,
             db_path=db_file,
         )
-        with open(filename, "w", encoding="utf-8") as fd:
-            fd.write(data)
 
     def _update_yaml_config(self, cfg_file: str, index: str, vector_store_id: str) -> None:
         """Update the config file with the created vector_store_id."""
@@ -759,6 +764,10 @@ class _LlamaStackDB(_BaseDB):
         lcs_file = os.path.join(output_dir, self.LCS_CFG_FILENAME)
         self.write_lcs_config(index, lcs_file, vector_store_id, db_file)
         return vector_store_id
+
+
+class _SqliteFaissDB(SqliteFaissDB, _BaseDB):
+    """sqlite-faiss vector store backend."""
 
 
 class DocumentProcessor:
@@ -813,12 +822,18 @@ class DocumentProcessor:
         if config.vector_store_type == "faiss" and not config.manual_chunking:
             LOG.warning("Ignoring manual_chunking parameter, not supported by faiss")
 
+        if config.vector_store_type == "sqlite-faiss" and not config.manual_chunking:
+            LOG.warning("Ignoring auto-chunking for sqlite-faiss; OGX Files API is unavailable")
+
         if config.vector_store_type != "postgres" and config.table_name:
             LOG.warning("Ignoring table_name parameter, not supported by faiss")
 
-    def _get_db(self) -> _LlamaIndexDB | _LlamaStackDB:
+    def _get_db(self) -> _LlamaIndexDB | _LlamaStackDB | _SqliteFaissDB:
         if self.config.vector_store_type in ("faiss", "postgres"):
             return _LlamaIndexDB(self.config)
+
+        if self.config.vector_store_type == "sqlite-faiss":
+            return _SqliteFaissDB(self.config)
 
         if self.config.vector_store_type.startswith("llamastack"):
             return _LlamaStackDB(self.config)

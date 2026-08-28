@@ -90,7 +90,8 @@ You can generate the vector database either using
 1. [Llama-Index Faiss Vector Store](#faiss-vector-store)
 2. [Llama-Index Postgres (PGVector) Vector Store](#postgres-pgvector-vector-store)
 3. [OGX Faiss Vector-IO](#ogx-faiss)
-4. [OGX Postgres (PGVector) Vector Store](#ogx-postgres-pgvector-vector-store)
+4. [sqlite-faiss](#sqlite-faiss)
+5. [OGX Postgres (PGVector) Vector Store](#ogx-postgres-pgvector-vector-store)
 
 Each section below shows commands for both **local (uv)** and **container image (podman)** workflows. The container image already includes the default embedding model and all dependencies — no local Python setup required.
 
@@ -486,6 +487,64 @@ uv run python scripts/query_rag.py \
   -m embeddings_model \
   -k 5 \
   -q "how can I configure a cinder backend"
+```
+
+### sqlite-faiss
+
+`sqlite-faiss` writes the same `faiss_store.db` layout as `llamastack-faiss`
+(namespaced SQLite KV, `IndexFlatL2`) using FAISS and SentenceTransformer. The
+output is a drop-in BYOK file for Lightspeed Core Stack (`backend: faiss`).
+
+**Via uv (local):**
+
+```bash
+uv run ./custom_processor.py \
+  -o ./vector_db/custom_docs/0.1 \
+  -f ./custom_docs/0.1/ \
+  -md embeddings_model/ \
+  -mn sentence-transformers/all-mpnet-base-v2 \
+  -i custom_docs-0_1 \
+  --vector-store-type=sqlite-faiss
+```
+
+Or with the bundled generator:
+
+```bash
+uv run python scripts/generate_embeddings.py \
+  -f ./custom_docs/0.1 \
+  -o ./vector_db/custom_docs/0.1 \
+  -i custom_docs-0_1 \
+  -s sqlite-faiss
+```
+
+**Via podman:**
+
+```bash
+podman run --rm \
+  -v ./custom_docs:/rag-content/custom_docs:Z \
+  -v ./vector_db:/rag-content/vector_db:Z \
+  -v ./custom_processor.py:/rag-content/custom_processor.py:Z \
+  quay.io/lightspeed-core/rag-content-cpu:latest \
+  python ./custom_processor.py \
+    -o ./vector_db/custom_docs/0.1 \
+    -f ./custom_docs/0.1/ \
+    -md ./embeddings_model/ \
+    -mn sentence-transformers/all-mpnet-base-v2 \
+    -i custom_docs-0_1 \
+    --vector-store-type=sqlite-faiss
+```
+
+The output directory contains `faiss_store.db` and `lightspeed-stack.yaml`. There is
+no `llama-stack.yaml`. Query it with:
+
+```bash
+uv run python scripts/query_rag.py \
+  -p vector_db/custom_docs/0.1 \
+  -x custom-docs-0_1 \
+  -m embeddings_model \
+  -k 5 \
+  -q "how can I configure a cinder backend" \
+  --vector-store-type sqlite-faiss
 ```
 
 ### OGX Postgres (PGVector) Vector Store

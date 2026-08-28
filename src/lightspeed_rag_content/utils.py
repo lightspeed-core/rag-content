@@ -120,6 +120,7 @@ def get_common_arg_parser() -> argparse.ArgumentParser:
             "postgres",
             "llamastack-faiss",
             "llamastack-pgvector",
+            "sqlite-faiss",
         ],
         help="vector store type to be used.",
     )

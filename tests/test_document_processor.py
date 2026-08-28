@@ -46,10 +46,12 @@ def mock_processor(mocker):
     log = mocker.patch.object(document_processor, "LOG")
     indexdb = mocker.patch.object(document_processor, "_LlamaIndexDB")
     llamadb = mocker.patch.object(document_processor, "_LlamaStackDB")
+    sqlitefaissdb = mocker.patch.object(document_processor, "_SqliteFaissDB")
     yield {
         "log": log,
         "indexdb": indexdb,
         "llamadb": llamadb,
+        "sqlitefaissdb": sqlitefaissdb,
         "params": {
             "chunk_size": 380,
             "chunk_overlap": 0,
@@ -140,6 +142,27 @@ class TestDocumentProcessor:
 
         assert params["embeddings_model_dir"] == os.environ["HF_HOME"]
         assert os.environ["TRANSFORMERS_OFFLINE"] == "1"
+        os.environ.pop("TRANSFORMERS_OFFLINE", None)
+
+    def test_init_sqlite_faiss(self, mock_processor):
+        """Test DocumentProcessor initialization with sqlite-faiss."""
+        params = mock_processor["params"].copy()
+        params["vector_store_type"] = "sqlite-faiss"
+
+        doc_processor = document_processor.DocumentProcessor(**params)
+        mock_processor["log"].warning.assert_not_called()
+        mock_processor["sqlitefaissdb"].assert_called_once_with(doc_processor.config)
+        mock_processor["llamadb"].assert_not_called()
+
+        assert doc_processor is not None
+
+        params.update(
+            embedding_dimension=None,
+            manual_chunking=True,
+            table_name=None,
+            show_progress=False,
+        )
+        assert params == doc_processor.config._Config__attributes
         os.environ.pop("TRANSFORMERS_OFFLINE", None)
 
     def test__check_config_faiss_auto_chunking(self, mock_processor):
