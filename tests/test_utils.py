@@ -36,6 +36,7 @@ class TestUtils:
             "faiss",
             "postgres",
             "llamastack-faiss",
+            "sqlite-faiss",
         ):
             args = parser.parse_args(["--vector-store-type", vector_store_type])
             assert args.vector_store_type == vector_store_type

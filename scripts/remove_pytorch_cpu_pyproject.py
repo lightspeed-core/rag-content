@@ -36,7 +36,7 @@ def remove_sections(file_path: str, sections_to_remove: list[str]) -> None:
         for key in keys[:-1]:
             if key not in current:
                 break
-            current = current[key]  # type: ignore
+            current = current[key]
         else:
             current.pop(keys[-1], None)
 

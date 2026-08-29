@@ -188,3 +188,27 @@ rag:
       sources:
         - {index_id}
 """
+
+
+def write_lcs_config_file(
+    filename: str,
+    *,
+    llama_stack_config_path: str,
+    byok_template: str,
+    index_id: str,
+    model_name: str,
+    dimension: object,
+    vector_store_id: str,
+    db_path: str,
+) -> None:
+    """Write lightspeed-stack.yaml from the base template plus a BYOK snippet."""
+    base = LCS_BASE_TEMPLATE.format(llama_stack_config_path=llama_stack_config_path)
+    data = base + byok_template.format(
+        index_id=index_id,
+        model_name=model_name,
+        dimension=dimension,
+        vector_store_id=vector_store_id,
+        db_path=db_path,
+    )
+    with open(filename, "w", encoding="utf-8") as fd:
+        fd.write(data)

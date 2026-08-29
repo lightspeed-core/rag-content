@@ -8,7 +8,8 @@ spec:
     Integration test: validates that rag-content images (CPU and CUDA) can
     generate a FAISS vector DB that lightspeed-stack can serve end-to-end.
     Runs on multiple architectures (x86_64 and arm64) using the Konflux
-    multi-platform controller. Tests all combinations: 2 images × 2 arches.
+    multi-platform controller. Tests all combinations: 2 images × 2 arches
+    × 2 vector stores (llamastack-faiss and sqlite-faiss).
   params:
     - name: SNAPSHOT
       description: 'JSON string with the application snapshot (contains rag-content-cpu-0-8, rag-content-cuda-12-9-0-8, and lightspeed-stack-0-8 components).'
@@ -127,7 +128,7 @@ spec:
               echo "========== End parameters =========="
 
     - name: run-integration-test
-      description: Run rag-content → lightspeed-stack E2E validation (platforms × images)
+      description: Run rag-content → lightspeed-stack E2E validation (platforms × images × vector stores)
       runAfter:
         - echo-integration-params
       matrix:
@@ -139,6 +140,10 @@ spec:
             value:
               - $(tasks.init-snapshot.results.cpu-image)
               - $(tasks.init-snapshot.results.cuda-image)
+          - name: VECTOR_STORE
+            value:
+              - llamastack-faiss
+              - sqlite-faiss
       params:
         - name: cmd
           value: |
@@ -155,6 +160,8 @@ spec:
             description: The platform of the VM to provision
           - name: RAG_CONTENT_IMAGE
             description: The rag-content container image to test
+          - name: VECTOR_STORE
+            description: Vector store type passed to generate_embeddings.py -s
           - name: cmd
             description: The command to run on the VM
           - name: envs
@@ -192,6 +199,8 @@ spec:
             env:
               - name: RAG_CONTENT_IMAGE
                 value: $(params.RAG_CONTENT_IMAGE)
+              - name: VECTOR_STORE
+                value: $(params.VECTOR_STORE)
               - name: TEST_CMD
                 value: $(params.cmd)
               - name: RESULTS_TEST_OUTPUT_PATH
@@ -263,8 +272,8 @@ spec:
               (cd repo && git fetch origin "${REPO_REV:-main}" && git checkout -q "${REPO_REV:-main}")
               mkdir -p scripts
 
-              # Build podman env flags (RAG_CONTENT_IMAGE comes from task param, not envs)
-              PODMAN_ENV=("-e" "RAG_CONTENT_IMAGE=$RAG_CONTENT_IMAGE")
+              # Build podman env flags (RAG_CONTENT_IMAGE and VECTOR_STORE come from task params)
+              PODMAN_ENV=("-e" "RAG_CONTENT_IMAGE=$RAG_CONTENT_IMAGE" "-e" "VECTOR_STORE=$VECTOR_STORE")
               while [ $# -ne 0 ]; do
                 PODMAN_ENV+=("-e" "$1")
                 shift
@@ -325,9 +334,15 @@ spec:
               exit $EXIT_CODE
 
     - name: run-gpu-integration-test
-      description: Run CUDA rag-content image on a GPU VM to verify GPU is actually used
+      description: Run CUDA rag-content image on a GPU VM (llamastack-faiss and sqlite-faiss)
       runAfter:
         - echo-integration-params
+      matrix:
+        params:
+          - name: VECTOR_STORE
+            value:
+              - llamastack-faiss
+              - sqlite-faiss
       params:
         - name: PLATFORM
           value: linux-g64xlarge/amd64
@@ -349,6 +364,8 @@ spec:
             description: The GPU platform of the VM to provision
           - name: RAG_CONTENT_IMAGE
             description: The CUDA rag-content container image to test
+          - name: VECTOR_STORE
+            description: Vector store type passed to generate_embeddings.py -s
           - name: cmd
             description: The command to run on the VM
           - name: envs
@@ -386,6 +403,8 @@ spec:
             env:
               - name: RAG_CONTENT_IMAGE
                 value: $(params.RAG_CONTENT_IMAGE)
+              - name: VECTOR_STORE
+                value: $(params.VECTOR_STORE)
               - name: TEST_CMD
                 value: $(params.cmd)
               - name: RESULTS_TEST_OUTPUT_PATH
@@ -470,6 +489,7 @@ spec:
               SCRIPTEOF
               # Inject env vars
               printf 'export RAG_CONTENT_IMAGE=%q\n' "$RAG_CONTENT_IMAGE" >> scripts/test.sh
+              printf 'export VECTOR_STORE=%q\n' "$VECTOR_STORE" >> scripts/test.sh
               while [ $# -ne 0 ]; do
                 VAR_NAME="${1%%=*}"
                 VAR_VALUE="${1#*=}"

@@ -10,6 +10,8 @@
 #   LIGHTSPEED_STACK_IMAGE — defaults to pinned release image
 #   GPU_ENABLED            — set to "true" to enable GPU device passthrough and
 #                            verify CUDA is available before DB generation
+#   VECTOR_STORE           — generate_embeddings.py -s value; llamastack-faiss
+#                            (default) or sqlite-faiss
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -18,6 +20,15 @@ CONFIG_DIR="$SCRIPT_DIR/config"
 CORPUS_DIR="$SCRIPT_DIR/corpus"
 
 LIGHTSPEED_STACK_IMAGE="${LIGHTSPEED_STACK_IMAGE:-quay.io/lightspeed-core/lightspeed-stack:dev-latest}"
+VECTOR_STORE="${VECTOR_STORE:-llamastack-faiss}"
+
+case "$VECTOR_STORE" in
+  llamastack-faiss|sqlite-faiss) ;;
+  *)
+    echo "ERROR: VECTOR_STORE must be llamastack-faiss or sqlite-faiss (got: $VECTOR_STORE)"
+    exit 1
+    ;;
+esac
 
 RAG_OUTPUT_DIR=$(mktemp -d /tmp/rag-integration-output.XXXXXX)
 MODEL_DIR=$(mktemp -d /tmp/rag-integration-model.XXXXXX)
@@ -38,6 +49,7 @@ trap cleanup EXIT
 
 progress "RAG_CONTENT_IMAGE=$RAG_CONTENT_IMAGE"
 progress "LIGHTSPEED_STACK_IMAGE=$LIGHTSPEED_STACK_IMAGE"
+progress "VECTOR_STORE=$VECTOR_STORE"
 progress "GPU_ENABLED=${GPU_ENABLED:-false}"
 
 GPU_FLAGS=()
@@ -74,7 +86,7 @@ fi
 #========================================
 # Phase 2/7: Generate FAISS DB
 #========================================
-progress "Phase 2/7: Generating FAISS vector DB from test corpus..."
+progress "Phase 2/7: Generating FAISS vector DB ($VECTOR_STORE) from test corpus..."
 chmod 777 "$RAG_OUTPUT_DIR"
 podman run --rm --network=host "${GPU_FLAGS[@]}" \
   -v "$CORPUS_DIR":/input:ro \
@@ -82,12 +94,29 @@ podman run --rm --network=host "${GPU_FLAGS[@]}" \
   "$RAG_CONTENT_IMAGE" \
   python /rag-content/scripts/generate_embeddings.py \
     -f /input -o /output -i e2e-test-index \
-    -s llamastack-faiss \
+    -s "$VECTOR_STORE" \
     -d /rag-content/embeddings_model
 
 podman unshare chmod -R 777 "$RAG_OUTPUT_DIR" 2>/dev/null || chmod -R 777 "$RAG_OUTPUT_DIR"
 progress "DB generation complete. Output files:"
 ls -la "$RAG_OUTPUT_DIR"
+
+if [ ! -f "$RAG_OUTPUT_DIR/faiss_store.db" ]; then
+  progress "FAILURE: faiss_store.db was not generated"
+  exit 1
+fi
+if [ ! -f "$RAG_OUTPUT_DIR/lightspeed-stack.yaml" ]; then
+  progress "FAILURE: lightspeed-stack.yaml was not generated"
+  exit 1
+fi
+if [ "$VECTOR_STORE" = "sqlite-faiss" ] && [ -f "$RAG_OUTPUT_DIR/llama-stack.yaml" ]; then
+  progress "FAILURE: sqlite-faiss must not write llama-stack.yaml"
+  exit 1
+fi
+if [ "$VECTOR_STORE" = "llamastack-faiss" ] && [ ! -f "$RAG_OUTPUT_DIR/llama-stack.yaml" ]; then
+  progress "FAILURE: llamastack-faiss must write llama-stack.yaml"
+  exit 1
+fi
 
 #========================================
 # Phase 3/7: Copy embedding model

@@ -255,6 +255,105 @@ def _ogx_query(args: argparse.Namespace) -> None:  # noqa: C901
                 print(f"Chunk ID: {chunk_id}\nScore: {score}\nText:\n{_get_chunk_text(chunk)}")
 
 
+def _sqlite_faiss_vector_store_id(db_dir: str, db_file: str) -> str:
+    """Resolve the vector_store_id from lightspeed-stack.yaml or the SQLite keys."""
+    lcs_path = os.path.join(db_dir, "lightspeed-stack.yaml")
+    if os.path.exists(lcs_path):
+        with open(lcs_path, encoding="utf-8") as fd:
+            cfg = yaml.safe_load(fd) or {}
+        stores = cfg.get("rag", {}).get("byok", {}).get("stores", [])
+        if stores and stores[0].get("vector_db_id"):
+            return str(stores[0]["vector_db_id"])
+
+    from lightspeed_rag_content.sqlite_faiss import list_sqlite_faiss_vector_store_ids
+
+    ids = list_sqlite_faiss_vector_store_ids(db_file)
+    if not ids:
+        raise ValueError(f"No sqlite-faiss vector store found in {db_file}")
+    return ids[0]
+
+
+def _sqlite_faiss_query(args: argparse.Namespace) -> None:
+    """Query a faiss_store.db written by sqlite-faiss."""
+    from sentence_transformers import SentenceTransformer
+
+    from lightspeed_rag_content.sqlite_faiss import search_sqlite_faiss_store
+
+    db_file = os.path.join(args.db_path, "faiss_store.db")
+    if not os.path.exists(db_file):
+        logging.error("Cannot find faiss_store.db in %s", args.db_path)
+        exit(1)
+
+    try:
+        vector_store_id = _sqlite_faiss_vector_store_id(args.db_path, db_file)
+    except ValueError as exc:
+        logging.error("%s", exc)
+        exit(1)
+
+    model = SentenceTransformer(os.path.realpath(args.model_path))
+    query_embedding = model.encode([args.query])[0].tolist()
+    hits = search_sqlite_faiss_store(db_file, vector_store_id, query_embedding, k=args.top_k)
+
+    if not hits:
+        logging.warning("No chunks retrieved for query: %s", args.query)
+        if args.json:
+            print(
+                json.dumps(
+                    {
+                        "query": args.query,
+                        "top_k": args.top_k,
+                        "threshold": args.threshold,
+                        "nodes": [],
+                    },
+                    indent=2,
+                )
+            )
+        exit(1)
+
+    if args.threshold > 0.0 and hits[0]["score"] > args.threshold:
+        logging.warning(
+            "Score %s of the top retrieved node for query '%s' "
+            "didn't cross the minimal threshold %s.",
+            hits[0]["score"],
+            args.query,
+            args.threshold,
+        )
+        if args.json:
+            print(
+                json.dumps(
+                    {
+                        "query": args.query,
+                        "top_k": args.top_k,
+                        "threshold": args.threshold,
+                        "nodes": [],
+                    },
+                    indent=2,
+                )
+            )
+        exit(1)
+
+    result = {
+        "query": args.query,
+        "top_k": args.top_k,
+        "threshold": args.threshold,
+        "nodes": [
+            {
+                "id": hit["chunk_id"],
+                "score": hit["score"],
+                "text": hit["content"],
+                "metadata": hit.get("metadata", {}),
+            }
+            for hit in hits
+        ],
+    }
+    if args.json:
+        print(json.dumps(result, indent=2))
+        return
+    for hit in hits:
+        print("=" * 80)
+        print(f"Chunk ID: {hit['chunk_id']}\nScore: {hit['score']}\nText:\n{hit['content']}")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Utility script for querying RAG database")
     parser.add_argument(
@@ -278,7 +377,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--vector-store-type",
         default="auto",
-        choices=["auto", "faiss", "llamastack-faiss"],
+        choices=["auto", "faiss", "llamastack-faiss", "sqlite-faiss"],
         help="vector store type to be used.",
     )
     parser.add_argument(
@@ -310,12 +409,17 @@ if __name__ == "__main__":
         elif os.path.exists(os.path.join(args.db_path, "metadata.json")):
             args.vector_store_type = "faiss"
         elif os.path.exists(os.path.join(args.db_path, "faiss_store.db")):
-            args.vector_store_type = "llamastack-faiss"
+            if os.path.exists(os.path.join(args.db_path, "llama-stack.yaml")):
+                args.vector_store_type = "llamastack-faiss"
+            else:
+                args.vector_store_type = "sqlite-faiss"
         else:
             logging.error(f"Cannot recognize the DB in {args.db_path}")
             exit(1)
 
     if args.vector_store_type == "faiss":
         _llama_index_query(args)
+    elif args.vector_store_type == "sqlite-faiss":
+        _sqlite_faiss_query(args)
     else:
         _ogx_query(args)
