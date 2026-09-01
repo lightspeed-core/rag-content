@@ -59,7 +59,6 @@ dependencies = [
     "llama-index-readers-file>=0.4.11",
     "faiss-cpu>=1.11.0.post1",
     "llama-index-vector-stores-postgres>=0.5.4",
-    # Pin torch/torchvision to versions available as CPU wheels
     # torch 2.9.x pairs with torchvision 0.24.x
     "ogx==1.0.2",
     "ogx-api==1.0.2",
@@ -82,8 +81,8 @@ dependencies = [
 requires-python = "==3.12.*"
 dynamic = ["license", "readme"]
 
-# PyTorch has multiple wheel variants for different backends - cpu, cuda, etc.
-# By default on pypi.org is the cuda variant. Forces uv to use the cpu variant.
+# PyTorch has multiple wheel variants for different backends.
+# Forces uv to use the cpu variant.
 [[tool.uv.index]]
 name = "pytorch-cpu"
 url = "https://download.pytorch.org/whl/cpu"
