@@ -15,15 +15,15 @@ undetected until manual testing or production.
 
 Add a Konflux integration test pipeline to the rag-content repository that runs
 after every successful image build and validates the generated FAISS vector DB
-works end-to-end with lightspeed-stack, on both x86_64 and arm64, for both the
-CPU (`rag-tool`) and CUDA (`rag-tool-cuda`) image variants.
+works end-to-end with lightspeed-stack, on both x86_64 and arm64, for the
+CPU (`rag-tool`) image variant.
 
 ## Decisions
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | Infrastructure | Multi-platform VMs via Konflux multi-platform controller; privileged container on VM (`--privileged --network=host --security-opt label=disable --security-opt seccomp=unconfined -e STORAGE_DRIVER=vfs`) | Native multi-arch testing on x86_64 and arm64; nested podman requires privilege escalation |
-| Pipeline pattern | Tekton matrix fan-out (2 platforms × 2 images = 4 runs) → VM SSH → shell script | Mirrors ramalama's multi-arch integration test pattern; locally reproducible |
+| Pipeline pattern | Tekton matrix fan-out (2 platforms × 1 image = 2 runs) → VM SSH → shell script | Mirrors ramalama's multi-arch integration test pattern; locally reproducible |
 | Lightspeed-stack deployment | Library mode (embedded OGX) via Podman on VM | Single container; no separate OGX service |
 | Lightspeed-stack image | `quay.io/lightspeed-core/lightspeed-stack:dev-latest` | Tracks latest dev build; no manual version bumps |
 | LLM provider | OpenAI (gpt-4o-mini) via Konflux secret | Same pattern as lightspeed-stack E2E |
@@ -38,19 +38,19 @@ CPU (`rag-tool`) and CUDA (`rag-tool-cuda`) image variants.
 │  Tekton Pipeline: rag-content-integration-tests-pipeline         │
 │                                                                  │
 │  Task: init-snapshot                                             │
-│    Extract cpu-image, cuda-image, commit, repo URL from SNAPSHOT │
+│    Extract cpu-image, commit, repo URL from SNAPSHOT             │
 │                                                                  │
 │  Task: echo-integration-params                                   │
 │    Log all parameters for debugging                              │
 │                                                                  │
-│  Task: run-integration-test (2×2 matrix fan-out)                 │
-│    ┌─────────────────────┐  ┌─────────────────────┐              │
-│    │  linux-mlarge/amd64  │  │  linux-mlarge/amd64  │             │
-│    │  CPU image           │  │  CUDA image          │             │
-│    ├─────────────────────┤  ├─────────────────────┤              │
-│    │  linux-mlarge/arm64  │  │  linux-mlarge/arm64  │             │
-│    │  CPU image           │  │  CUDA image          │             │
-│    └─────────────────────┘  └─────────────────────┘              │
+│  Task: run-integration-test (2×1 matrix fan-out)                 │
+│    ┌─────────────────────┐                                       │
+│    │  linux-mlarge/amd64  │                                       │
+│    │  CPU image           │                                       │
+│    ├─────────────────────┤                                       │
+│    │  linux-mlarge/arm64  │                                       │
+│    │  CPU image           │                                       │
+│    └─────────────────────┘                                       │
 │                                                                  │
 │    Each cell: Tekton step SSHs into VM →                         │
 │    git clone + rsync repo → privileged container →               │
@@ -113,18 +113,17 @@ tests/
 Tekton Pipeline with task specs inlined (no external taskRef).
 
 **Params:**
-- `SNAPSHOT` — JSON string with built rag-content images (contains `rag-tool` and `rag-tool-cuda` components, provided by Konflux)
+- `SNAPSHOT` — JSON string with built rag-content images (contains `rag-tool` component, provided by Konflux)
 - `test-name` — defaults to `rag-content-e2e-tests`
 - `platforms` — VM platforms, defaults to `[linux-mlarge/amd64, linux-mlarge/arm64]`
 
 **Tasks:**
-1. `init-snapshot` — parse SNAPSHOT JSON with `jq` to extract separate `cpu-image`
-   (from `rag-tool` component) and `cuda-image` (from `rag-tool-cuda` component),
-   plus git revision and repo URL.
-2. `echo-integration-params` — log all parameters (CPU image, CUDA image, commit,
+1. `init-snapshot` — parse SNAPSHOT JSON with `jq` to extract `cpu-image`
+   (from `rag-tool` component), plus git revision and repo URL.
+2. `echo-integration-params` — log all parameters (CPU image, commit,
    repo URL) for debugging before matrix fan-out.
-3. `run-integration-test` — 2×2 matrix fan-out: platforms × images (cpu-image,
-   cuda-image). Each cell provisions a VM, SSHs in, clones the repo in the Tekton
+3. `run-integration-test` — 2×1 matrix fan-out: platforms × cpu-image.
+   Each cell provisions a VM, SSHs in, clones the repo in the Tekton
    step, rsyncs to the VM, then runs `pipeline-konflux.sh` inside a privileged
    container with `--privileged --network=host --security-opt label=disable
    --security-opt seccomp=unconfined -e STORAGE_DRIVER=vfs`.
@@ -343,15 +342,12 @@ multi-platform controller.
 
 The SNAPSHOT JSON contains two components:
 - `rag-tool` — CPU image, extracted as `cpu-image`
-- `rag-tool-cuda` — CUDA image, extracted as `cuda-image`
-
-Both are tested independently via the matrix fan-out.
 
 ## What This Validates
 
 The integration test validates the full pipeline from index generation to serving:
 
-1. **Image build correctness** — both the CPU and CUDA rag-content images can run
+1. **Image build correctness** — the CPU rag-content image can run
    `generate_embeddings.py` and produce valid output
 2. **Embedding model bundling** — the model at `/rag-content/embeddings_model/`
    is present, loadable, and produces valid embeddings
@@ -362,8 +358,6 @@ The integration test validates the full pipeline from index generation to servin
 5. **End-to-end RAG retrieval** — a query retrieves context from the test corpus
    and includes it in the LLM-augmented response
 6. **Multi-arch compatibility** — all of the above works on both x86_64 and arm64
-7. **CPU and CUDA image parity** — both image variants produce functionally
-   equivalent results
 
 ## What This Does NOT Validate
 
@@ -371,7 +365,6 @@ The integration test validates the full pipeline from index generation to servin
 - Multi-product document processing or OKP filtering
 - Lightspeed-stack features unrelated to RAG (auth, MCP, streaming, etc.)
 - Performance or scale (single small corpus, single query)
-- GPU acceleration (CUDA image is tested for correctness, not GPU code paths)
 
 ## Failure Modes and Debugging
 
