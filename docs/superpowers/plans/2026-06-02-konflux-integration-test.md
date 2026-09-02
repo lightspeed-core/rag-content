@@ -2,9 +2,9 @@
 
 > **Status:** Implemented. This plan documents the implemented tasks for reference.
 
-**Goal:** Add a Konflux integration test that validates rag-content FAISS vector DB generation works end-to-end with lightspeed-stack on both x86_64 and arm64, for both CPU (`rag-tool`) and CUDA (`rag-tool-cuda`) image variants (2 platforms × 2 images = 4 matrix runs).
+**Goal:** Add a Konflux integration test that validates rag-content FAISS vector DB generation works end-to-end with lightspeed-stack on both x86_64 and arm64, for the CPU (`rag-tool`) image variant (2 platforms × 1 image = 2 matrix runs).
 
-**Architecture:** Tekton Pipeline with 2×2 matrix fan-out across platforms and images. The `init-snapshot` task extracts separate `cpu-image` and `cuda-image` from the SNAPSHOT JSON. The multi-platform controller provisions VMs for each arch. The task spec is inlined in the pipeline YAML — it SSHs into each VM, clones the repo in the Tekton step, rsyncs to the VM, then runs `pipeline-konflux.sh` inside a privileged container (`--privileged --network=host --security-opt label=disable --security-opt seccomp=unconfined -e STORAGE_DRIVER=vfs`). The script uses Podman to run the built rag-content image (DB generation) and `quay.io/lightspeed-core/lightspeed-stack:dev-latest` (library mode, serving), then queries and asserts RAG context from a synthetic corpus. `test-vm-cmd.yaml` exists as a standalone reference but is not used by the pipeline.
+**Architecture:** Tekton Pipeline with 2×1 matrix fan-out across platforms. The `init-snapshot` task extracts `cpu-image` from the SNAPSHOT JSON. The multi-platform controller provisions VMs for each arch. The task spec is inlined in the pipeline YAML — it SSHs into each VM, clones the repo in the Tekton step, rsyncs to the VM, then runs `pipeline-konflux.sh` inside a privileged container (`--privileged --network=host --security-opt label=disable --security-opt seccomp=unconfined -e STORAGE_DRIVER=vfs`). The script uses Podman to run the built rag-content image (DB generation) and `quay.io/lightspeed-core/lightspeed-stack:dev-latest` (library mode, serving), then queries and asserts RAG context from a synthetic corpus. `test-vm-cmd.yaml` exists as a standalone reference but is not used by the pipeline.
 
 **Tech Stack:** Tekton/Konflux pipelines, Konflux multi-platform controller, Podman, Bash, lightspeed-stack (library mode), OpenAI API, FAISS/OGX
 
@@ -16,7 +16,7 @@
 
 | File | Responsibility |
 |------|---------------|
-| `.tekton/integration-tests/pipeline/rag-content-integration-test.yaml` | Tekton Pipeline — SNAPSHOT extraction (cpu-image + cuda-image), matrix fan-out across platforms × images |
+| `.tekton/integration-tests/pipeline/rag-content-integration-test.yaml` | Tekton Pipeline — SNAPSHOT extraction (cpu-image), matrix fan-out across platforms |
 | `.tekton/integration-tests/pipeline/its.yaml` | IntegrationTestScenario — registers the pipeline with Konflux |
 | `.tekton/integration-tests/tasks/test-vm-cmd.yaml` | Standalone reference Tekton Task (not used by pipeline — task spec is inlined) |
 | `tests/integration-konflux/pipeline-konflux.sh` | Main orchestration — DB generation, serving, query, assertion, teardown |
@@ -82,12 +82,11 @@ required by the `/v1/query` endpoint:
 - `.tekton/integration-tests/pipeline/its.yaml`
 
 Pipeline uses Tekton `matrix` to fan out `run-integration-test` across
-platforms (`linux-mlarge/amd64`, `linux-mlarge/arm64`) × images (cpu-image,
-cuda-image) = 4 runs. Task spec is inlined in the pipeline (no taskRef).
+platforms (`linux-mlarge/amd64`, `linux-mlarge/arm64`) × cpu-image
+= 2 runs. Task spec is inlined in the pipeline (no taskRef).
 
-The `init-snapshot` task extracts two separate images from the SNAPSHOT:
+The `init-snapshot` task extracts the image from the SNAPSHOT:
 - `cpu-image` from the `rag-tool` component
-- `cuda-image` from the `rag-tool-cuda` component
 
 Each matrix cell:
 - Multi-platform controller provisions a VM and creates SSH credentials
@@ -115,9 +114,9 @@ Issues found and fixed during testing:
 
 ### Task 7: Multi-arch and dual-image support
 
-Added Tekton 2×2 matrix fan-out: platforms (`linux-mlarge/amd64`,
-`linux-mlarge/arm64`) × images (cpu-image, cuda-image). The `init-snapshot` task
-extracts both `rag-tool` and `rag-tool-cuda` component images from the SNAPSHOT.
+Added Tekton matrix fan-out: platforms (`linux-mlarge/amd64`,
+`linux-mlarge/arm64`) × cpu-image. The `init-snapshot` task
+extracts the `rag-tool` component image from the SNAPSHOT.
 The `test-vm-cmd.yaml` standalone task is kept as reference but the pipeline
 inlines its own task spec with git clone, rsync, privileged container execution,
 and additional secrets (`huggingface-token`).

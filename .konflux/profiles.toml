@@ -11,11 +11,3 @@ tekton_files = [
     ".tekton/rag-content-cpu-0-8-pull-request.yaml",
     ".tekton/rag-content-cpu-0-8-push.yaml",
 ]
-
-[profiles.cuda]
-rhoai_index_url = "https://packages.redhat.com/api/pypi/public-rhai/rhoai/3.5/cuda12.9-ubi9/simple/"
-output_suffix = ".cuda"
-tekton_files = [
-    ".tekton/rag-content-cuda-12-9-0-8-pull-request.yaml",
-    ".tekton/rag-content-cuda-12-9-0-8-push.yaml",
-]
