@@ -1,4 +1,4 @@
-# Shared Buildah build + push for dev tags (CPU or GPU). Called by build_and_push_dev*.yaml.
+# Shared Buildah build + push for dev tags. Called by build_and_push_dev.yaml.
 on:
   workflow_call:
     inputs:

@@ -2,7 +2,7 @@
 """Policy-driven dependency resolver for Hermeto/Cachi2 hermetic builds.
 
 Enforces: RHOAI wheel > PyPI sdist > PyPI wheel (last resort).
-Usage: python3 scripts/konflux_resolve.py --profile cpu|cuda [--verbose | --quiet]
+Usage: python3 scripts/konflux_resolve.py --profile cpu [--verbose | --quiet]
 """
 
 from __future__ import annotations
@@ -1200,7 +1200,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Policy-driven dependency resolver for Hermeto/Cachi2 builds."
     )
-    parser.add_argument("--profile", required=True, help="Build profile (cpu|cuda)")
+    parser.add_argument("--profile", required=True, help="Build profile (cpu)")
     verbosity = parser.add_mutually_exclusive_group()
     verbosity.add_argument("--verbose", action="store_true", help="Verbose logging")
     verbosity.add_argument("--quiet", action="store_true", help="Errors only")
