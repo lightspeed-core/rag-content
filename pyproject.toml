@@ -47,7 +47,7 @@ build-backend = "pdm.backend"
 
 [project]
 name = "lightspeed-rag-content"
-version = "0.5.0"
+version = "0.7.0"
 description = "RAG content for OpenShift LightSpeed."
 authors = []
 dependencies = [
@@ -60,9 +60,9 @@ dependencies = [
     "faiss-cpu>=1.11.0.post1",
     "llama-index-vector-stores-postgres>=0.5.4",
     # torch 2.9.x pairs with torchvision 0.24.x
-    "ogx==1.0.2",
-    "ogx-api==1.0.2",
-    "ogx-client==1.0.2",
+    "ogx==1.2.5",
+    "ogx-api==1.2.5",
+    "ogx-client==1.2.5",
     "torch>=2.9.0",
     "torchvision>=0.24.0",
     "aiosqlite>=0.21.0",
