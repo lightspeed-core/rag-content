@@ -22,8 +22,9 @@ packages:
   ]
 upgradePackages:
   [
-    libgcrypt,
-    thrift,
+    python3.12,
+    python3.12-devel,
+    python3.12-libs,
   ]
 moduleEnable:
   - "ruby:3.3"
