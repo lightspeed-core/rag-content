@@ -219,8 +219,6 @@ nest-asyncio==1.6.0 \
     --hash=sha256:bc670975ff4841edd60557a783e392e2986b15add8e0a00d1496c1e39dbc770e
 networkx==3.6.1 \
     --hash=sha256:56b687ad58bed743066f1b7d5e6f56a72d2f193c8eaf35064abaedda4fba3745
-nltk==3.10.0 \
-    --hash=sha256:a15da2911adca5c7b4574b902f6b344f3f65db72ded7f79b30617bbe7100d318
 numpy==2.5.1 \
     --hash=sha256:398208907bae47249bf42e9ec9777b0843f16ff00b184a787df82f6e9d34e2ff \
     --hash=sha256:3ac2e92457dccce781b28fef191628bca87e4faf42d32bdc9a27b9e5591ad4a9 \
