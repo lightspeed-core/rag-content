@@ -330,7 +330,7 @@ spec:
         - echo-integration-params
       params:
         - name: PLATFORM
-          value: linux-g64xlarge/amd64
+          value: linux-g6xlarge/amd64
         - name: RAG_CONTENT_IMAGE
           value: $(tasks.init-snapshot.results.cuda-image)
         - name: cmd
