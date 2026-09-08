@@ -20,10 +20,6 @@ packages:
     openexr-libs,
     skopeo,
   ]
-upgradePackages:
-  [
-    thrift,
-  ]
 moduleEnable:
   - "ruby:3.3"
 contentOrigin:
