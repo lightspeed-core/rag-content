@@ -76,7 +76,7 @@ dependencies = [
     "certifi>=2025.10.5",
     # CVE floor constraints — transitive deps pinned to fix known vulnerabilities
     "Pillow>=12.3.0",          # CVE-2026-59205: heap corruption in ImageCms.ImageCmsTransform.apply
-    "nltk>=3.10.0",            # CVE-2026-54293: URL-encoded path traversal in nltk.data.load()
+    "nltk>=3.10.3",            # CVE-2026-54293: URL-encoded path traversal in nltk.data.load()
 ]
 requires-python = "==3.12.*"
 dynamic = ["license", "readme"]
