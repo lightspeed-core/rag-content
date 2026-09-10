@@ -18,9 +18,10 @@ packages:
   ]
 upgradePackages:
   [
-    libxslt,
-    libgcrypt,
-    thrift,
+    python3.12,
+    python3.12-libs,
+    python3.12-devel,
+    glib2
   ]
 moduleEnable:
   - "ruby:3.3"
