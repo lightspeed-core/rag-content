@@ -214,6 +214,20 @@ arches:
     name: kmod
     evr: 28-10.el9
     sourcerpm: kmod-28-10.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/baseos/os/Packages/o/openssh-8.7p1-45.el9_6.4.aarch64.rpm
+    repoid: rhel-9-for-aarch64-baseos-eus-rpms__9_DOT_6
+    size: 456765
+    checksum: sha256:3534b08fc922286c6cda29719390db41ddf7822f6fbfa246f892cdea0dff98df
+    name: openssh
+    evr: 8.7p1-45.el9_6.4
+    sourcerpm: openssh-8.7p1-45.el9_6.4.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/baseos/os/Packages/o/openssh-clients-8.7p1-45.el9_6.4.aarch64.rpm
+    repoid: rhel-9-for-aarch64-baseos-eus-rpms__9_DOT_6
+    size: 699364
+    checksum: sha256:e944accee643c03db938dcba977e694b216d89ba86da80dc7a289b76a06cab52
+    name: openssh-clients
+    evr: 8.7p1-45.el9_6.4
+    sourcerpm: openssh-8.7p1-45.el9_6.4.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/baseos/os/Packages/p/protobuf-c-1.3.3-13.el9.aarch64.rpm
     repoid: rhel-9-for-aarch64-baseos-eus-rpms__9_DOT_6
     size: 38582
@@ -230,10 +244,10 @@ arches:
     sourcerpm: shadow-utils-4.9-12.el9.src.rpm
   source: []
   module_metadata:
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/repodata/5776b8f3d4c2fe7aa1d4ade5bc1147cedb578335f7b6e244e7ffd81e74c0c74b-modules.yaml.gz
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/repodata/7c77606ce7ee034b18c77073b6d144d11cb2cf2bd465aa177de9c35666a58d71-modules.yaml.gz
     repoid: rhel-9-for-aarch64-appstream-eus-rpms__9_DOT_6
     size: 45006
-    checksum: sha256:5776b8f3d4c2fe7aa1d4ade5bc1147cedb578335f7b6e244e7ffd81e74c0c74b
+    checksum: sha256:7c77606ce7ee034b18c77073b6d144d11cb2cf2bd465aa177de9c35666a58d71
 - arch: x86_64
   packages:
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/c/containers-common-1-117.el9_6.x86_64.rpm
@@ -446,6 +460,20 @@ arches:
     name: kmod
     evr: 28-10.el9
     sourcerpm: kmod-28-10.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/baseos/os/Packages/o/openssh-8.7p1-45.el9_6.4.x86_64.rpm
+    repoid: rhel-9-for-x86_64-baseos-eus-rpms__9_DOT_6
+    size: 467908
+    checksum: sha256:e4eeb264f72d5fa7ecd3a11d37342e333d8329cbd178181885d95ef2d43b4607
+    name: openssh
+    evr: 8.7p1-45.el9_6.4
+    sourcerpm: openssh-8.7p1-45.el9_6.4.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/baseos/os/Packages/o/openssh-clients-8.7p1-45.el9_6.4.x86_64.rpm
+    repoid: rhel-9-for-x86_64-baseos-eus-rpms__9_DOT_6
+    size: 730299
+    checksum: sha256:a679af014e014ac1654aeaf37644bd2166d7b1fa3f4924e4d8874a92943f95c8
+    name: openssh-clients
+    evr: 8.7p1-45.el9_6.4
+    sourcerpm: openssh-8.7p1-45.el9_6.4.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/baseos/os/Packages/p/protobuf-c-1.3.3-13.el9.x86_64.rpm
     repoid: rhel-9-for-x86_64-baseos-eus-rpms__9_DOT_6
     size: 38224
@@ -462,7 +490,7 @@ arches:
     sourcerpm: shadow-utils-4.9-12.el9.src.rpm
   source: []
   module_metadata:
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/repodata/431d2c92b52c34ca7048dc9a9098cfdbebb1b8f808710e560f750c1328d4a865-modules.yaml.gz
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/repodata/b97db94d0cf77a440eb4c85f7cfc3023ce4210598308587b1d00aae8f1652b86-modules.yaml.gz
     repoid: rhel-9-for-x86_64-appstream-eus-rpms__9_DOT_6
     size: 43699
-    checksum: sha256:431d2c92b52c34ca7048dc9a9098cfdbebb1b8f808710e560f750c1328d4a865
+    checksum: sha256:b97db94d0cf77a440eb4c85f7cfc3023ce4210598308587b1d00aae8f1652b86
