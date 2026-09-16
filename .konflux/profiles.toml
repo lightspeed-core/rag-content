@@ -8,6 +8,6 @@ force_sdist_packages = ["setuptools", "packaging", "pluggy", "tomlkit"]
 rhoai_index_url = "https://packages.redhat.com/api/pypi/public-rhai/rhoai/3.5/cpu-ubi9/simple/"
 output_suffix = ""
 tekton_files = [
-    ".tekton/rag-content-cpu-0-8-pull-request.yaml",
-    ".tekton/rag-content-cpu-0-8-push.yaml",
+    ".tekton/rag-content-cpu-0-7-pull-request.yaml",
+    ".tekton/rag-content-cpu-0-7-push.yaml",
 ]
