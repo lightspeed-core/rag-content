@@ -20,12 +20,14 @@ packages:
     openexr-libs,
     skopeo,
   ]
+
 upgradePackages:
   [
-    python3.12,
-    python3.12-devel,
-    python3.12-libs,
+    ffmpeg-free-rhai,
+    acl,
+    libxslt,
   ]
+
 moduleEnable:
   - "ruby:3.3"
 contentOrigin:
