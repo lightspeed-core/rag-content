@@ -23,9 +23,8 @@ packages:
 
 upgradePackages:
   [
-    ffmpeg-free-rhai,
-    acl,
-    libxslt,
+    python3,
+    python3-libs,
   ]
 
 moduleEnable:

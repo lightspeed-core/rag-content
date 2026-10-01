@@ -270,6 +270,20 @@ arches:
     name: protobuf-c
     evr: 1.3.3-13.el9
     sourcerpm: protobuf-c-1.3.3-13.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/baseos/os/Packages/p/python3-3.9.21-2.el9_6.7.aarch64.rpm
+    repoid: rhel-9-for-aarch64-baseos-eus-rpms__9_DOT_6
+    size: 25259
+    checksum: sha256:8da6c570a5e33d89dd40077fbd85bf0c719fbfa9db07f0a22c3fec82429921f8
+    name: python3
+    evr: 3.9.21-2.el9_6.7
+    sourcerpm: python3.9-3.9.21-2.el9_6.7.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/baseos/os/Packages/p/python3-libs-3.9.21-2.el9_6.7.aarch64.rpm
+    repoid: rhel-9-for-aarch64-baseos-eus-rpms__9_DOT_6
+    size: 8462381
+    checksum: sha256:57c86796858fff48efec988106d85c7b3e3ec63336f20d1d666e9756dfa988c0
+    name: python3-libs
+    evr: 3.9.21-2.el9_6.7
+    sourcerpm: python3.9-3.9.21-2.el9_6.7.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/baseos/os/Packages/s/shadow-utils-subid-4.9-12.el9.aarch64.rpm
     repoid: rhel-9-for-aarch64-baseos-eus-rpms__9_DOT_6
     size: 89073
@@ -279,10 +293,10 @@ arches:
     sourcerpm: shadow-utils-4.9-12.el9.src.rpm
   source: []
   module_metadata:
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/repodata/c0247d3f1b3b1ba7834dfbeed9fcb52d3eea42f58194b0fd260a080f55ff475f-modules.yaml.gz
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/repodata/de89bec3a9c6f8a63456cbb83e330d50923287c084d255e12958787935768b9d-modules.yaml.gz
     repoid: rhel-9-for-aarch64-appstream-eus-rpms__9_DOT_6
-    size: 45006
-    checksum: sha256:c0247d3f1b3b1ba7834dfbeed9fcb52d3eea42f58194b0fd260a080f55ff475f
+    size: 46121
+    checksum: sha256:de89bec3a9c6f8a63456cbb83e330d50923287c084d255e12958787935768b9d
 - arch: x86_64
   packages:
   - url: https://cdn.redhat.com/content/dist/layered/rhel9/x86_64/rhelai/3.5/os/Packages/f/ffmpeg-free-rhai-6.1.6-9.el9ai.x86_64.rpm
@@ -551,6 +565,20 @@ arches:
     name: protobuf-c
     evr: 1.3.3-13.el9
     sourcerpm: protobuf-c-1.3.3-13.el9.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/baseos/os/Packages/p/python3-3.9.21-2.el9_6.7.x86_64.rpm
+    repoid: rhel-9-for-x86_64-baseos-eus-rpms__9_DOT_6
+    size: 25312
+    checksum: sha256:cc08460dae8a0833113110e2a8a38d2ede7c61142e580de8c0b697a3b0a5607a
+    name: python3
+    evr: 3.9.21-2.el9_6.7
+    sourcerpm: python3.9-3.9.21-2.el9_6.7.src.rpm
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/baseos/os/Packages/p/python3-libs-3.9.21-2.el9_6.7.x86_64.rpm
+    repoid: rhel-9-for-x86_64-baseos-eus-rpms__9_DOT_6
+    size: 8473456
+    checksum: sha256:0dd8473784ef930055b72de89db1d7d484134a02157ee46dbb9cfed42f0f5835
+    name: python3-libs
+    evr: 3.9.21-2.el9_6.7
+    sourcerpm: python3.9-3.9.21-2.el9_6.7.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/baseos/os/Packages/s/shadow-utils-subid-4.9-12.el9.x86_64.rpm
     repoid: rhel-9-for-x86_64-baseos-eus-rpms__9_DOT_6
     size: 90389
@@ -560,7 +588,7 @@ arches:
     sourcerpm: shadow-utils-4.9-12.el9.src.rpm
   source: []
   module_metadata:
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/repodata/1f040a7cf1f5fa4cdef6c5128244b286254c88261fad67a91a8d199af672db33-modules.yaml.gz
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/repodata/999b6aa9d656b1662942444559b17e6b87782570ae94afa9df45cbaf20d46cab-modules.yaml.gz
     repoid: rhel-9-for-x86_64-appstream-eus-rpms__9_DOT_6
-    size: 43699
-    checksum: sha256:1f040a7cf1f5fa4cdef6c5128244b286254c88261fad67a91a8d199af672db33
+    size: 44734
+    checksum: sha256:999b6aa9d656b1662942444559b17e6b87782570ae94afa9df45cbaf20d46cab
