@@ -662,6 +662,10 @@ podman run --rm \
     --base-image registry.access.redhat.com/ubi9/ubi:latest
 ```
 
+### Security policy
+
+* See [security policy document](SECURITY.md).
+
 ### Excluding the embedding model
 
 If the model will be provided separately at runtime, pass `--exclude-model`:
