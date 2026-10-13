@@ -18,8 +18,6 @@ packages:
   ]
 upgradePackages:
   [
-    acl,
-    ffmpeg-free-rhai,
   ]
 moduleEnable:
   - "ruby:3.3"
