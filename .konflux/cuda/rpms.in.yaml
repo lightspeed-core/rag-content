@@ -1,12 +1,8 @@
 packages:
   [
     gcc,
-    ruby,
-    ruby-libs,
     rubygems,
     rubygem-bundler,
-    rubygem-io-console,
-    rubygem-psych,
     python3.12,
     python3.12-devel,
     python3.12-pip,
