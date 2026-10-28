@@ -19,6 +19,7 @@ packages:
 
 upgradePackages:
   [
+    libbrotli,
   ]
 
 moduleEnable:
