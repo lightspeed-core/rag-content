@@ -77,7 +77,7 @@ dependencies = [
     # CVE floor constraints — transitive deps pinned to fix known vulnerabilities
     "Pillow>=13.0.0",          # CVE-2026-96639
     "nltk>=3.10.0",            # CVE-2026-54293: URL-encoded path traversal in nltk.data.load()
-    "pypdf>=6.14.2",           # CVE-2026-59935/59936/59937/59938: infinite loops, memory exhaustion
+    "pypdf>=6.21.4",           # CVE-2026-103000
     "mcp>=1.28.1",             # CVE-2026-52869/52870/59950: HTTP session hijack, task access, WebSocket origin bypass
 ]
 requires-python = ">=3.12,<3.15"

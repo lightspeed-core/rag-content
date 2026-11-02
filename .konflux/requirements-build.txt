@@ -34,6 +34,7 @@ flit-core==4.2.0
     #   dependency-groups
     #   packaging
     #   pathspec
+    #   pypdf
     #   pyproject-hooks
     #   wheel
 hatch-fancy-pypi-readme==25.1.0
@@ -68,6 +69,7 @@ macholib==1.16.4
     # via delocate
 packaging==25.0
     # via
+    #   cibuildwheel
     #   hatchling
     #   scikit-build-core
     #   setuptools-scm
