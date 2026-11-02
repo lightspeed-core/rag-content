@@ -80,6 +80,7 @@ dependencies = [
     "pypdf>=6.14.2",           # CVE-2026-59935/59936/59937/59938: infinite loops, memory exhaustion
     "mcp>=1.28.1",             # CVE-2026-52869/52870/59950: HTTP session hijack, task access, WebSocket origin bypass
     "PyJWT>=2.15.0",           # CVE-2026-102268
+    "urllib3>=2.8.0",          # CVE-2026-97689
 ]
 requires-python = "==3.12.*"
 dynamic = ["license", "readme"]
