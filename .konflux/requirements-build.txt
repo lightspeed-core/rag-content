@@ -4,33 +4,96 @@
 #
 #    pybuild-deps compile --output-file=.konflux/requirements-build.txt .konflux/_tmp_sdist_list.txt
 #
+altgraph==0.17.5
+    # via macholib
+bashlex==0.18
+    # via cibuildwheel
+bracex==3.2
+    # via cibuildwheel
+build==1.6.1
+    # via cibuildwheel
 calver==2025.10.20
     # via trove-classifiers
+certifi==2026.10.23
+    # via cibuildwheel
+cibuildwheel==4.3.5
+    # via docling-parse
+cmake==4.4.4
+    # via docling-parse
+delocate==0.13.0
+    # via docling-parse
+dependency-groups==1.3.2
+    # via cibuildwheel
+filelock==4.2.7
+    # via cibuildwheel
+flit-core==3.12.0
+    # via typing-extensions
 flit-core==4.2.0
     # via
+    #   build
+    #   dependency-groups
     #   packaging
     #   pathspec
+    #   pyproject-hooks
+    #   wheel
+hatch-fancy-pypi-readme==25.1.0
+    # via
+    #   filelock
+    #   platformdirs
 hatch-vcs==0.5.0
-    # via chardet
-hatchling==1.33.0
     # via
     #   chardet
+    #   filelock
+    #   humanize
+    #   platformdirs
+    #   scikit-build-core
+hatchling==1.33.0
+    # via
+    #   bracex
+    #   chardet
+    #   cibuildwheel
+    #   docling
+    #   docling-slim
+    #   filelock
+    #   hatch-fancy-pypi-readme
     #   hatch-vcs
+    #   humanize
     #   llama-index-readers-file
     #   llama-index-vector-stores-postgres
+    #   platformdirs
+    #   scikit-build-core
+humanize==4.16.0
+    # via cibuildwheel
+macholib==1.16.4
+    # via delocate
 packaging==25.0
     # via
     #   hatchling
+    #   scikit-build-core
     #   setuptools-scm
     #   vcs-versioning
+    #   wheel
 pathspec==1.1.1
-    # via hatchling
+    # via
+    #   hatchling
+    #   scikit-build-core
+platformdirs==4.14.3
+    # via cibuildwheel
 pluggy==1.6.0
     # via hatchling
 poetry-core==2.5.0
     # via tomlkit
+pybind11==3.1.0
+    # via docling-parse
+pyproject-hooks==1.3.3
+    # via build
+scikit-build-core==1.1.1
+    # via
+    #   cmake
+    #   pybind11
 setuptools-scm==10.2.1
     # via
+    #   delocate
     #   hatch-vcs
     #   ogx
     #   ogx-api
@@ -39,14 +102,24 @@ tomlkit==0.15.2
     # via hatchling
 trove-classifiers==2026.9.21.13
     # via hatchling
+typing-extensions==4.16.0
+    # via delocate
 vcs-versioning==2.2.2
     # via setuptools-scm
+wheel==0.48.0
+    # via
+    #   bashlex
+    #   docling-parse
 
 # The following packages are considered to be unsafe in a requirements file:
 setuptools==81.0.0
     # via
+    #   bashlex
     #   calver
+    #   certifi
+    #   delocate
     #   doclang
+    #   docling-parse
     #   ogx
     #   ogx-api
     #   ogx-client
