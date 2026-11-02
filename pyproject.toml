@@ -71,7 +71,7 @@ dependencies = [
     "hf-xet>=1.2.0",
     "einops>=0.8.1",
     # For HTML to Markdown conversion in BYOK workflows
-    "docling>=2.94.0",
+    "docling>=2.132.0",        # CVE-2026-105744
     "python-frontmatter>=1.1.0",
     "certifi>=2025.10.5",
     # CVE floor constraints — transitive deps pinned to fix known vulnerabilities
