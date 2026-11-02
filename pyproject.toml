@@ -122,6 +122,7 @@ dev = [
     "pytest-mock>=3.15.1",
     "pybuild-deps>=0.5.0",
     "pip==26.1.2",
+    "virtualenv>=21.14.9",
 ]
 
 [tool.pylint.main]
