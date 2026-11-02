@@ -106,7 +106,7 @@ torchvision = [{ index = "pytorch-cpu" }]
 
 [dependency-groups]
 dev = [
-    "black>=25.1.0",
+    "black>=26.10.1", # CVE-2026-114134
     "mypy>=1.15.0",
     "ruff>=0.12.4",
     "types-requests>=2.32.0.20240622",
