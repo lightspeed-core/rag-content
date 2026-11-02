@@ -73,7 +73,7 @@ dependencies = [
     # For HTML to Markdown conversion in BYOK workflows
     "docling>=2.94.0",
     "python-frontmatter>=1.1.0",
-    "certifi>=2025.10.5",
+    "certifi>=2026.10.18",
     # CVE floor constraints — transitive deps pinned to fix known vulnerabilities
     "Pillow>=13.0.0",          # CVE-2026-96639
     "nltk>=3.10.0",            # CVE-2026-54293: URL-encoded path traversal in nltk.data.load()
