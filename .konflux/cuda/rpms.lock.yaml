@@ -179,13 +179,6 @@ arches:
     name: yajl
     evr: 2.1.0-25.el9
     sourcerpm: yajl-2.1.0-25.el9.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/baseos/os/Packages/c/curl-minimal-7.76.1-31.el9_6.4.aarch64.rpm
-    repoid: rhel-9-for-aarch64-baseos-eus-rpms__9_DOT_6
-    size: 125239
-    checksum: sha256:2ecd0625e515ed14c606247a307fe77fb92e0a7f719fa4ec0d2970d53a94aad0
-    name: curl-minimal
-    evr: 7.76.1-31.el9_6.4
-    sourcerpm: curl-7.76.1-31.el9_6.4.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/baseos/os/Packages/f/fuse-common-3.10.2-9.el9.aarch64.rpm
     repoid: rhel-9-for-aarch64-baseos-eus-rpms__9_DOT_6
     size: 8718
@@ -193,13 +186,6 @@ arches:
     name: fuse-common
     evr: 3.10.2-9.el9
     sourcerpm: fuse3-3.10.2-9.el9.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/baseos/os/Packages/l/libcurl-minimal-7.76.1-31.el9_6.4.aarch64.rpm
-    repoid: rhel-9-for-aarch64-baseos-eus-rpms__9_DOT_6
-    size: 225436
-    checksum: sha256:02734e347f33c0f468feb7b5a51ae3a9c2d3ce905584e3b44869921f21496f6d
-    name: libcurl-minimal
-    evr: 7.76.1-31.el9_6.4
-    sourcerpm: curl-7.76.1-31.el9_6.4.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/baseos/os/Packages/p/protobuf-c-1.3.3-13.el9.aarch64.rpm
     repoid: rhel-9-for-aarch64-baseos-eus-rpms__9_DOT_6
     size: 38582
@@ -216,10 +202,10 @@ arches:
     sourcerpm: shadow-utils-4.9-12.el9.src.rpm
   source: []
   module_metadata:
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/repodata/70fc42aed1f5554d1eec6e438ecee665b5c58e2937f96e2be93bd5aef72a057b-modules.yaml.gz
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/aarch64/appstream/os/repodata/11e353e25b7fc37ff7e5972028e94f83a10527244b8dad74c5364bb3a405b782-modules.yaml.gz
     repoid: rhel-9-for-aarch64-appstream-eus-rpms__9_DOT_6
     size: 48203
-    checksum: sha256:70fc42aed1f5554d1eec6e438ecee665b5c58e2937f96e2be93bd5aef72a057b
+    checksum: sha256:11e353e25b7fc37ff7e5972028e94f83a10527244b8dad74c5364bb3a405b782
 - arch: x86_64
   packages:
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/Packages/c/containers-common-1-117.el9_6.x86_64.rpm
@@ -397,13 +383,6 @@ arches:
     name: yajl
     evr: 2.1.0-25.el9
     sourcerpm: yajl-2.1.0-25.el9.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/baseos/os/Packages/c/curl-minimal-7.76.1-31.el9_6.4.x86_64.rpm
-    repoid: rhel-9-for-x86_64-baseos-eus-rpms__9_DOT_6
-    size: 128880
-    checksum: sha256:f78473a803dab272bb2211784b025cfce54e3a7f3519d9fa1713235577384088
-    name: curl-minimal
-    evr: 7.76.1-31.el9_6.4
-    sourcerpm: curl-7.76.1-31.el9_6.4.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/baseos/os/Packages/f/fuse-common-3.10.2-9.el9.x86_64.rpm
     repoid: rhel-9-for-x86_64-baseos-eus-rpms__9_DOT_6
     size: 8750
@@ -411,13 +390,6 @@ arches:
     name: fuse-common
     evr: 3.10.2-9.el9
     sourcerpm: fuse3-3.10.2-9.el9.src.rpm
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/baseos/os/Packages/l/libcurl-minimal-7.76.1-31.el9_6.4.x86_64.rpm
-    repoid: rhel-9-for-x86_64-baseos-eus-rpms__9_DOT_6
-    size: 229836
-    checksum: sha256:986b7e2e5112340ceda2f6643130cc6cfa6bec9a0ca47445dff9687ca8b31915
-    name: libcurl-minimal
-    evr: 7.76.1-31.el9_6.4
-    sourcerpm: curl-7.76.1-31.el9_6.4.src.rpm
   - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/baseos/os/Packages/p/protobuf-c-1.3.3-13.el9.x86_64.rpm
     repoid: rhel-9-for-x86_64-baseos-eus-rpms__9_DOT_6
     size: 38224
@@ -434,7 +406,7 @@ arches:
     sourcerpm: shadow-utils-4.9-12.el9.src.rpm
   source: []
   module_metadata:
-  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/repodata/8f919efd201314fa87086a8f2f4cd5298e905b4fa948f3d81fd8ec0862dc7325-modules.yaml.gz
+  - url: https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/repodata/f4f3c415db8e8d9281665ca628a610236a9a27bfc57b6c8acda3c905ceb254c8-modules.yaml.gz
     repoid: rhel-9-for-x86_64-appstream-eus-rpms__9_DOT_6
     size: 46437
-    checksum: sha256:8f919efd201314fa87086a8f2f4cd5298e905b4fa948f3d81fd8ec0862dc7325
+    checksum: sha256:f4f3c415db8e8d9281665ca628a610236a9a27bfc57b6c8acda3c905ceb254c8
