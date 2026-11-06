@@ -14,8 +14,6 @@ packages:
   ]
 upgradePackages:
   [
-    libcurl-minimal,
-    curl-minimal,
   ]
 moduleEnable:
   - "ruby:3.3"
