@@ -18,6 +18,15 @@ packages:
   ]
 upgradePackages:
   [
+    python3-libs,
+    python3,
+    tesseract,
+    libXrender,
+    cpp,
+    gcc-c++,
+    gcc,
+    libgfortran,
+    libstdc++-devel
   ]
 moduleEnable:
   - "ruby:3.3"
