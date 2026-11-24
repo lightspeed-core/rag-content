@@ -1,7 +1,7 @@
 [common]
 python_version = "3.12"
 platforms = ["x86_64", "aarch64"]
-bootstrap_packages = []
+bootstrap_packages = ["uv", "pip"]
 force_sdist_packages = ["setuptools", "packaging", "pluggy", "tomlkit"]
 
 [profiles.cpu]
