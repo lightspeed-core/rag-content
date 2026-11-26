@@ -90,7 +90,7 @@ RUN if [ -f /cachi2/cachi2.env ]; then \
     fi
 
 # Check if the downloaded model match pinned value
-RUN sha256sum -c ./emdeddings_model/checksums.txt
+RUN sha256sum -c ./embeddings_model/checksums.txt
 
 # Create non-root user and set ownership of app directory
 RUN groupadd -r rag -g 1000 && \
