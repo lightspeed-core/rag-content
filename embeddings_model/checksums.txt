@@ -1,0 +1,1 @@
+78c0197b6159d92658e319bc1d72e4c73a9a03dd03815e70e555c5ef05615658  embeddings_model/model.safetensors

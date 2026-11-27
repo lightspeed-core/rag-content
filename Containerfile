@@ -89,6 +89,9 @@ RUN if [ -f /cachi2/cachi2.env ]; then \
     -r ${EMBEDDING_MODEL}; \
     fi
 
+# Check if the downloaded model match pinned value
+RUN sha256sum -c ./embeddings_model/checksums.txt
+
 # Create non-root user and set ownership of app directory
 RUN groupadd -r rag -g 1000 && \
     useradd -r -u 1000 -g rag -d /rag-content -s /sbin/nologin rag && \
